@@ -68,7 +68,7 @@ const FindDoctor = () => {
 
       <div className="sm:w-xl md:w-2xl lg:w-2xl container object-center justify-self-center ">
 
-      <div className="">
+      <div className="mt-12">
         <div className="">
         <input type="text" placeholder="Search Doctor" 
         className="min-sm:w-100 md:w-130 lg:w-130 container py-1 px-4 bg-blue-200 rounded-3xl ml-5">
