@@ -20,12 +20,12 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/Home",
-        element: <Home/>,
+        index: true,
+        element: <Home />,
       },
       {
         path: "/Event",
-        element: <Event/>,
+        element: <Event />,
       },
       {
         path: "/FindDoctor",
@@ -53,11 +53,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/Admin_post",
-        element: <Admin_post/>,
+        element: <Admin_post />,
       },
       {
         path: "/Admin_Appointment",
-        element: <Admin_Appointment/>,
+        element: <Admin_Appointment />,
       },
     ],
   },
@@ -65,6 +65,6 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
-    <RouterProvider router={router} /> 
+  <RouterProvider router={router} />
   //</StrictMode>
 );
