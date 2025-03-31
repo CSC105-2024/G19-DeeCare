@@ -9,42 +9,42 @@ const FindDoctor = () => {
       id: 1,
       name: "Dr.Apple Mac",
       department: "Cardiology",
-      photo: "src/images/Dr_Apple.jpg",
+      photo: "/images/Dr_Apple.jpg",
       specialization: "Interventional Cardiology",
     },
     {
       id: 2,
       name: "Dr.Banana Choco",
       department: "Neurology",
-      photo: "src/images/Dr_Banana.jpg",
+      photo: "/images/Dr_Banana.jpg",
       specialization: "Movement Disorders",
     },
     {
       id: 3,
       name: "Dr.Orange Juice",
       department: "Pediatrics",
-      photo: "src/images/Dr_Orange.jpg",
+      photo: "/images/Dr_Orange.jpg",
       specialization: "Pediatric Immunology",
     },
     {
       id: 4,
       name: "Dr.StrawBerry ShortCake",
       department: "Orthopedics",
-      photo: "src/images/Dr_Strawberry.jpg",
+      photo: "/images/Dr_Strawberry.jpg",
       specialization: "Sports Medicine",
     },
     {
       id: 5,
       name: "Dr.Durian Thailand",
       department: "Orthopedics",
-      photo: "src/images/Dr_Durian.jpg",
+      photo: "/images/Dr_Durian.jpg",
       specialization: "King of fruit",
     },
     {
       id: 6,
       name: "Dr.Mango Teen",
       department: "Orthopedics",
-      photo: "src/images/Dr_Mango.jpg",
+      photo: "/images/Dr_Mango.jpg",
       specialization: "Queen of fruit",
     },
   ];
@@ -62,7 +62,7 @@ const FindDoctor = () => {
     <div>
       <div>   
        <button >
-        <Link to="/Home"> <img src="src/icons/backIcon.png" className='fixed m-10 bottom-1 left-1 rounded-4xl h-15 w-15 object-cover'></img> </Link>
+        <Link to="/Home"> <img src="/icons/backIcon.png" className='fixed m-10 bottom-1 left-1 rounded-4xl h-15 w-15 object-cover'></img> </Link>
       </button>
       </div>
 
@@ -73,9 +73,9 @@ const FindDoctor = () => {
         <input type="text" placeholder="Search Doctor" 
         className="min-sm:w-100 md:w-130 lg:w-130 container py-1 px-4 bg-blue-200 rounded-3xl ml-5">
         </input>
-        <button type="submit" ><img src="src/icons/SearchIcon.png" className='ml-5 mt-5  h-7 w-7 rounded-full object-cover'></img></button>
+        <button type="submit" ><img src="/icons/SearchIcon.png" className='ml-5 mt-5  h-7 w-7 rounded-full object-cover'></img></button>
 
-        <button><img src="src/icons/FilterIcon.jpg" className='ml-5   h-7 w-7 rounded-full object-cover'></img></button>
+        <button><img src="/icons/FilterIcon.jpg" className='ml-5   h-7 w-7 rounded-full object-cover'></img></button>
         </div>
       </div>
       <ul className="space-y-4 p-5 bg-blue-200 mt-5">
