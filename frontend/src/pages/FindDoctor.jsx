@@ -62,20 +62,22 @@ const FindDoctor = () => {
     <div>
       <div>   
        <button >
-        <Link to="/Home"> <img src="src/icons/backIcon.png" className='fixed m-10 bottom-1 left-1 rounded-4xl h-15 w-15 object-cover'></img> </Link>
+        <Link to="/Filter"> <img src="src/icons/backIcon.png" className='fixed m-10 bottom-1 left-1 rounded-4xl h-15 w-15 object-cover'></img> </Link>
       </button>
       </div>
 
-      <div className="sm:w-xl md:w-2xl lg:w-2xl container object-center justify-self-center ">
+      <div className="sm:w-xl md:w-2xl lg:w-2xl mt-15 container object-center justify-self-center ">
 
-      <div className="mt-12">
+      <div className="">
         <div className="">
         <input type="text" placeholder="Search Doctor" 
-        className="min-sm:w-100 md:w-130 lg:w-130 container py-1 px-4 bg-blue-200 rounded-3xl ml-5">
+        className="min-sm:w-100 md:w-130 lg:w-130 container py-1 px-4  bg-blue-400 rounded-lg">
         </input>
-        <button type="submit" ><img src="src/icons/SearchIcon.png" className='ml-5 mt-5  h-7 w-7 rounded-full object-cover'></img></button>
-
-        <button><img src="src/icons/FilterIcon.jpg" className='ml-5   h-7 w-7 rounded-full object-cover'></img></button>
+        
+        <button type="submit" className="p-2 ml-4 mt-5 bg-blue-400 rounded-full"><img src="src/icons/search.png" className='h-5 w-5 object-cover'></img></button>
+        <Link to="/Filter">
+        <button className="p-2 ml-4 bg-blue-400 rounded-full"><img src="src/icons/filter.png" className='h-5 w-5 object-cover'></img></button>
+        </Link>
         </div>
       </div>
       <ul className="space-y-4 p-5 bg-blue-200 mt-5">
@@ -95,13 +97,23 @@ const FindDoctor = () => {
               <div className="ml-3 flex-grow">
                 <h2 className="text-lg font-semibold text-gray-800">{doctor.name}</h2>
                 <p className="text-gray-600">{doctor.department}</p>
+               
               </div>
+              <div className="flex-col">
+              <Link to="/Timeslot">
+              <div>
+                  <p className="w-30 py-2 bg-yellow-600 text-white text-center rounded-lg hover:bg-yellow-500 transition mr-2 font-bold">
+                    Select Doctor
+                  </p>
+              </div>
+              </Link>
               <button 
                 onClick={() => toggleDetails(doctor.id)}
-                className="w-26 py-2 bg-gradient-to-l from-blue-400 to-blue-900 text-white  rounded-lg "
+                className="mt-2 w-30 py-0.5 text-blue-800 border-1  text-center rounded-lg hover:underline  transition"
               >
                 {selectedDoctor === doctor.id ? "Hide Details" : "View Details"}
               </button>
+              </div>
             </div>
             {selectedDoctor === doctor.id && (
               <div className="p-4">
@@ -109,11 +121,7 @@ const FindDoctor = () => {
                 <div className="text-gray-700 ml-2">I think it should have more detail hmmmmm</div>
                 {/* doctor detail เดี๋ยวมาใส่เพิ่ม  */ }
                 <div className="mt-4 text-center">
-                <Link to="/Timeslot">
-                  <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition mr-2 font-bold">
-                    Select Doctor
-                  </button>
-                </Link>
+              
                 </div>
               </div>
             )}
