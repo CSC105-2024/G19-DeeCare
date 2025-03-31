@@ -1,11 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, useTransform, useScroll } from "framer-motion";
 import { useRef } from "react";
-import Hospital1 from "../images/Hospital1.jpg";
-import call from "../icons/call.png";
-import map from "../icons/map.png";
-import email from "../icons/email.png";
-import line from "../icons/line.png";
 
 const Home = () => {
   return (
@@ -13,7 +8,7 @@ const Home = () => {
       {/* Hospital Image */}
       <div className="w-full md:h-[856px] relative">
         <img
-          src={Hospital1}
+          src="/images/Hospital1.jpg"
           alt="Hospital"
           className="block max-width-100% object-cover" 
           // w-full h-full
@@ -44,19 +39,19 @@ const Home = () => {
             <h2>Contact</h2>
             <div className="flex flex-col gap-2">
                 <p className="inline-flex items-center gap-2">
-                    <img src={call} alt="" className="h-4" />
+                    <img src="/icons/call.png" alt="" className="h-4" />
                     +XX XXX XXXX
                 </p>
                 <p className="inline-flex items-center gap-2">
-                    <img src={map} alt="" className="h-5" />
+                    <img src="/icons/map.png" alt="" className="h-5" />
                     Siam Bangkok 10200
                 </p>
                 <p className="inline-flex items-center gap-2">
-                    <img src={email} alt="" className="h-5" />
+                    <img src="/icons/email.png" alt="" className="h-5" />
                     Deecare@gmail.com
                 </p>
                 <p className="inline-flex items-center gap-2">
-                    <img src={line} alt="" className="h-5" />
+                    <img src="/icons/line.png" alt="" className="h-5" />
                     @Deecare
                 </p>
             </div>
