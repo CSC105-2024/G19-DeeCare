@@ -5,6 +5,7 @@ import "./index.css";
 import App from "./App.jsx";
 import Home from "./pages/Home.jsx";
 import Event from "./pages/Event.jsx";
+import Filter from "./components/filterBar.jsx";
 import FindDoctor from "./pages/FindDoctor.jsx";
 import Timeslot from "./pages/Timeslot.jsx";
 import Confirm from "./pages/Confirm.jsx";
@@ -20,12 +21,16 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        index: true,
-        element: <Home />,
+        path: "/Home",
+        element: <Home/>,
       },
       {
         path: "/Event",
-        element: <Event />,
+        element: <Event/>,
+      },
+      {
+        path: "/Filter",
+        element: <Filter/>,
       },
       {
         path: "/FindDoctor",
@@ -53,18 +58,18 @@ const router = createBrowserRouter([
       },
       {
         path: "/Admin_post",
-        element: <Admin_post />,
+        element: <Admin_post/>,
       },
       {
         path: "/Admin_Appointment",
-        element: <Admin_Appointment />,
+        element: <Admin_Appointment/>,
       },
     ],
   },
 ]);
 
 createRoot(document.getElementById("root")).render(
-  // <StrictMode>
-  <RouterProvider router={router} />
-  //</StrictMode>
+  <StrictMode>
+    <RouterProvider router={router} /> {/* Provide the router to the app */}
+  </StrictMode>
 );
