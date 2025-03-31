@@ -15,7 +15,8 @@ const Home = () => {
         <img
           src={Hospital1}
           alt="Hospital"
-          className="w-full h-full object-cover"
+          className="block max-width-100% object-cover" 
+          // w-full h-full
         />
         {/* Text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white md:px-[151px] w-1/2">
