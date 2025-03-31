@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 const Timeslot = () => {
   return (
     <>
-    <div >
+    <div>
       <div className="text-4xl">time slot page</div>
       <div className='float-left px-4 m-10 rounded-4xl bg-gray-400 text-black'>   
        <button>
