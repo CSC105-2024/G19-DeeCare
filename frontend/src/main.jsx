@@ -13,6 +13,8 @@ import Login from "./pages/Login.jsx";
 import UserDetail from "./pages/UserDetail.jsx";
 import Admin_post from "./pages/Admin_post.jsx";
 import Admin_Appointment from "./pages/Admin_Appointment.jsx";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
+import LoginOverlay from "./components/LoginOverlay.jsx";
 
 const router = createBrowserRouter([
   {
@@ -45,7 +47,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/Login",
-        element: <Login />,
+        element: <LoginOverlay />,
       },
       {
         path: "/UserDetail",
@@ -60,6 +62,10 @@ const router = createBrowserRouter([
         element: <Admin_Appointment />,
       },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />,
   },
 ]);
 
