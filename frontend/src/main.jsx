@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+// import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
@@ -9,7 +9,7 @@ import FindDoctor from "./pages/FindDoctor.jsx";
 import Timeslot from "./pages/Timeslot.jsx";
 import Confirm from "./pages/Confirm.jsx";
 import Register from "./pages/Register.jsx";
-import Login from "./pages/Login.jsx";
+// import Login from "./pages/Login.jsx";
 import UserDetail from "./pages/UserDetail.jsx";
 import Admin_post from "./pages/Admin_post.jsx";
 import Admin_Appointment from "./pages/Admin_Appointment.jsx";
@@ -70,7 +70,7 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  // <StrictMode>
-  <RouterProvider router={router} />
-  //</StrictMode>
+    // <StrictMode>
+    <RouterProvider router={router} />
+    //</StrictMode>
 );
