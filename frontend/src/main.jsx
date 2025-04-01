@@ -9,7 +9,6 @@ import FindDoctor from "./pages/FindDoctor.jsx";
 import Timeslot from "./pages/Timeslot.jsx";
 import Confirm from "./pages/Confirm.jsx";
 import Register from "./pages/Register.jsx";
-import Login from "./pages/Login.jsx";
 import UserDetail from "./pages/UserDetail.jsx";
 import Admin_post from "./pages/Admin_post.jsx";
 import Admin_Appointment from "./pages/Admin_Appointment.jsx";
