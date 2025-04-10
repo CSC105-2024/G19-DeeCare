@@ -38,7 +38,7 @@ export default function Register() {
 
     return (
         <div className="flex justify-center items-center min-h-screen mt-32 bg-white p-4">
-            <div className="bg-blue-50 p-8 rounded-xl shadow-md max-w-xl w-full">
+            <div className="bg-blue-100 p-8 rounded-xl shadow-md max-w-xl w-full">
                 <h2 className="text-3xl font-bold text-blue-900 text-center mb-6">REGISTER</h2>
 
                 {/* Step Indicator */}
@@ -70,7 +70,7 @@ export default function Register() {
                             value={form.idNumber}
                             onChange={handleChange}
                             placeholder="ENTER YOUR IDENTIFICATION NUMBER"
-                            className="w-full p-3 rounded-md bg-blue-50 border border-blue-100 placeholder-gray-500"
+                            className="w-full p-3 rounded-md bg-gray-50 border border-blue-100 placeholder-gray-500"
                         />
                     </div>
 
@@ -84,7 +84,7 @@ export default function Register() {
                             value={form.firstName}
                             onChange={handleChange}
                             placeholder="ENTER YOUR FIRST NAME"
-                            className="w-full p-3 rounded-md bg-blue-50 border border-blue-100 placeholder-gray-500"
+                            className="w-full p-3 rounded-md bg-gray-50 border border-blue-100 placeholder-gray-500"
                         />
                     </div>
 
@@ -98,7 +98,7 @@ export default function Register() {
                             value={form.lastName}
                             onChange={handleChange}
                             placeholder="ENTER YOUR LAST NAME"
-                            className="w-full p-3 rounded-md bg-blue-50 border border-blue-100 placeholder-gray-500"
+                            className="w-full p-3 rounded-md bg-gray-50 border border-blue-100 placeholder-gray-500"
                         />
                     </div>
 
@@ -113,7 +113,7 @@ export default function Register() {
                                 name="dob"
                                 value={form.dob}
                                 onChange={handleChange}
-                                className="w-full p-2.5 rounded-md bg-blue-50 border border-blue-100 text-gray-700"
+                                className="w-full p-2.5 rounded-md bg-gray-50 border border-blue-100 text-gray-700"
                             />
                         </div>
 
@@ -127,7 +127,7 @@ export default function Register() {
                                 value={form.age}
                                 readOnly
                                 placeholder="AGE"
-                                className="w-full p-2.5 rounded-md bg-blue-50 border border-blue-100 text-gray-700"
+                                className="w-full p-2.5 rounded-md bg-gray-50 border border-blue-100 text-gray-700"
                             />
                         </div>
 
@@ -139,7 +139,7 @@ export default function Register() {
                                 name="bloodType"
                                 value={form.bloodType}
                                 onChange={handleChange}
-                                className="w-full p-2.5 rounded-md bg-blue-50 border border-blue-100 text-gray-700"
+                                className="w-full p-2.5 rounded-md bg-gray-50 border border-blue-100 text-gray-700"
                             >
                                 <option value="">BLOOD TYPE</option>
                                 <option value="A+">A+</option>
@@ -164,7 +164,7 @@ export default function Register() {
                             value={form.email}
                             onChange={handleChange}
                             placeholder="ENTER YOUR EMAIL"
-                            className="w-full p-3 rounded-md bg-blue-50 border border-blue-100 placeholder-gray-500"
+                            className="w-full p-3 rounded-md bg-gray-50 border border-blue-100 placeholder-gray-500"
                         />
                     </div>
 
@@ -178,13 +178,13 @@ export default function Register() {
                             value={form.password}
                             onChange={handleChange}
                             placeholder="ENTER YOUR PASSWORD"
-                            className="w-full p-3 rounded-md bg-blue-50 border border-blue-100 placeholder-gray-500"
+                            className="w-full p-3 rounded-md bg-gray-50 border border-blue-100 placeholder-gray-500"
                         />
                     </div>
 
                     {/* Buttons */}
-                    <div className="pt-6">
-                        <button className="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-semibold py-3 rounded-md transition-colors">
+                    <div className="pt-2">
+                        <button className="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-semibold py-4 rounded-md transition-colors">
                             CONTINUE
                         </button>
                     </div>
