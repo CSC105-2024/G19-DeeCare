@@ -19,7 +19,7 @@ const LoginOverlay=({ onClose })=>{
                     placeholder="Enter your ID"
                 />
 
-                <label className="block text-blue-900 text-sm font-semibold mb-2">PASSWORD</label>
+                <label className="text-blue-900 text-sm font-semibold mb-2">PASSWORD</label>
                 <input
                     type="password"
                     className="w-full p-2 mb-4 border bg-gray-50 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
