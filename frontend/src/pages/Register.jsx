@@ -14,71 +14,179 @@ export default function Register() {
 
     const calculateAge = (dob) => {
         if (!dob) return "";
-        const birthDate = new Date(dob);
+        const [year, month, day] = dob.split("-");
+        const birthDate = new Date(year, month - 1, day);
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
             age--;
         }
-
-        return age > 0 ? age : "";
+        return age;
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        let updatedForm = { ...form, [name]: value };
 
-        setForm((prevForm) => {
-            const updatedForm = { ...prevForm, [name]: value };
+        if (name === "dob") {
+            updatedForm.age = calculateAge(value);
+        }
 
-            if (name === "dob") {
-                updatedForm.age = calculateAge(value);
-            }
-
-            return updatedForm;
-        });
+        setForm(updatedForm);
     };
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100 mt-20 p-4">
-            <div className="bg-white p-8 rounded-2xl shadow-lg max-w-lg w-full">
-                <h2 className="text-2xl font-bold text-center mb-6">REGISTER</h2>
-                {/*<div className="flex justify-center space-x-4 mb-6">*/}
-                {/*    <div className="flex items-center">*/}
-                {/*        <div className="w-6 h-6 flex justify-center items-center bg-blue-600 text-white rounded-full">1</div>*/}
-                {/*        <span className="ml-2 font-semibold">Patient Info</span>*/}
-                {/*    </div>*/}
-                {/*    <div className="w-16 h-px bg-gray-400 mt-3"></div>*/}
-                {/*    <div className="flex items-center text-gray-400">*/}
-                {/*        <div className="w-6 h-6 flex justify-center items-center bg-gray-300 text-white rounded-full">2</div>*/}
-                {/*        <span className="ml-2">Emergency Contact</span>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
-                <div className="space-y-4">
-                    <input type="text" name="idNumber" placeholder="Identification Number" className="w-full p-3 border rounded-lg" onChange={handleChange} />
-                    <input type="text" name="firstName" placeholder="First Name" className="w-full p-3 border rounded-lg" onChange={handleChange} />
-                    <input type="text" name="lastName" placeholder="Last Name" className="w-full p-3 border rounded-lg" onChange={handleChange} />
-                    <div className="flex space-x-2">
-                        <input type="date" name="dob" className="w-1/2 p-3 border rounded-lg" onChange={handleChange} />
-                        <input type="text" name="age" value={form.age} placeholder="Age" className="w-1/4 p-3 border rounded-lg bg-gray-200" readOnly />
-                        <select name="bloodType" className="w-1/4 p-3 border rounded-lg" onChange={handleChange}>
-                            <option value="">Blood Type</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                        </select>
+        <div className="flex justify-center items-center min-h-screen mt-32 bg-white p-4">
+            <div className="bg-blue-50 p-8 rounded-xl shadow-md max-w-xl w-full">
+                <h2 className="text-3xl font-bold text-blue-900 text-center mb-6">REGISTER</h2>
+
+                {/* Step Indicator */}
+                <div className="flex justify-center items-center mb-8">
+                    <div className="flex items-center space-x-2">
+                        <div className="w-10 h-10 rounded-full bg-yellow-100 border border-yellow-300 flex items-center justify-center text-blue-900 font-bold">
+                            1
+                        </div>
+                        <span className="text-blue-900 font-medium">Patient Info</span>
                     </div>
-                    <input type="password" name="password" placeholder="Password" className="w-full p-3 border rounded-lg" onChange={handleChange} />
-                    <input type="email" name="email" placeholder="Email" className="w-full p-3 border rounded-lg" onChange={handleChange} />
-                    <div className="flex space-x-4 mt-4">
-                        <button className="w-1/2 bg-blue-600 text-white py-2 rounded-lg">Continue</button>
-                        <button className="w-1/2 bg-gray-800 text-white py-2 rounded-lg">Skip</button>
+                    <div className="w-16 h-px bg-gray-300 mx-4"></div>
+                    <div className="flex items-center space-x-2 text-gray-400">
+                        <div className="w-10 h-10 rounded-full bg-gray-300 text-white flex items-center justify-center">2</div>
+                        <span className="font-medium">Emergency Contact</span>
+                    </div>
+                </div>
+
+                {/* Form Section */}
+                <h3 className="text-xl font-bold text-blue-900 mb-4">PATIENT INFORMATION</h3>
+                <div className="space-y-4">
+
+                    <div>
+                        <label className="block font-semibold text-sm text-blue-900 mb-1">
+                            IDENTIFICATION NUMBER <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="idNumber"
+                            value={form.idNumber}
+                            onChange={handleChange}
+                            placeholder="ENTER YOUR IDENTIFICATION NUMBER"
+                            className="w-full p-3 rounded-md bg-blue-50 border border-blue-100 placeholder-gray-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block font-semibold text-sm text-blue-900 mb-1">
+                            FIRST NAME <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="firstName"
+                            value={form.firstName}
+                            onChange={handleChange}
+                            placeholder="ENTER YOUR FIRST NAME"
+                            className="w-full p-3 rounded-md bg-blue-50 border border-blue-100 placeholder-gray-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block font-semibold text-sm text-blue-900 mb-1">
+                            LAST NAME <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="lastName"
+                            value={form.lastName}
+                            onChange={handleChange}
+                            placeholder="ENTER YOUR LAST NAME"
+                            className="w-full p-3 rounded-md bg-blue-50 border border-blue-100 placeholder-gray-500"
+                        />
+                    </div>
+
+                    {/* DOB + Age + Blood Type */}
+                    <div className="flex space-x-4">
+                        <div className="w-1/2">
+                            <label className="block font-semibold text-sm text-blue-900 mb-1">
+                                BIRTH DATE <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="date"
+                                name="dob"
+                                value={form.dob}
+                                onChange={handleChange}
+                                className="w-full p-2.5 rounded-md bg-blue-50 border border-blue-100 text-gray-700"
+                            />
+                        </div>
+
+                        <div className="w-1/4">
+                            <label className="block font-semibold text-sm text-blue-900 mb-1">
+                                AGE <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="age"
+                                value={form.age}
+                                readOnly
+                                placeholder="AGE"
+                                className="w-full p-2.5 rounded-md bg-blue-50 border border-blue-100 text-gray-700"
+                            />
+                        </div>
+
+                        <div className="w-1/4">
+                            <label className="block font-semibold text-sm text-blue-900 mb-1">
+                                BLOOD TYPE <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                name="bloodType"
+                                value={form.bloodType}
+                                onChange={handleChange}
+                                className="w-full p-2.5 rounded-md bg-blue-50 border border-blue-100 text-gray-700"
+                            >
+                                <option value="">BLOOD TYPE</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block font-semibold text-sm text-blue-900 mb-1">
+                            EMAIL <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            placeholder="ENTER YOUR EMAIL"
+                            className="w-full p-3 rounded-md bg-blue-50 border border-blue-100 placeholder-gray-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block font-semibold text-sm text-blue-900 mb-1">
+                            PASSWORD <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="password"
+                            name="password"
+                            value={form.password}
+                            onChange={handleChange}
+                            placeholder="ENTER YOUR PASSWORD"
+                            className="w-full p-3 rounded-md bg-blue-50 border border-blue-100 placeholder-gray-500"
+                        />
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="pt-6">
+                        <button className="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-semibold py-3 rounded-md transition-colors">
+                            CONTINUE
+                        </button>
                     </div>
                 </div>
             </div>
