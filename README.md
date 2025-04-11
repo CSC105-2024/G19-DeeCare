@@ -1,18 +1,18 @@
-#G19-DeeCare
+# G19-DeeCare
 
-🩺 Doctor Appointment Booking App
+## 🩺 Doctor Appointment Booking App
 
 This is a simple web application that allows patients to book appointments with doctors online. It's designed to be easy to use for all users, including the elderly.
 
-🔧 Features
+## 🔧 Features
 
-Patient registration and login
+- Patient registration and login
 
-Book and cancel appointments
+- Book and cancel appointments
 
-View doctor availability
+- View doctor availability
 
-Email reminders (optional)
+- Email reminders (optional)
 
-Easy and clean interface
+- Easy and clean interface
 
