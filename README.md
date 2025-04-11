@@ -6,13 +6,13 @@ This is a simple web application that allows patients to book appointments with 
 
 ## 🔧 Features
 
-Patient registration and login
+- Patient registration and login
 
-Book and cancel appointments
+- Book and cancel appointments
 
-View doctor availability
+- View doctor availability
 
-Email reminders (optional)
+- Email reminders (optional)
 
-Easy and clean interface
+- Easy and clean interface
 
