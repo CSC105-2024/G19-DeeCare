@@ -1,5 +1,17 @@
 @import 'tailwindcss';
- 
+@config '../tailwind.config.js';
+
 @theme {
-    --color-primary: #133E87;
+    --color-primary: "#133E87";
+    --color-secondary: "#608BC1";
+    --color-light-blue: "#CBDCEB";
+    --color-yellow: "#F3A83C";
+    --color-ivory: "#F3F3E0";
+    --color-background: "#FDFDFF";
+    --font-poppins: "Poppins, sans-serif";
 }
+
+html, body {
+    @apply font-poppins text-primary;
+}
+
