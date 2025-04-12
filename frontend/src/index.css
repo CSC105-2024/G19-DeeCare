@@ -1,9 +1,14 @@
 @import 'tailwindcss';
+/* not sure that it should be here or app.css */
+@plugin "daisyui";
 
 @tailwind utilities;
 @tailwind components;
 @tailwind base;
  
 @theme{
-    --color-primary: #133E87;
+    --color-p1: #133e87;
+    --color-page: #FDFDFF;
+    --font-poppins: Poppins, sans-serif;
+    --font-roboto: Roboto, sans-serif;
 }
