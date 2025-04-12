@@ -1,62 +1,43 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { motion, useTransform, useScroll } from "framer-motion";
 import { useRef } from "react";
+
 
 const Home = () => {
   return (
     <>
-      {/* Hospital Image */}
-      <div className="w-full md:h-[856px] relative">
-        <img
-          src="/images/Hospital1.jpg"
-          alt="Hospital"
-          className="block max-width-100% object-cover" 
-          // w-full h-full
-        />
-        {/* Text */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white md:px-[151px] w-1/2">
-          <div className="md:font-bold md:text-[64px]">DeeCare</div>
-          <p className="md:w-1/2 font-medium text-center">
+      <div className="bg-page">
+          {/* Hospital Image */}
+        <div className="w-full md:h-[856px] relative">
+          <img
+            src="/images/Hospital1.jpg"
+            alt="Hospital"
+            className="block max-width-100% object-cover" 
+            // w-full h-full
+          />
+          {/* Hospital describe */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white md:px-[151px] w-1/2">
+            {/* ชื่อ Website */}
+            <div className="md:font-bold md:text-[64px]">DeeCare</div>
+            {/* blue box */}
+            <div className="bg-p1 bg-opacity-20">
+              {/* motto */}
+              <p className="md:w-1/2 font-medium text-center ">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur fugit consequatur veritatis sapiente laborum quidem, assumenda libero consequuntur! Vel blanditiis dolore laboriosam itaque ipsam necessitatibus?
-          </p>
+              </p>
+            </div>
+          </div>
+          {/* Appointment botton */}
+          <button className='md:block bg-amber-200 text-white 
+              px-6 py-2.5 rounded-lg hover:bg-blue-700 font-medium transition-all 
+              hover:shadow-lg hover:shadow-blue-100'>
+                  <Link to="/FindDoctor">Appointment</Link>
+          </button>  
         </div>
-        <button className='md:block bg-amber-200 text-white 
-            px-6 py-2.5 rounded-lg hover:bg-blue-700 font-medium transition-all 
-            hover:shadow-lg hover:shadow-blue-100'>
-                <Link to="/FindDoctor">Appointment</Link>
-        </button>
-        
       </div>
-        
 
       {/* Event with Horizontal Scroll */}
       <HorizontalScrollCarousel />
-
-      {/* Footer */}
-
-      <div className="bg-blue-100 py-6 px-4 ">
-        <div className="container mx-20">
-            <h2>Contact</h2>
-            <div className="flex flex-col gap-2">
-                <p className="inline-flex items-center gap-2">
-                    <img src="/icons/call.png" alt="" className="h-4" />
-                    +XX XXX XXXX
-                </p>
-                <p className="inline-flex items-center gap-2">
-                    <img src="/icons/map.png" alt="" className="h-5" />
-                    Siam Bangkok 10200
-                </p>
-                <p className="inline-flex items-center gap-2">
-                    <img src="/icons/email.png" alt="" className="h-5" />
-                    Deecare@gmail.com
-                </p>
-                <p className="inline-flex items-center gap-2">
-                    <img src="/icons/line.png" alt="" className="h-5" />
-                    @Deecare
-                </p>
-            </div>
-        </div>
-      </div>
     </>
   );
 };
