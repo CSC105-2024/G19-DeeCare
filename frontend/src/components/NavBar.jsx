@@ -8,7 +8,7 @@ const NavBar = () => {
 
     return (
         <>
-            <nav className="bg-primary text-white fixed top-0 w-full z-50">
+            <nav className="bg-p1 text-white fixed top-0 w-full z-50">
                 <div className="container mx-auto flex justify-between items-center h-[65px] px-4">
                     {/* Hamburger Icon */}
                     <div className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
@@ -19,8 +19,9 @@ const NavBar = () => {
                         )}
                     </div>
                     {/* Logo */}
-                    <NavLink to="/" className="text-xl font-bold">
-                        DeeCare
+                    <NavLink to="/" className="">
+                        <img src="/icons/deecare-logo-transparent.png" alt="Deecare logo" 
+                        className="h-[40px]"/>
                     </NavLink>
 
                     {/* Desktop Menu */}
@@ -31,11 +32,11 @@ const NavBar = () => {
                         <NavLink to="/FindDoctor" className="hover:text-amber-300">
                             Appointment
                         </NavLink>
-                        <NavLink to="/Event" className="hover:text-amber-300">
-                            Event
-                        </NavLink>
                         <NavLink to="/Login" className="hover:text-amber-300">
                           Login
+                        </NavLink>
+                        <NavLink to="/Register" className="hover:text-amber-300">
+                            Register
                         </NavLink>
                         {/*<button*/}
                         {/*    onClick={() => setIsLoginOpen(true)}*/}
