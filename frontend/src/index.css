@@ -1,14 +1,18 @@
 @import 'tailwindcss';
-/* not sure that it should be here or app.css */
 @plugin "daisyui";
+@config '../tailwind.config.js';
 
-@tailwind utilities;
-@tailwind components;
-@tailwind base;
- 
-@theme{
-    --color-p1: #133e87;
-    --color-page: #FDFDFF;
-    --font-poppins: Poppins, sans-serif;
-    --font-roboto: Roboto, sans-serif;
+@theme {
+    --color-primary: #133E87;
+    --color-secondary: #608BC1;
+    --color-light-blue: #CBDCEB;
+    --color-yellow: #F3A83C;
+    --color-ivory: #F3F3E0;
+    --color-background: #FDFDFF;
+    --font-poppins: "Poppins";
 }
+
+html, body {
+    @apply font-poppins text-primary;
+}
+
