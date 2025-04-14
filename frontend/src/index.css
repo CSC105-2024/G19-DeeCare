@@ -4,6 +4,7 @@
 
 @theme {
     --color-primary: #133E87;
+    --color-pri: #133E87;
     --color-secondary: #608BC1;
     --color-light-blue: #CBDCEB;
     --color-yellow: #F3A83C;
@@ -13,6 +14,6 @@
 }
 
 html, body {
-    @apply font-poppins text-primary;
+    @apply font-poppins text-black;
 }
 
