@@ -8,16 +8,15 @@ const NavBar = () => {
 
     return (
         <>
-            <nav className="bg-[#0D47A1] text-white fixed top-0 w-full z-50 shadow">
-                <div className="max-w-[1280px] mx-auto flex items-center h-[72px] px-6 justify-between">
+            <nav className="bg-pri text-white fixed top-0 left-0 right-0 w-full z-50">
+                <div className="max-w-[1280px] flex items-center h-[72px] px-6 justify-between">
                     {/* Left: Logo */}
                     <NavLink to="/" className="flex items-center gap-2">
                         <img
-                            src="images/apple-touch-icon" // Change to your actual logo path
-                            alt="Logo"
-                            className="w-6 h-6"
+                            src="icons/fullLogo.png"
+                            alt="fullLogo"
+                            className="h-6"
                         />
-                        <span className="text-xl font-semibold tracking-wide">DEECARE</span>
                     </NavLink>
 
                     {/* Middle + Right: Menu links and buttons */}
@@ -67,10 +66,21 @@ const NavBar = () => {
                 {/* Mobile Menu */}
                 {menuOpen && (
                     <div className="md:hidden bg-white text-black px-4 py-2 space-y-2 border-t">
-                        <NavLink to="/" className="block hover:text-blue-600" onClick={() => setMenuOpen(false)}>Home</NavLink>
-                        <NavLink to="/FindDoctor" className="block hover:text-blue-600" onClick={() => setMenuOpen(false)}>Appointment</NavLink>
-                        <NavLink to="/Login" className="block hover:text-blue-600" onClick={() => setMenuOpen(false)}>Login</NavLink>
-                        <NavLink to="/Register" className="block hover:text-blue-600" onClick={() => setMenuOpen(false)}>Register</NavLink>
+                        <NavLink to="/" className="block hover:text-blue-600" onClick={() => setMenuOpen(false)}>
+                            Home
+                        </NavLink>
+                        <NavLink to="/FindDoctor" className="block hover:text-blue-600" 
+                        onClick={() => setMenuOpen(false)}>
+                            Appointment
+                        </NavLink>
+                        <NavLink to="/Login" className="block hover:text-blue-600" 
+                        onClick={() => setMenuOpen(false)}>
+                            Login
+                        </NavLink>
+                        <NavLink to="/Register" className="block hover:text-blue-600" 
+                        onClick={() => setMenuOpen(false)}>
+                            Register
+                        </NavLink>
                     </div>
                 )}
             </nav>
