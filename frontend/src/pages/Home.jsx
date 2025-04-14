@@ -6,25 +6,35 @@ import {useRef} from "react";
 const Home = () => {
     return (
         <>
-            {/* Hospital Image */}
+            {/* Hospital Hero section */}
             <div className="w-full md:h-[856px] relative">
+                {/* hospital image */}
                 <img
-                    src="/images/Hospital1.jpg"
+                    src="/images/hospital-final.jpg"
                     alt="Hospital"
-                    className="block max-width-100% object-cover"
-                    // w-full h-full
+                    className="block max-h-100% object-cover"
                 />
-                {/* Text */}
-                <div
-                    className="absolute inset-0 flex flex-col items-center justify-center text-white md:px-[151px] w-1/2">
-                    <div className="md:font-bold md:text-[64px]">DeeCare</div>
-                    <p className="md:w-1/2 font-medium text-center">
+
+                {/* hospital image text */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white md:px-[151px] w-1/2">
+
+                    {/* Deecare */}
+                    <div className="md:font-bold md:text-[64px]">
+                        DeeCare
+                    </div>
+
+                    {/* hospital motto */}
+                    <p className="md:w-1/2 font-medium text-center break-words">
                         Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur fugit consequatur veritatis
                         sapiente laborum quidem, assumenda libero consequuntur! Vel blanditiis dolore laboriosam itaque
                         ipsam necessitatibus?
                     </p>
-                    <Link to="/FindDoctor" className="bg-yellow-500 text-white px-6 py-2 rounded-md hover:bg-yellow-600">
-                        Appointment
+
+                    {/* Appointment button */}
+                    <Link       
+                        to="FindDoctor"    
+                        className="bg-yellow-500 text-white px-6 py-2 rounded-md hover:bg-yellow-600">
+                            Appointment
                     </Link>
             {/*        <button className='md:block bg-yellow text-white*/}
             {/*px-6 py-2.5 rounded-lg hover:bg-blue-700 font-medium transition-all*/}
@@ -34,103 +44,63 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Events */}
-            <section className="py-12 px-6 md:px-20">
-                <h2 className="text-2xl font-bold mb-6">Explore Event 🩺</h2>
+
+            {/* Explore Events */}
+            <section className="px-[114px] md:px-20 bg-amber-200">
+                <h2 className="text-2xl font-bold mb-3">
+                    Explore Events 🩺
+                </h2>
                 <HorizontalScrollCarousel />
             </section>
-
-{/*            /!* Footer *!/*/}
-{/*            <div className="bg-blue-100 py-6 px-4 ">*/}
-{/*                <div className="container mx-20">*/}
-{/*                    <h2>Contact</h2>*/}
-{/*                    <div className="flex flex-col gap-2">*/}
-{/*                        <p className="inline-flex items-center gap-2">*/}
-{/*                            <img src="/icons/call.png" alt="" className="h-4"/>*/}
-{/*                            +XX XXX XXXX*/}
-{/*                        </p>*/}
-{/*                        <p className="inline-flex items-center gap-2">*/}
-{/*                            <img src="/icons/map.png" alt="" className="h-5"/>*/}
-{/*                            Siam Bangkok 10200*/}
-{/*                        </p>*/}
-{/*                        <p className="inline-flex items-center gap-2">*/}
-{/*                            <img src="/icons/email.png" alt="" className="h-5"/>*/}
-{/*                            Deecare@gmail.com*/}
-{/*                        </p>*/}
-{/*                        <p className="inline-flex items-center gap-2">*/}
-{/*                            <img src="/icons/line.png" alt="" className="h-5"/>*/}
-{/*                            @Deecare*/}
-{/*                        </p>*/}
-{/*                    </div>*/}
-{/*                </div>*/}
-{/*            </div>*/}
-{/*        </>*/}
-{/*    );*/}
-{/*};*/}
-            <footer className="bg-blue-900 text-white px-10 py-8">
-                <div className="grid md:grid-cols-4 gap-6">
-                    <div>
-                        <div className="flex items-center gap-2 mb-4">
-                            <img src="/icons/logo.png" alt="Logo" className="h-6" />
-                            <span className="text-xl font-bold">DEECARE</span>
-                        </div>
-                        <p className="text-sm">
-                            High-level experience in assisting and development knowledge, producing quality work.
-                        </p>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold mb-2">Follow us</h4>
-                        <p className="text-sm">Call us</p>
-                        <p className="text-sm">+1 800 854-36-00</p>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold mb-2">Our Services</h4>
-                        <ul className="text-sm space-y-1">
-                            <li>Book Appointment</li>
-                            <li>Hospital Review</li>
-                            <li>Find a doctor</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold mb-2">Site Information</h4>
-                        <ul className="text-sm space-y-1">
-                            <li>Privacy Policy</li>
-                            <li>FAQ</li>
-                            <li>Terms</li>
-                            <li>Contact Us</li>
-                        </ul>
-                    </div>
-                </div>
-                <div className="text-center text-xs mt-8">© 2025 DeeCare</div>
-            </footer>
         </>
     );
-};
+}; 
 
+// Explore event data
 const eventData = [
     {
         id: 1,
-        image: "../images/Dr_Mango.jpg",
-        title: "Health Talk with dr.Tany",
+        image: "/images/event.jpg",
+        day: "31",
+        month: "Aug",
+        title: "Medical Fair Asia 2022",
+        date: "31 August - 2 September 2022 (Physical), 3 - 9 September (Digital, Online)",
         description: "Join us for a health talk on the latest medical advancements.",
+        place: "Marina Bay Sands, Singapore",
+        website: "https://www.hhmglobal.com/events/medical-fair-asia-2022",
     },
     {
         id: 2,
-        image: "src/images/event2.jpg",
-        title: "Wellness Workshop",
+        image: "/images/event1.jpg",
+        day: "7",
+        month: "May",
+        title: "Mars Impact Health",
+        date: "",
+        place: "",
         description: "Learn about mental health and stress management techniques.",
+        website: "https://impacthealth.marsdd.com/",
     },
     {
         id: 3,
-        image: "../images/event3.jpg",
+        image: "/images/event3.jpg",
+        day: "",
+        month: "",
         title: "Yoga Session",
+        date: "",
+        place: "",
         description: "Relax your mind and body with our expert-guided yoga sessions.",
+        website: "",
     },
     {
         id: 4,
-        image: "../images/event4.jpg",
+        image: "/images/event4.jpg",
+        day: "",
+        month: "",
         title: "Community Health Check",
+        date: "",
+        place: "",
         description: "Get free health check-ups from our medical professionals.",
+        website: "",
     },
 ];
 
@@ -146,21 +116,63 @@ const HorizontalScrollCarousel = () => {
     return (
         <div
             ref={targetRef}
-            className="relative w-full overflow-x-auto whitespace-nowrap scrollbar-hide flex"
-        >
-            <motion.div style={{x}} className="flex gap-4 py-10">
+            className="relative w-full overflow-x-auto whitespace-nowrap scrollbar-hide flex py-3">
+            <motion.div style={{x}} className="flex sm:gap-[58px]">
                 {eventData.map((event) => (
-                    <div
+                    <div 
+                        // event box
                         key={event.id}
-                        className="min-w-[250px] bg-gray-100 p-4 rounded-lg shadow-md"
-                    >
+                        className=" bg-white rounded-3xl shadow-md sm:w-[366px] sm:h-[355px]">
+
+                        {/* inside box */}
+                        {/* image */}
                         <img
                             src={event.image}
                             alt={event.title}
-                            className="w-full h-32 object-cover rounded-md"
+                            className="w-full rounded-3xl h-[223px] p-[12px] object-cover "
                         />
-                        <h3 className="mt-2 font-bold">{event.title}</h3>
-                        <p className="mt-1 text-sm text-gray-600">{event.description}</p>
+
+                        {/* event detail */}
+                        <div className="flex justify-start items-center px-[12px]">
+
+                            {/* event start date */}
+                            <div 
+                                className="sm:w-[86px] sm:h-[86px] sm:mr-[14px] flex justify-center items-center bg-light-blue rounded-2xl  font-medium flex-col">
+                                    <p>{event.day}</p>
+                                    <p>{event.month}</p>
+                            </div>
+
+
+                            {/* event detail */}
+                            <div>
+                                {/* event topic */}
+                                <h1 className="sm:font-medium ">
+                                    {event.title}
+                                </h1>
+
+                                {/* Event date */}
+                                <div className="flex">
+                                    <img 
+                                        src="/icons/calendar-event.svg" 
+                                        alt="icons calendar-event" 
+                                    />
+                                    <p className="ml-2  truncate">
+                                        {event.date}
+                                    </p>
+                                </div>
+
+                                {/* place */}
+                                <div className="flex">
+                                    <img 
+                                        src="/icons/map-pin.svg" 
+                                        alt="icon map-pin"
+                                    />
+                                    <p className="ml-2 break-words">
+                                        {event.place}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 ))}
             </motion.div>
@@ -169,3 +181,6 @@ const HorizontalScrollCarousel = () => {
 };
 
 export default Home;
+// sm:max-w-[366px]  sm:max-h-[355px] min-h-[183px]
+// min-w-[172px] min-h-[183px]
+// sm:max-w-[366px] sm:min-h-[355px]
