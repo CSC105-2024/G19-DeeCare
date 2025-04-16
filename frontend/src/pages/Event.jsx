@@ -1,11 +1,17 @@
-import { Link } from "react-router-dom";
+import React from "react";
+import { useParams } from "react-router-dom";
 
 const Event = () => {
+  const { id } = useParams();
+  // const event = eventData.find((event) => event.id === parseInt(id)); 
+
+  // if (!event) {
+  //   return <div>Event not found</div>;
+  // }
   return (
     <>
-    {/* whole page */}
+    {/* page content */}
     <div className="sm:m-[64px] m-[32px]">
-
       {/* event brief */}
       <div className="flex sm:justify-start items-center h-[128px] sm:flex-row flex-col">
         {/* event mobile topic */}
@@ -14,7 +20,7 @@ const Event = () => {
         </h1>
 
         {/* event date */}
-        <div className="sm:w-[128px] w-full sm:h-[128px] sm:mr-[42px] flex justify-center items-center bg-light-blue rounded-2xl flex-col font-medium py-3">
+        <div className="sm:w-[128px] w-full sm:h-[128px] sm:mr-[42px] flex flex-none justify-center items-center bg-light-blue rounded-2xl flex-col font-medium py-3">
           <p>22</p>
           <p>Jan</p>
         </div>
@@ -54,8 +60,8 @@ const Event = () => {
       {/* event image */}
       <div className="bg-light-blue flex justify-center items-center my-[32px]">
         <img 
-          src="/images/event.jpg" 
-          alt="Event Medical Fair Asia 2022" className="h-[300px]" />
+          src="/images/event1.jpg" 
+          alt="Event Medical Fair Asia 2022" className="h-[300px] object-cover" />
       </div>
       
 
