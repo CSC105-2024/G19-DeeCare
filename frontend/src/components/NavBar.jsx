@@ -9,7 +9,8 @@ const NavBar = () => {
     return (
         <>
             <nav className="bg-pri text-white fixed top-0 left-0 right-0 w-full z-50">
-                <div className="max-w-[1280px] flex items-center h-[72px] px-6 justify-between">
+                {/* div inside */}
+                <div className=" flex items-center h-[72px] px-6 justify-between">
                     {/* Left: Logo */}
                     <NavLink to="/" className="flex items-center gap-2">
                         <img
