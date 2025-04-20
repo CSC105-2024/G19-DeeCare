@@ -1,12 +1,12 @@
 import React from "react";
-
+import { Link } from "react-router-dom";
 
 const LoginOverlay=({ onClose })=>{
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-blue-100 p-8 rounded-2xl shadow-lg w-96 relative">
                 <button
-                    className="absolute top-6 right-6 m bg-red-700 text-red-50 "
+                    className="absolute top-6 right-6 py-1 px-2.5 rounded-full bg-red-800 text-white hover:bg-red-600 "
                     onClick={onClose}>
                     ✕
                 </button>
@@ -29,7 +29,10 @@ const LoginOverlay=({ onClose })=>{
                 <button className="w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-blue-900">LOGIN</button>
 
                 <p className="text-center text-sm text-blue-900 mt-4">
-                    Don't have an account? <span className="text-amber-500 font-semibold cursor-pointer hover:underline">REGISTER NOW</span>
+                    Don't have an account? 
+                    <Link to="/Register">
+                    <span className="text-amber-500 font-semibold cursor-pointer hover:underline"> REGISTER NOW</span>
+                    </Link>
                 </p>
             </div>
         </div>
