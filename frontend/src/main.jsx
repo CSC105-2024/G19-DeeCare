@@ -5,6 +5,7 @@ import "./index.css";
 import App from "./App.jsx";
 import Home from "./pages/Home.jsx";
 import Event from "./pages/Event.jsx";
+import FilterBar from "./components/filterBar.jsx";
 import FindDoctor from "./pages/FindDoctor.jsx";
 import Timeslot from "./pages/Timeslot.jsx";
 import Confirm from "./pages/Confirm.jsx";
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "/Event/:id",
         element: <Event />,
+      },
+      {
+        path: "/FilterBar",
+        element: <FilterBar />,
       },
       {
         path: "/FindDoctor",
