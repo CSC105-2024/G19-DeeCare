@@ -24,6 +24,21 @@ importers:
 
   frontend:
     dependencies:
+      '@schedule-x/calendar':
+        specifier: ^2.28.0
+        version: 2.28.0(@preact/signals@2.0.3(preact@10.26.5))(preact@10.26.5)
+      '@schedule-x/calendar-controls':
+        specifier: ^2.28.0
+        version: 2.28.0
+      '@schedule-x/current-time':
+        specifier: ^2.28.0
+        version: 2.28.0
+      '@schedule-x/drag-and-drop':
+        specifier: ^2.28.0
+        version: 2.28.0
+      '@schedule-x/event-modal':
+        specifier: ^2.28.0
+        version: 2.28.0(@preact/signals@2.0.3(preact@10.26.5))(preact@10.26.5)
       '@schedule-x/events-service':
         specifier: ^2.28.0
         version: 2.28.0
@@ -36,6 +51,12 @@ importers:
       '@tabler/icons-react':
         specifier: ^3.31.0
         version: 3.31.0(react@19.1.0)
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       framer-motion:
         specifier: ^12.6.0
         version: 12.6.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -51,6 +72,9 @@ importers:
       react-router-dom:
         specifier: ^7.4.0
         version: 7.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      tailwind-merge:
+        specifier: ^3.2.0
+        version: 3.2.0
       tailwindcss:
         specifier: ^4.0.15
         version: 4.1.3
@@ -518,8 +542,23 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@schedule-x/calendar-controls@2.28.0':
+    resolution: {integrity: sha512-GYdRG8np+/utvlQA3qvYRnp0n3C0zsmIU2CbqxQpWAxg+bbV61METNhycpV+D0ArTsjXXhkdJEtR6gLWmNgjpQ==}
+
   '@schedule-x/calendar@2.28.0':
     resolution: {integrity: sha512-ddxXUTS+qpMytKf3e0XdrU8ccdy/0qlRcB029v1+mkYCeM0sH6mwfjxauKWEXwwUkDCN+0VSZN92dSM0HC3zyQ==}
+    peerDependencies:
+      '@preact/signals': ^2.0.2
+      preact: ^10.19.2
+
+  '@schedule-x/current-time@2.28.0':
+    resolution: {integrity: sha512-OlW+Tdhmw+hqNrdaX19MZSAp8XCOOvSyJtBg2rke+0ympKtKAex9R/2nrUCbiUdz84p7Whc7NXM5YiaNdMgEsQ==}
+
+  '@schedule-x/drag-and-drop@2.28.0':
+    resolution: {integrity: sha512-jodtbcSBzBTN7L7WLQvaZknPnESnps6A1Gm20XDymeR7+1MqXGoeLN+YcMQ/uMZeGpHm49pvTHTntGzen94+Sw==}
+
+  '@schedule-x/event-modal@2.28.0':
+    resolution: {integrity: sha512-R6QAiNgx9IlMsmbRbXLsb3L29xL0Vfb2xmhHjYCY+2wrO1lDnyNO0M/jR3xkCEGkZUcRPONiqPK1Cv//CfEbXg==}
     peerDependencies:
       '@preact/signals': ^2.0.2
       preact: ^10.19.2
@@ -736,6 +775,9 @@ packages:
 
   daisyui@5.0.27:
     resolution: {integrity: sha512-XrpqgfpGaZJvTPg9pS9Rq6xbYpmMnR0a7AKqyVPZceJzjAs5HH3rfkRkiuGin0+KC2Adnu+WLHU7UDxAtCMyAw==}
+
+  date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
   debug@4.4.0:
     resolution: {integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==}
@@ -1207,6 +1249,9 @@ packages:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
 
+  tailwind-merge@3.2.0:
+    resolution: {integrity: sha512-FQT/OVqCD+7edmmJpsgCsY820RTD5AkBryuG5IUqR5YQZSdj5xlH5nLgH7YPths7WsLPSpSBNneJdM8aS8aeFA==}
+
   tailwindcss@4.1.3:
     resolution: {integrity: sha512-2Q+rw9vy1WFXu5cIxlvsabCwhU2qUwodGq03ODhLJ0jW4ek5BUtoCsnLB0qG+m8AHgEsSJcJGDSDe06FXlP74g==}
 
@@ -1646,7 +1691,18 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.39.0':
     optional: true
 
+  '@schedule-x/calendar-controls@2.28.0': {}
+
   '@schedule-x/calendar@2.28.0(@preact/signals@2.0.3(preact@10.26.5))(preact@10.26.5)':
+    dependencies:
+      '@preact/signals': 2.0.3(preact@10.26.5)
+      preact: 10.26.5
+
+  '@schedule-x/current-time@2.28.0': {}
+
+  '@schedule-x/drag-and-drop@2.28.0': {}
+
+  '@schedule-x/event-modal@2.28.0(@preact/signals@2.0.3(preact@10.26.5))(preact@10.26.5)':
     dependencies:
       '@preact/signals': 2.0.3(preact@10.26.5)
       preact: 10.26.5
@@ -1846,6 +1902,8 @@ snapshots:
   csstype@3.1.3: {}
 
   daisyui@5.0.27: {}
+
+  date-fns@4.1.0: {}
 
   debug@4.4.0:
     dependencies:
@@ -2289,6 +2347,8 @@ snapshots:
   supports-color@7.2.0:
     dependencies:
       has-flag: 4.0.0
+
+  tailwind-merge@3.2.0: {}
 
   tailwindcss@4.1.3: {}
 
