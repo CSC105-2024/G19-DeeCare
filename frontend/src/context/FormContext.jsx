@@ -7,11 +7,8 @@ export const FormProvider = ({children}) => {
 
     const [page, setPage] = useState(0)
 
-
-
     return (
         <div>
-
 
             {/*    /!* Button *!/*/}
             {/*    <div className="pt-2">*/}

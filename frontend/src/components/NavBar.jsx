@@ -46,13 +46,13 @@ const NavBar = () => {
                         {/* Auth Buttons */}
                         <NavLink
                             to="/Login"
-                            className="bg-[#FFA500] text-white px-4 py-2 rounded text-sm font-medium hover:bg-[#e69500] transition-all"
+                            className="bg-yellow border-2 border-yellow text-white px-4 py-2 rounded text-sm font-medium hover:bg-yellow transition-all"
                         >
                             Login
                         </NavLink>
                         <NavLink
                             to="/Register"
-                            className="border border-white text-white px-4 py-2 rounded text-sm font-medium hover:bg-white hover:text-[#0D47A1] transition-all"
+                            className="border-2 border-yellow text-white px-4 py-2 rounded text-sm font-medium hover:bg-white hover:text-[#0D47A1] transition-all"
                         >
                             Register
                         </NavLink>

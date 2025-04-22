@@ -6,6 +6,12 @@ settings:
 
 importers:
 
+  .:
+    dependencies:
+      '@schedule-x/calendar':
+        specifier: ^2.28.0
+        version: 2.28.0(@preact/signals@2.0.3(preact@10.26.5))(preact@10.26.5)
+
   backend:
     dependencies:
       '@hono/node-server':
