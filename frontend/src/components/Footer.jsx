@@ -57,15 +57,8 @@ const Footer = () => {
                     </a>
                 </div>
 
-                {/* col-4 map */}
-                <div className="sm:px-5 text-wrap pr-5">
-                    <h2 className='sm:text-lg text-base font-medium pb-3'>
-                        Map and Direction
-                    </h2>
-                    <img src="icons/map-pin.svg" alt="map" />     
-                </div>
-
-                {/* col-5 site info */}
+                
+                {/* col-4 site info */}
                 <div className='sm:px-5 text-wrap pb-3 pr-5'>
                     <h2 className='sm:text-lg text-base pb-3 font-medium'>Site Information</h2>
                     <p className='text-[14px]'>About Us</p>
@@ -73,9 +66,28 @@ const Footer = () => {
                     <p className='text-[14px]'>FAQs</p>
                     <p className='text-[14px]'>Contact Us</p>
                 </div>
+
+                {/* col-5 map */}
+                <div className="sm:px-5 text-wrap pr-5">
+                    {/* <h2 className='sm:text-lg text-base font-medium pb-3'>
+                    </h2>   */}
+                    <div className="w-full h-full">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3875.8940444191626!2d100.53244677600274!3d13.72486419791473!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29f2dd8fd00fb%3A0x64d690448dcd23b6!2sBNH%20Hospital!5e0!3m2!1sen!2sth!4v1745306013121!5m2!1sen!2sth"
+                            width="100%"
+                            height="100%"
+                            style={{ border: 0 }}
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        >
+                        </iframe>
+                    </div>
+                </div>
+
             </div>
 
-            <div className="px-5 py-3 w-full bottom-0">
+            <div className="px-5 py-3 w-full bottom-0 ">
                 <div className='h-[1px] bg-white'></div>
                 <p className='sm:text-lg text-base flex items-center justify-center  text-white pt-3'>© 2025 DeeCare</p>
             </div>
