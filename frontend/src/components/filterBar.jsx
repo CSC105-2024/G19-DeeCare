@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
-import React, { useState } from 'react';
+import React from 'react';
 
-const filterBar = () => {
-
-  const [selectedDept, setSelectedDept] = useState(null);
+const FilterBar = () => {
   
   const departments = [
     { id: 1, name: 'Emergency' },
@@ -47,10 +45,9 @@ const filterBar = () => {
           </Link>
         ))}
       </div>
-      
     </div>
   );
 
 };
 
-export default filterBar;
+export default FilterBar;
