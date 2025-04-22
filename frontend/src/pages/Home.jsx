@@ -34,7 +34,7 @@ const Home = () => {
 
                     {/* Appointment button */}
                     <Link       
-                        to="FindDoctor"    
+                        to="FilterBar"    
                         className="bg-yellow-500 text-white sm:px-6 sm:py-2  px-3 py-1 rounded-md font-medium hover:bg-yellow-600 z-50 sm:mt-[20px] mt-[16px] text-xs sm:text-[20px]">
                             Appointment
                     </Link>
