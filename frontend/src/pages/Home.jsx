@@ -7,12 +7,12 @@ const Home = () => {
     return (
         <>
             {/* Hospital Hero section */}
-            <div className=" relative z-10">
+            <div className="relative z-10 w-screen">
                 {/* hospital image */}
                 <img
                     src="/images/hospital-final.jpg"
                     alt="Hospital"
-                    className="block h-[236px] sm:min-h-[700px] object-cover z-20"
+                    className="block h-[236px] max-w-screen sm:min-h-[700px] sm:w-screen object-cover z-20"
                 />
 
                 {/* text-block */}
@@ -242,6 +242,3 @@ const HorizontalScrollCarousel = () => {
 };
 
 export default Home;
-// sm:max-w-[366px]  sm:max-h-[355px] min-h-[183px]
-// min-w-[172px] min-h-[183px]
-// sm:max-w-[366px] sm:min-h-[355px]

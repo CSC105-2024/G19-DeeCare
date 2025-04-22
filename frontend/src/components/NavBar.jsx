@@ -34,7 +34,7 @@ const NavBar = () => {
                         <NavLink
                             to="/FindDoctor"
                             className={({ isActive }) =>
-                                isActive ? "text-yellow-300" : "hover:text-yellow-300"
+                                isActive ? "text-yellow-300" : "hover:text-yellow-600"
                             }
                         >
                             Appointment
