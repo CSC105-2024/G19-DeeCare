@@ -75,12 +75,10 @@ const Footer = () => {
                 </div>
             </div>
 
-            <div className="px-5 py-3 w-full">
+            <div className="px-5 py-3 w-full bottom-0">
                 <div className='h-[1px] bg-white'></div>
                 <p className='sm:text-lg text-base flex items-center justify-center  text-white pt-3'>© 2025 DeeCare</p>
             </div>
-            
-            
         </footer >
     </>
     
