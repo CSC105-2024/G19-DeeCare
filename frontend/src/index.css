@@ -1,6 +1,9 @@
 @import 'tailwindcss';
-@plugin "daisyui";
 @config '../tailwind.config.js';
+
+@plugin "daisyui" {
+    themes: light --default;
+}
 
 @theme {
     --color-primary: #133E87;

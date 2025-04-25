@@ -1,10 +1,10 @@
-import { input } from "framer-motion/client";
+// import { input } from "framer-motion/client";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const UserDetail = () => {
   const[isEdit, setIsEdit] = useState(false);
-  const[formdata, setFormData] = useState({
+  const[formData, setFormData] = useState({
     firstName: "Oreo",
     lastName: "Milk",
     birthDate: "30 Feburary 2077",
@@ -26,9 +26,9 @@ const UserDetail = () => {
        ...prev, [name]: value
     }))
   };
-  const handleSave = () => {
-    setIsEdit(false);
-  };
+  // const handleSave = () => {
+  //   setIsEdit(false);
+  // };
 
   return (
     <div className="flex flex-col lg:flex-row  justify-center">
@@ -106,13 +106,30 @@ const UserDetail = () => {
             <div className="font-bold text-2xl mt-1 ml-2">Patient Information</div>
             <div
             onClick={() => setIsEdit(!isEdit)}
-            className="text-xl bg-pri px-3 py-1 ml-25 rounded-lg border-2 border-pri text-white hover:text-pri hover:bg-white ">
+            className="text-xl bg-pri w-17 text-center py-1 ml-25 rounded-lg border-2 border-pri text-white hover:text-pri hover:bg-white ">
               {isEdit ? "Save" : "Edit"}
             </div>
           </div>
 
           <div className="mx-2 my-2">
-            <div className="text-pri ml-1">First Name</div>
+            <label className="text-pri ml-1">First Name</label>
+            <div>
+              {isEdit ? (
+              <input
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                className="bg-white p-2 px-4 rounded-lg w-auto"
+              />
+              ) : (
+              <div className="bg-white p-2 px-4 rounded-lg w-auto">
+                {formData.firstName}
+              </div>
+              )}
+            </div>
+             
+            
             <div className="bg-white p-2 px-4 rounded-lg w-auto">Oreo</div>
           </div>
           <div className="mx-2 my-2">
