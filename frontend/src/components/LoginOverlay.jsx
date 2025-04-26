@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as z from "zod";
 // import {
 //     IconEye,
@@ -70,8 +70,12 @@ const LoginOverlay = ({ onClose, onLogin }) => {
     };
 
     const handleRegisterClick = () => {
-        onClose(); // Close overlay first
-        navigate("/register"); // Then navigate to register page
+        if (typeof onClose === "function") {
+            onClose(); 
+        } else {
+            console.error("onClose is not a function");
+        }
+        navigate("/register");
     };
 
     // Prevent background scrolling when overlay is open
