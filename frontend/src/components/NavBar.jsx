@@ -1,23 +1,42 @@
-import React, { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import LoginOverlay from "./LoginOverlay.jsx";
 
 const NavBar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
+    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    }, []);
 
     const handleLogin = (data) => {
-        console.log("Login data:", data);
-        // Handle login logic
+        const newUser = {
+            name: data.name,
+            photo: data.photo,
+        };
+        setUser(newUser);
+        localStorage.setItem('user', JSON.stringify(newUser));
         setShowLogin(false);
+        setMenuOpen(false); 
+        navigate("/"); 
     };
+
+    const handleLogout = () => {
+        setUser(null);
+        localStorage.removeItem('user');
+        setMenuOpen(false);
+    };
+
     return (
         <>
             <nav className="bg-pri text-white fixed top-0 left-0 right-0 w-full z-50">
-                {/* div inside */}
-                <div className=" flex items-center h-[72px] px-6 justify-between">
-                    {/* Left: Logo */}
+                <div className="flex items-center h-[72px] px-6 justify-between">
                     <NavLink to="/" className="flex items-center gap-2">
                         <img
                             src="icons/fullLogo.png"
@@ -26,13 +45,11 @@ const NavBar = () => {
                         />
                     </NavLink>
 
-                    {/* Middle + Right: Menu links and buttons */}
                     <div className="hidden md:flex items-center gap-6">
-                        {/* Nav Links */}
                         <NavLink
                             to="/"
                             className={({ isActive }) =>
-                                isActive ? "text-yellow-300" : "hover:text-yellow-300"
+                                isActive ? "text-yellow-300" : "hover:text-yellow-600"
                             }
                         >
                             Home
@@ -40,66 +57,133 @@ const NavBar = () => {
                         <NavLink
                             to="/FindDoctor"
                             className={({ isActive }) =>
-                                isActive ? "text-yellow-300" : "hover:text-yellow-300"
+                                isActive ? "text-yellow-300" : "hover:text-yellow-600"
                             }
                         >
                             Appointment
                         </NavLink>
 
-                        {/* Auth Buttons */}
-                        <div className="bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all">
-                            <button onClick={() => setShowLogin(true)}>Login</button>
-                            {showLogin && (
-                                <LoginOverlay
-                                    onClose={() => setShowLogin(false)}
-                                    onLogin={handleLogin}
-                                />
-                            )}
-                        </div>
-                        {/*<NavLink*/}
-                        {/*    to="/Login"*/}
-                        {/*    className="bg-yellow border-2 border-yellow text-white px-4 py-2 rounded text-sm font-medium hover:bg-yellow transition-all"*/}
-                        {/*>*/}
-                        {/*    Login*/}
-                        {/*</NavLink>*/}
-                        <NavLink
-                            to="/Register"
-                            className="border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-white hover:text-[#0D47A1] transition-all"
-                        >
-                            Register
-                        </NavLink>
+                        {user ? (
+                            <div className="flex items-center gap-4">
+                                <a href="/UserDetail" className="flex items-center gap-2 ">
+                                    <img
+                                        src={user.photo}
+                                        alt="Profile"
+                                        className="h-8 w-8 rounded-full object-cover"
+                                    />
+                                </a>
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-sm  px-3 py-1 rounded-lg transition-all"
+                                >
+                                    <svg  
+                                        xmlns="http://www.w3.org/2000/svg"  width="24"  
+                                        height="24"  
+                                        viewBox="0 0 24 24"  
+                                        fill="none"  
+                                        stroke="white"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  className="icon icon-tabler icons-tabler-outline icon-tabler-logout">
+                                        <path 
+                                            stroke="none" 
+                                            d="M0 0h24v24H0z" fill="none"/>
+                                        <path 
+                                            d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
+                                        <path d="M9 12h12l-3 -3" />
+                                        <path d="M18 15l3 -3" />
+                                    </svg>
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all">
+                                <NavLink
+                                    to="/Login"
+                                    className="bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all"
+                                    onClick={() => {
+                                        setShowLogin(true); // เปิด LoginOverlay
+                                        setMenuOpen(false);  // ปิดเมนู hamburger
+                                    }}
+                                >
+                                    Login
+                                </NavLink>
+
+                                </div>
+                                <NavLink
+                                    to="/Register"
+                                    className="border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-white hover:text-[#0D47A1] transition-all"
+                                    onClick={() => setMenuOpen(false)} 
+                                >
+                                    Register
+                                </NavLink>
+                            </>
+                        )}
                     </div>
 
-                    {/* Mobile: Hamburger */}
-                    <div className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
-                        <span className="text-2xl cursor-pointer">{menuOpen ? "✕" : "☰"}</span>
+                    <div className="flex items-center gap-2 md:hidden">
+                        {user && (
+                            <a href="/UserDetail">
+                                <img
+                                    src={user.photo}
+                                    alt="Profile"
+                                    className="h-8 w-8 rounded-full object-cover"
+                                />
+                            </a>
+                        )}
+                        <div onClick={() => setMenuOpen(!menuOpen)}>
+                            <span className="text-2xl cursor-pointer">{menuOpen ? "✕" : "☰"}</span>
+                        </div>
                     </div>
                 </div>
 
-                {/* Mobile Menu */}
                 {menuOpen && (
                     <div className="md:hidden bg-white text-black px-4 py-2 space-y-2 border-t">
-                        <NavLink to="/" className="block hover:text-blue-600" onClick={() => setMenuOpen(false)}>
+                        <NavLink
+                            to="/"
+                            className="block hover:text-blue-600"
+                            onClick={() => setMenuOpen(false)}
+                        >
                             Home
                         </NavLink>
-                        <NavLink to="/FindDoctor" className="block hover:text-blue-600" 
-                        onClick={() => setMenuOpen(false)}>
+                        <NavLink
+                            to="/FindDoctor"
+                            className="block hover:text-blue-600"
+                            onClick={() => setMenuOpen(false)}
+                        >
                             Appointment
                         </NavLink>
-                        <NavLink to="/Login" className="block hover:text-blue-600" 
-                        onClick={() => setMenuOpen(false)}>
-                            Login
-                        </NavLink>
-                        <NavLink to="/Register" className="block hover:text-blue-600" 
-                        onClick={() => setMenuOpen(false)}>
-                            Register
-                        </NavLink>
+
+                        {user ? (
+                            <div className="flex flex-col gap-2 py-2">
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-left hover:text-red-500"
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <NavLink
+                                    to="/Login"
+                                    className="block hover:text-blue-600"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        setShowLogin(true);
+                                    }}
+                                >
+                                    Login
+                                </NavLink>
+                                <NavLink
+                                    to="/Register"
+                                    className="block hover:text-blue-600"
+                                    onClick={() => setMenuOpen(false)} 
+                                >
+                                    Register
+                                </NavLink>
+                            </>
+                        )}
                     </div>
                 )}
             </nav>
-
-            {/* Login Modal (if using one) */}
-            {isLoginOpen && <LoginOverlay onClose={() => setIsLoginOpen(false)} />}
 
             <div className="pt-[72px]">
                 <Outlet />

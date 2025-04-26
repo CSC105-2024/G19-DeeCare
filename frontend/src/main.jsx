@@ -5,7 +5,7 @@ import "./index.css";
 import App from "./App.jsx";
 import Home from "./pages/Home.jsx";
 import Event from "./pages/Event.jsx";
-import FilterBar from "./components/filterBar.jsx";
+import FilterBar from "./components/FilterBar.jsx";
 import FindDoctor from "./pages/FindDoctor.jsx";
 import Timeslot from "./pages/Timeslot.jsx";
 import Confirm from "./pages/Confirm.jsx";
@@ -14,6 +14,7 @@ import UserDetail from "./pages/UserDetail.jsx";
 import Admin_post from "./pages/Admin_post.jsx";
 import Admin_Appointment from "./pages/Admin_Appointment.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
+import LoginOverlay from "./components/LoginOverlay.jsx";
 
 const router = createBrowserRouter([
   {
@@ -48,10 +49,10 @@ const router = createBrowserRouter([
         path: "/Register",
         element: <Register />,
       },
-      // {
-      //   path: "/Login",
-      //   element: <Login />,
-      // },
+      {
+        path: "/Login",
+        element: <LoginOverlay />,
+      },
       {
         path: "/UserDetail",
         element: <UserDetail />,
