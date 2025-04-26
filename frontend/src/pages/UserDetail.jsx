@@ -52,14 +52,13 @@ const UserDetail = () => {
     profileImage: ""
   });
 
-  // Function to get user initials
+
   const getUserInitials = () => {
     const firstInitial = formData.firstName ? formData.firstName.charAt(0).toUpperCase() : "";
     const lastInitial = formData.lastName ? formData.lastName.charAt(0).toUpperCase() : "";
     return firstInitial + lastInitial;
   };
 
-  // Load patient data when component mounts
   useEffect(() => {
     const savedData = localStorage.getItem('patientData');
     if (savedData) {
@@ -79,7 +78,6 @@ const UserDetail = () => {
   };
 
   const handleSave = () => {
-    // Save updated data to localStorage
     localStorage.setItem('patientData', JSON.stringify(formData));
     setIsEditing(false);
   };
@@ -104,7 +102,6 @@ const UserDetail = () => {
     setAppointmentToDelete(null);
   };
 
-  // Handle image upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
