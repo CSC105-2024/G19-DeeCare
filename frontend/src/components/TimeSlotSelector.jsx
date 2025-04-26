@@ -11,12 +11,22 @@ import { format } from 'date-fns';
  * @param {boolean} props.isLoading - Whether the slots are currently loading
  */
 const TimeSlotSelector = ({ availableSlots, selectedSlot, onSlotSelect, isLoading }) => {
+    // Helper function to get time part regardless of format
+    const getTimePart = (dateTimeString) => {
+        // Handle ISO format with T separator
+        if (dateTimeString.includes('T')) {
+            return dateTimeString.split('T')[1].substring(0, 5); // Get HH:MM
+        }
+        // Handle space-separated format
+        return dateTimeString.split(' ')[1].substring(0, 5); // Get HH:MM
+    };
+
     // Group time slots by hour
     const groupSlotsByHour = () => {
         const groupedSlots = {};
 
         availableSlots.forEach(slot => {
-            const startTime = slot.start.split(' ')[1]; // Get the time part (HH:MM)
+            const startTime = getTimePart(slot.start);
             const hour = startTime.split(':')[0]; // Get the hour part
 
             if (!groupedSlots[hour]) {
@@ -62,14 +72,14 @@ const TimeSlotSelector = ({ availableSlots, selectedSlot, onSlotSelect, isLoadin
                         if (!slot.isAvailable) return null;
 
                         const isSelected = selectedSlot && selectedSlot.id === slot.id;
-                        const startTime = slot.start.split(' ')[1];
-                        const endTime = slot.end.split(' ')[1];
+                        const startTime = getTimePart(slot.start);
+                        const endTime = getTimePart(slot.end);
 
                         return (
                             <button
                                 key={slot.id}
-                                className={`py-2 px-4 rounded-lg transition-colors duration-200 text-center 
-                                ${isSelected
+                                className={`py-2 px-4 rounded-lg transition-colors duration-200 text-center
+                                 ${isSelected
                                     ? 'bg-yellow text-white'
                                     : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
                                 onClick={() => onSlotSelect(slot)}

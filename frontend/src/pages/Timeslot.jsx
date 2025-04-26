@@ -1,36 +1,22 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Calendar from 'react-calendar';
 import '../styles/react-calendar.css';
 
-import { useCalendarApp, ScheduleXCalendar } from '@schedule-x/react';
-import { createViewWeek } from '@schedule-x/calendar';
+import { ScheduleXCalendar } from '@schedule-x/react';
+import { createCalendar, createViewWeek } from '@schedule-x/calendar';
 import { createEventsServicePlugin } from '@schedule-x/events-service';
 import { createEventModalPlugin } from '@schedule-x/event-modal';
 import '@schedule-x/theme-default/dist/index.css';
-import { createCurrentTimePlugin } from "@schedule-x/current-time";
-import { createCalendarControlsPlugin } from "@schedule-x/calendar-controls";
 import { format, isWithinInterval } from 'date-fns';
 
-// Import our custom components
-import TimeSlotSelector from '../components/TimeSlotSelector';
+// Import our custom hook and plugin
 import useAvailableTime from '../hook/useAvailableTime.jsx';
-import AvailableTime from '../components/AvailableTime';
-
-// Empty component for custom calendar header
-const EmptyComponent = props => {
-    return null;
-};
-
-const calendarCustomComponents = {
-    headerContent: EmptyComponent,
-};
+import { AvailableTimePlugin } from '../plugin/AvailableTimePlugin.jsx';
 
 function Timeslot() {
     const navigate = useNavigate();
-
-    // Toggle between calendar view and simple selector
-    const [showSimpleSelector, setShowSimpleSelector] = useState(true);
+    const calendarRef = useRef(null);
 
     // Define booking period (Apr 28, 2025 - May 16, 2025)
     const bookingStartDate = new Date(2025, 3, 28); // April 28, 2025
@@ -51,7 +37,7 @@ function Timeslot() {
         image: "/images/Dr_Apple.jpg"
     };
 
-    // Use our custom hook with mock data
+    // Use our custom hook
     const {
         selectedDate,
         selectedTimeSlot,
@@ -62,36 +48,139 @@ function Timeslot() {
         saveBooking
     } = useAvailableTime(initialDate);
 
-    const eventsService = useState(() => createEventsServicePlugin())[0];
-    const calendarControls = useState(() => createCalendarControlsPlugin())[0];
+    // Store the calendar app and plugins as refs
+    const calendarAppRef = useRef(null);
+    const eventsServicePluginRef = useRef(null);
+    const eventModalPluginRef = useRef(null);
+    const availableTimePluginRef = useRef(null);
 
-    // Initialize event modal plugin with our custom click handler
-    const eventModalPlugin = useState(() => createEventModalPlugin({
-        onEventClick: (eventId) => {
-            const clickedSlot = availableSlots.find(slot => slot.id === eventId);
-            if (clickedSlot && clickedSlot.isAvailable) {
-                handleTimeSlotSelected(clickedSlot);
-            }
+    // Initialize or update the available time plugin when availableSlots change
+    useEffect(() => {
+        if (!availableTimePluginRef.current) {
+            availableTimePluginRef.current = new AvailableTimePlugin({
+                onTimeSlotSelected: handleTimeSlotSelected,
+                availableSlots: availableSlots,
+                selectedDate: selectedDate
+            });
+        } else {
+            availableTimePluginRef.current.updateAvailableSlots(availableSlots);
+            availableTimePluginRef.current.updateSelectedDate(selectedDate);
         }
-    }))[0];
+    }, [availableSlots, selectedDate, handleTimeSlotSelected]);
 
-    const calendar = useCalendarApp({
-        views: [
-            createViewWeek(),
-        ],
-        events: [],
-        plugins: [
-            calendarControls,
-            eventsService,
+    useEffect(() => {
+        // Only attempt to create calendar when we have slots and the plugin
+        if (isLoading || !availableSlots.length) return;
+
+        // Create our available time plugin if it doesn't exist
+        if (!availableTimePluginRef.current) {
+            availableTimePluginRef.current = new AvailableTimePlugin({
+                onTimeSlotSelected: handleTimeSlotSelected,
+                availableSlots: availableSlots,
+                selectedDate: selectedDate
+            });
+
+            console.log("Created available time plugin with", availableSlots.length, "slots");
+        } else {
+            // Update plugin with new slots
+            availableTimePluginRef.current.updateAvailableSlots(availableSlots);
+            availableTimePluginRef.current.updateSelectedDate(selectedDate);
+            console.log("Updated plugin with", availableSlots.length, "slots");
+        }
+
+        // Create plugins if they don't exist
+        const eventsServicePlugin = createEventsServicePlugin();
+        const eventModalPlugin = createEventModalPlugin();
+
+        // Create or recreate calendar
+        if (calendarAppRef.current) {
+            calendarAppRef.current.destroy();
+        }
+
+        // Create calendar with updated plugins
+        const calendarApp = createCalendar({
+            views: [createViewWeek()],
+            defaultView: 'week',
+            dayBoundaries: {
+                start: '08:00',
+                end: '16:00',
+            },
+            isResponsive: true,
+            initialDate: format(selectedDate, 'yyyy-MM-dd')
+        }, [
+            eventsServicePlugin,
             eventModalPlugin,
-            createCurrentTimePlugin()
-        ],
-        dayBoundaries: {
-            start: '06:00',
-            end: '18:00',
-        },
-        isResponsive: true,
-    });
+            availableTimePluginRef.current
+        ]);
+
+        // Store ref to calendar app
+        calendarAppRef.current = calendarApp;
+
+        // Render calendar
+        if (calendarRef.current) {
+            calendarAppRef.current.render(calendarRef.current);
+            console.log("Calendar rendered");
+        }
+
+        // Cleanup on unmount
+        return () => {
+            if (calendarAppRef.current) {
+                calendarAppRef.current.destroy();
+            }
+        };
+    }, [selectedDate, availableSlots, isLoading]);
+    // // Create or recreate the calendar when needed
+    // useEffect(() => {
+    //     // Create plugins if they don't exist
+    //     if (!eventsServicePluginRef.current) {
+    //         eventsServicePluginRef.current = createEventsServicePlugin();
+    //     }
+    //     if (!eventModalPluginRef.current) {
+    //         eventModalPluginRef.current = createEventModalPlugin();
+    //     }
+    //
+    //     // Wait until the availableTimePlugin is initialized
+    //     if (!availableTimePluginRef.current) return;
+    //
+    //     // Destroy existing calendar if it exists
+    //     if (calendarAppRef.current) {
+    //         calendarAppRef.current.destroy();
+    //     }
+    //
+    //     // Create new calendar with updated date
+    //     const calendarApp = createCalendar({
+    //         views: [createViewWeek()],
+    //         defaultView: 'week',
+    //         dayBoundaries: {
+    //             start: '08:00',
+    //             end: '16:00',
+    //         },
+    //         isResponsive: true,
+    //         initialDate: format(selectedDate, 'yyyy-MM-dd')
+    //     }, [
+    //         eventsServicePluginRef.current,
+    //         eventModalPluginRef.current,
+    //         availableTimePluginRef.current
+    //     ]);
+    //
+    //     // Store ref to calendar app
+    //     calendarAppRef.current = calendarApp;
+    //
+    //     // Render calendar if container exists
+    //     if (calendarRef.current) {
+    //         calendarAppRef.current.render(calendarRef.current);
+    //
+    //         // Log for debugging
+    //         console.log("Calendar rendered with", availableSlots.length, "available slots");
+    //     }
+    //
+    //     // Cleanup on unmount
+    //     return () => {
+    //         if (calendarAppRef.current) {
+    //             calendarAppRef.current.destroy();
+    //         }
+    //     };
+    // }, [selectedDate, availableTimePluginRef.current]);
 
     // Custom tileDisabled function for Calendar component
     const tileDisabled = ({ date, view }) => {
@@ -107,13 +196,6 @@ function Timeslot() {
 
     const handleMiniCalendarChange = (date) => {
         handleDateChange(date);
-        calendarControls.setDate(format(date, 'yyyy-MM-dd'));
-        calendarControls.setFirstDayOfWeek(0);
-
-        if (!showSimpleSelector) {
-            calendar.destroy();
-            calendar.render(document.getElementById('calendar'));
-        }
     };
 
     const handleConfirmClick = () => {
@@ -128,35 +210,16 @@ function Timeslot() {
         }
     };
 
-    // Update events when availableSlots change
-    useEffect(() => {
-        if (!showSimpleSelector && calendar && calendar.setEvents) {
-            calendar.setEvents(availableSlots);
-        }
-    }, [availableSlots, calendar, showSimpleSelector]);
-
-    // Ensure calendar renders after loading
-    useEffect(() => {
-        if (!showSimpleSelector && document.getElementById('calendar')) {
-            calendar.render(document.getElementById('calendar'));
-        }
-    }, [calendar, showSimpleSelector]);
-
     return (
         <>
-            {/* Whole page */}
             <div className="max-w-6xl mx-auto mt-4">
-
-                {/* Doctor  */}
+                {/* Doctor */}
                 <div className="bg-light-blue rounded-2xl p-6 mb-6">
-                    {/* inside */}
-                    <div className="flex justify-start items-center ">
-                        {/* doctor image */}
+                    <div className="flex justify-start items-center">
                         <img src={doctorInfo.image}
                              alt={doctorInfo.name}
                              className="rounded-full w-[150px] mr-[64px]"
                         />
-                        {/* doctor detail */}
                         <div className="flex flex-col justify-center">
                             <p>Name: {doctorInfo.name}</p>
                             <p>Department: {doctorInfo.department}</p>
@@ -168,24 +231,14 @@ function Timeslot() {
                 {/* Booking period notice */}
                 <div className="mb-4 p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
                     <p className="font-bold">Booking Period: April 28, 2025 - May 16, 2025</p>
-                    <p>Please select a date within this range to see available time slots.</p>
+                    <p>Please select a date within this range and click on an available time slot.</p>
                 </div>
 
-                {/* Toggle view option */}
-                <div className="mb-4">
-                    <button
-                        className="px-4 py-2 bg-gray-200 rounded-lg mr-2"
-                        onClick={() => setShowSimpleSelector(!showSimpleSelector)}
-                    >
-                        Switch to {showSimpleSelector ? 'Calendar View' : 'Simple View'}
-                    </button>
-                </div>
-
-                {/* both calendars */}
+                {/* Calendar layout */}
                 <div className='flex flex-col lg:flex-row gap-6'>
                     {/* Left part */}
                     <div className="flex flex-col lg:w-1/4">
-                        {/* small Calendar */}
+                        {/* Mini Calendar */}
                         <div className="mb-4">
                             <Calendar
                                 onChange={handleMiniCalendarChange}
@@ -202,7 +255,16 @@ function Timeslot() {
                             <div className="mb-4 p-3 border-2 border-yellow rounded-lg">
                                 <p className="font-bold">Selected Time:</p>
                                 <p>{format(selectedDate, 'MMMM d, yyyy')}</p>
-                                <p>{selectedTimeSlot.start.split(' ')[1]} - {selectedTimeSlot.end.split(' ')[1]}</p>
+                                <p>
+                                    {selectedTimeSlot.start.includes('T')
+                                        ? selectedTimeSlot.start.split('T')[1].substring(0, 5)
+                                        : selectedTimeSlot.start.split(' ')[1]
+                                    } -
+                                    {selectedTimeSlot.end.includes('T')
+                                        ? selectedTimeSlot.end.split('T')[1].substring(0, 5)
+                                        : selectedTimeSlot.end.split(' ')[1]
+                                    }
+                                </p>
                             </div>
                         )}
 
@@ -216,30 +278,24 @@ function Timeslot() {
                         </button>
                     </div>
 
-                    {/* Right part - Calendar or Simple Selector */}
+                    {/* Right part - Schedule-X Calendar */}
                     <div className="lg:w-3/4">
-                        {showSimpleSelector ? (
-                            <TimeSlotSelector
-                                availableSlots={availableSlots}
-                                selectedSlot={selectedTimeSlot}
-                                onSlotSelect={handleTimeSlotSelected}
-                                isLoading={isLoading}
-                            />
+                        {isLoading ? (
+                            <div className="min-h-[500px] flex justify-center items-center">
+                                <p>Loading calendar...</p>
+                            </div>
                         ) : (
-                            <div id="calendar">
-                                <ScheduleXCalendar
-                                    calendarApp={calendar}
-                                    customComponents={calendarCustomComponents}
-                                />
-                                <AvailableTime
-                                    calendar={calendar}
-                                    onTimeSlotSelected={handleTimeSlotSelected}
-                                    availableSlots={availableSlots}
-                                    selectedDate={selectedDate}
-                                />
+                            <div className="min-h-[500px] border rounded-lg">
+                                <div ref={calendarRef} style={{ width: '100%', height: '500px' }}>
+                                    {/* ScheduleX calendar will render here */}
+                                </div>
                             </div>
                         )}
                     </div>
+                </div>
+
+                <div className="mt-4 text-sm">
+                    <p>Available Slots: {availableSlots.length}</p>
                 </div>
             </div>
         </>

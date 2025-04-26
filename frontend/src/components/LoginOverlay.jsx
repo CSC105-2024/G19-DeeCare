@@ -98,7 +98,7 @@ const LoginOverlay = ({ onClose, onLogin }) => {
 
     return (
         <div
-            className="fixed inset-0 flex items-center justify-center backdrop-blur-3xl bg-opacity-50 z-50"
+            className="fixed inset-0 flex items-center justify-center backdrop-blur-lg bg-opacity-40 z-50"
             onClick={handleOverlayClick}
         >
             <div className="bg-blue-100 p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl shadow-lg w-11/12 sm:w-96 relative mx-4 sm:mx-auto">
