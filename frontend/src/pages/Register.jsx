@@ -137,7 +137,25 @@ function Register() {
         if (validateStep(currentStep)) {
             setIsSubmitting(true);
             try {
-                // Simulate sending to backend
+                localStorage.setItem('patientData', JSON.stringify({
+                    idNumber: form.idNumber,
+                    firstName: form.firstName,
+                    lastName: form.lastName,
+                    dob: form.dob,
+                    age: form.age,
+                    bloodType: form.bloodType,
+                    email: form.email,
+                    contactName: form.contactName,
+                    relationship: form.relationship,
+                    contactPhone: form.contactPhone,
+                    contactEmail: form.contactEmail,
+                    phoneNumber: "",
+                    gender: "",
+                    chronicDisease: "-",
+                    allergicDrugs: "-",
+                    profileImage: ""
+                }));
+                // Wait to send to backend
                 console.log("Submitting form data:", form);
                 alert("Registration successfully submitted!");
             } catch (error) {
@@ -151,6 +169,8 @@ function Register() {
     const ErrorMessage = ({name}) => (
         errors[name] ? <p className="text-red-500 text-xs mt-1">{errors[name]}</p> : null
     );
+
+    
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-background p-4">
@@ -280,11 +300,15 @@ function Register() {
                                     onChange={handleChange}
                                     className={`w-full p-3 rounded-md bg-gray-50 border ${errors.bloodType ? 'border-red-500' : 'border-blue-100'} text-gray-500 outline-0`}
                                 >
-                                    <option value="">SELECT</option>
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
-                                    <option value="O">O</option>
-                                    <option value="AB">AB</option>
+                                    <option value="">Select</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
                                 </select>
                                 <ErrorMessage name="bloodType" />
                             </div>
