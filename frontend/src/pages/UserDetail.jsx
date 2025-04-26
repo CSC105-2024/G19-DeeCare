@@ -5,7 +5,7 @@ const UserDetail = () => {
     <div className="flex flex-col lg:flex-row  justify-center">
       {/*profile and appointment*/}
         <div>
-          <div className="bg-gradient-to-b from-cyan-400 to-blue-600 m-5 p-1 w-115 rounded-xl hover:from-blue-500 hover:to-violet-600 hover:shadow-indigo-700 hover:shadow-lg ">
+          <div className="bg-gradient-to-b from-cyan-400 to-blue-600 m-5 p-1 w-115 rounded-xl hover:from-blue-500 hover:to-violet-600 hover:shadow-indigo-700 hover:shadow-lg duration-500">
           <div className="bg-white w-113  flex items-center p-2 transition rounded-lg">
               <img 
                 src="images/UserProfile.JPG" 
@@ -39,7 +39,7 @@ const UserDetail = () => {
               </div>
             </div>
             <div>
-                  <p className="w-auto mx-2 py-2 bg-gradient-to-tr from-pri to-blue-400  text-white text-center rounded-lg hover:bg-gradient-to-bl transition font-semibold">
+                  <p className="w-auto mx-2 py-2 bg-gradient-to-tr from-yellow to-amber-600  text-white text-center rounded-lg hover:bg-gradient-to-bl transition font-semibold">
                     More Details
                   </p>
               </div>
@@ -61,7 +61,7 @@ const UserDetail = () => {
               </div>
             </div>
             <div>
-                  <p className="w-auto mx-2 py-2 bg-gradient-to-tr from-pri to-blue-400  text-white text-center rounded-lg hover:bg-gradient-to-bl transition font-semibold">
+                  <p className="w-auto mx-2 py-2 bg-gradient-to-tr from-yellow to-amber-600  text-white text-center rounded-lg hover:bg-gradient-to-bl transition font-semibold">
                     More Details
                   </p>
               </div>
@@ -75,7 +75,7 @@ const UserDetail = () => {
         <div className="bg-light-blue p-5 w-119 my-5  mx-5 rounded-2xl max-h-120 overflow-auto">
           <div className="flex flex-row">
           <div className="font-bold text-2xl mt-1 ml-2">Patient Information</div>
-          <div className="text-xl bg-pri px-3 py-1 ml-25 rounded-lg border-2 border-pri text-white hover:text-pri hover:bg-white ">Edit</div>
+          <div className="text-xl bg-pri px-3 py-1 ml-25 rounded-lg border-2 border-pri text-white hover:text-pri hover:bg-white duration-300">Edit</div>
           </div>
 
           <div className="mx-2 my-2">
@@ -118,7 +118,7 @@ const UserDetail = () => {
           </div>
           <div className="mx-2 my-2 ">
             <div className="text-pri ml-1 "></div>
-            <div className="bg-pri p-1.5 px-5.5 rounded-lg mt-6  border-2 border-pri text-white hover:text-pri hover:bg-white ">More...</div>
+            <div className="bg-pri p-1.5 px-5.5 rounded-lg mt-6  border-2 border-pri text-white hover:text-pri hover:bg-white duration-400">More...</div>
           </div>
           </div>
 
