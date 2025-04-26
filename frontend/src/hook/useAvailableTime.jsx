@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { format, parseISO, addDays } from 'date-fns';
 
 /**
  * Custom hook to manage available time slots
@@ -12,47 +12,48 @@ const useAvailableTime = (initialDate = new Date()) => {
     const [availableSlots, setAvailableSlots] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    // Generate slots for a specific date
+    const generateSlotsForDate = (date) => {
+        const formattedDate = format(date, 'yyyy-MM-dd');
+        const slots = [];
+
+        // Create time slots from 8:00 to 17:00 with 1-hour intervals
+        for (let hour = 8; hour < 17; hour++) {
+            // Format hours with leading zeros
+            const startHour = hour.toString().padStart(2, '0');
+            const endHour = (hour + 1).toString().padStart(2, '0');
+
+            // Randomly determine if slot is available (80% chance)
+            const isAvailable = Math.random() < 0.8;
+
+            slots.push({
+                id: `slot-${formattedDate}-${hour}`,
+                title: isAvailable ? 'Available' : 'Booked',
+                start: `${formattedDate} ${startHour}:00`,
+                end: `${formattedDate} ${endHour}:00`,
+                color: isAvailable ? '#f9a825' : '#cccccc', // Orange for available, gray for booked
+                editable: false,
+                isAvailable: isAvailable
+            });
+        }
+
+        return slots;
+    };
+
     // Fetch available slots for the selected date
     const fetchAvailableSlots = async (date) => {
         setIsLoading(true);
         try {
-            // Replace this with your actual API call
-            // For now, we'll simulate with sample data
-            const formattedDate = format(date, 'yyyy-MM-dd');
+            // In a real app, this would be an API call
+            // For this example, we're generating mock data
 
-            // Simulated API response (replace with actual API call)
-            // In a real implementation, you would fetch this from your backend
-            const sampleSlots = [
-                {
-                    id: `slot-${formattedDate}-1`,
-                    title: 'Available',
-                    start: `${formattedDate} 08:00`,
-                    end: `${formattedDate} 09:00`,
-                    color: '#f9a825', // Orange color
-                    editable: false,
-                    isAvailable: true
-                },
-                {
-                    id: `slot-${formattedDate}-2`,
-                    title: 'Available',
-                    start: `${formattedDate} 09:00`,
-                    end: `${formattedDate} 10:00`,
-                    color: '#f9a825',
-                    editable: false,
-                    isAvailable: true
-                },
-                {
-                    id: `slot-${formattedDate}-3`,
-                    title: 'Available',
-                    start: `${formattedDate} 10:00`,
-                    end: `${formattedDate} 11:00`,
-                    color: '#f9a825',
-                    editable: false,
-                    isAvailable: true
-                }
-            ];
+            // Add a small delay to simulate API call
+            await new Promise(resolve => setTimeout(resolve, 300));
 
-            setAvailableSlots(sampleSlots);
+            // Generate slots for the selected date
+            const slots = generateSlotsForDate(date);
+
+            setAvailableSlots(slots);
         } catch (error) {
             console.error('Error fetching available slots:', error);
         } finally {
@@ -68,7 +69,12 @@ const useAvailableTime = (initialDate = new Date()) => {
 
     // Handle time slot selection
     const handleTimeSlotSelected = (slot) => {
-        setSelectedTimeSlot(slot);
+        // Only allow selecting available slots
+        if (slot && slot.isAvailable) {
+            setSelectedTimeSlot(slot);
+        } else if (!slot) {
+            setSelectedTimeSlot(null);
+        }
     };
 
     // Store selected booking in session storage
