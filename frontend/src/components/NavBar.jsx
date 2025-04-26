@@ -5,7 +5,13 @@ import LoginOverlay from "./LoginOverlay.jsx";
 const NavBar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [showLogin, setShowLogin] = useState(false);
 
+    const handleLogin = (data) => {
+        console.log("Login data:", data);
+        // Handle login logic
+        setShowLogin(false);
+    };
     return (
         <>
             <nav className="bg-pri text-white fixed top-0 left-0 right-0 w-full z-50">
@@ -40,19 +46,25 @@ const NavBar = () => {
                             Appointment
                         </NavLink>
 
-                        {/* Divider */}
-                        <div className="w-px h-5 bg-white opacity-30 mx-2" />
-
                         {/* Auth Buttons */}
-                        <NavLink
-                            to="/Login"
-                            className="bg-yellow border-2 border-yellow text-white px-4 py-2 rounded text-sm font-medium hover:bg-yellow transition-all"
-                        >
-                            Login
-                        </NavLink>
+                        <div className="bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all">
+                            <button onClick={() => setShowLogin(true)}>Login</button>
+                            {showLogin && (
+                                <LoginOverlay
+                                    onClose={() => setShowLogin(false)}
+                                    onLogin={handleLogin}
+                                />
+                            )}
+                        </div>
+                        {/*<NavLink*/}
+                        {/*    to="/Login"*/}
+                        {/*    className="bg-yellow border-2 border-yellow text-white px-4 py-2 rounded text-sm font-medium hover:bg-yellow transition-all"*/}
+                        {/*>*/}
+                        {/*    Login*/}
+                        {/*</NavLink>*/}
                         <NavLink
                             to="/Register"
-                            className="border-2 border-yellow text-white px-4 py-2 rounded text-sm font-medium hover:bg-white hover:text-[#0D47A1] transition-all"
+                            className="border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-white hover:text-[#0D47A1] transition-all"
                         >
                             Register
                         </NavLink>
