@@ -6,6 +6,7 @@ import {
     IconEye,
     IconEyeClosed
 } from "@tabler/icons-react";
+import { useNavigate } from "react-router-dom";
 
 const stepTitle = [
     'PATIENT INFORMATION',
@@ -130,7 +131,7 @@ function Register() {
     const handlePreviousStep = () => {
         setCurrentStep(prev => prev - 1);
     };
-
+    const navigate = useNavigate(); 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -158,6 +159,7 @@ function Register() {
                 // Wait to send to backend
                 console.log("Submitting form data:", form);
                 alert("Registration successfully submitted!");
+                navigate('/');
             } catch (error) {
                 console.error("Error submitting form:", error);
             } finally {
@@ -169,8 +171,6 @@ function Register() {
     const ErrorMessage = ({name}) => (
         errors[name] ? <p className="text-red-500 text-xs mt-1">{errors[name]}</p> : null
     );
-
-    
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-background p-4">
