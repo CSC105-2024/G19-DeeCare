@@ -12,10 +12,6 @@ import { createCurrentTimePlugin } from "@schedule-x/current-time";
 import { createCalendarControlsPlugin } from "@schedule-x/calendar-controls";
 import { format } from 'date-fns';
 
-// Import our modified custom component
-import AvailableTime from '../components/AvailableTime';
-import useAvailableTime from '../hooks/useAvailableTime';
-
 const EmptyComponent = props => {
     return null;
 };
@@ -26,51 +22,43 @@ const calendarCustomComponents = {
 
 function Timeslot() {
     const navigate = useNavigate();
-
-    // Doctor information (could come from props or context in a real app)
-    const doctorInfo = {
-        name: "Dr. Apple",
-        department: "General Health",
-        workHours: "8:00-16:00",
-        image: "/images/Dr_Apple.jpg"
-    };
-
-    // Use our custom hook
-    const {
-        selectedDate,
-        selectedTimeSlot,
-        availableSlots,
-        isLoading,
-        handleDateChange,
-        handleTimeSlotSelected,
-        saveBooking
-    } = useAvailableTime(new Date());
+    const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+    const [availableSlots, setAvailableSlots] = useState([
+        {
+            id: 'slot-1',
+            title: 'Available',
+            start: '2025-04-21 08:00',
+            end: '2025-04-21 09:00',
+            color: '#f9a825', // Orange color for available slots
+            editable: false,
+            isAvailable: true
+        },
+        {
+            id: 'slot-2',
+            title: 'Available',
+            start: '2025-04-21 10:00',
+            end: '2025-04-21 11:00',
+            color: '#f9a825',
+            editable: false,
+            isAvailable: true
+        },
+        // Add more available slots as needed
+    ]);
 
     const eventsService = useState(() => createEventsServicePlugin())[0];
     const calendarControls = useState(() => createCalendarControlsPlugin())[0];
-
-    // Custom event click handler
-    const handleEventClick = (eventId) => {
-        const clickedSlot = availableSlots.find(slot => slot.id === eventId);
-        if (clickedSlot && clickedSlot.isAvailable) {
-            handleTimeSlotSelected(clickedSlot);
-        }
-    };
-
-    // Initialize event modal plugin with our custom click handler
-    const eventModalPlugin = useState(() => createEventModalPlugin({
-        onEventClick: handleEventClick
-    }))[0];
 
     const calendar = useCalendarApp({
         views: [
             createViewWeek(),
         ],
-        events: availableSlots, // Start with available slots
+        events: availableSlots,
         plugins: [
             calendarControls,
             eventsService,
-            eventModalPlugin,
+            createEventModalPlugin({
+                onEventClick: (eventId) => handleEventClick(eventId),
+            }),
             createCurrentTimePlugin()
         ],
         dayBoundaries: {
@@ -80,12 +68,27 @@ function Timeslot() {
         isResponsive: true,
     });
 
+    const handleEventClick = (eventId) => {
+        const clickedSlot = availableSlots.find(slot => slot.id === eventId);
+
+        if (clickedSlot && clickedSlot.isAvailable) {
+            setSelectedTimeSlot(clickedSlot);
+            // Visual feedback - could be done via state update if schedule-x supports it
+            console.log(`Selected time slot: ${clickedSlot.start} - ${clickedSlot.end}`);
+        }
+    };
+
+    const [selectedDate, setSelectedDate] = useState(new Date());
+
     const handleMiniCalendarChange = (date) => {
-        handleDateChange(date);
+        setSelectedDate(date);
         calendarControls.setDate(format(date, 'yyyy-MM-dd'));
         calendarControls.setFirstDayOfWeek(0);
         calendar.destroy();
         calendar.render(document.getElementById('calendar'));
+
+        // Here you would typically load available slots for the selected date
+        // fetchAvailableSlotsForDate(date);
     };
 
     const handleConfirmClick = () => {
@@ -94,18 +97,24 @@ function Timeslot() {
             return;
         }
 
-        const success = saveBooking(doctorInfo);
-        if (success) {
-            navigate("/Confirm");
-        }
+        // Store the selected time slot in localStorage or sessionStorage
+        sessionStorage.setItem('selectedBooking', JSON.stringify({
+            date: format(selectedDate, 'yyyy-MM-dd'),
+            startTime: selectedTimeSlot.start.split(' ')[1],
+            endTime: selectedTimeSlot.end.split(' ')[1],
+            doctorName: "Dr. Apple", // Get this from your actual data
+            department: "General Health" // Get this from your actual data
+        }));
+
+        // Navigate to confirmation page
+        navigate("/Confirm");
     };
 
-    // Update events when availableSlots change
     useEffect(() => {
-        if (calendar && calendar.setEvents) {
-            calendar.setEvents(availableSlots);
-        }
-    }, [availableSlots, calendar]);
+        // Load available slots when component mounts
+        // This would typically be a fetch from your API
+        eventsService.getAll();
+    }, []);
 
     return (
         <>
@@ -117,15 +126,15 @@ function Timeslot() {
                     {/* inside */}
                     <div className="flex justify-start items-center ">
                         {/* doctor image */}
-                        <img src={doctorInfo.image}
-                             alt={doctorInfo.name}
+                        <img src="/images/Dr_Apple.jpg"
+                             alt="doctor Apple"
                              className="rounded-full w-[150px] mr-[64px]"
                         />
                         {/* doctor detail */}
                         <div className="flex flex-col justify-center">
-                            <p>Name: {doctorInfo.name}</p>
-                            <p>Department: {doctorInfo.department}</p>
-                            <p>Work hour: {doctorInfo.workHours}</p>
+                            <p>Name: Dr. Apple</p>
+                            <p>Department: General Health</p>
+                            <p>Work hour: 8:00-16:00</p>
                         </div>
                     </div>
                 </div>
@@ -152,18 +161,10 @@ function Timeslot() {
                             </div>
                         )}
 
-                        {/* Loading indicator */}
-                        {isLoading && (
-                            <div className="mb-4 p-3 text-center">
-                                <p>Loading available times...</p>
-                            </div>
-                        )}
-
                         {/* Confirm button */}
                         <button
                             className="w-full rounded-lg py-2 text-white bg-yellow"
                             onClick={handleConfirmClick}
-                            disabled={!selectedTimeSlot}
                         >
                             CONFIRM
                         </button>
