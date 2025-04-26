@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as z from "zod";
-import {
-    IconEye,
-    IconEyeClosed
-} from "@tabler/icons-react";
+// import {
+//     IconEye,
+//     IconEyeClosed
+// } from "@tabler/icons-react";
 
 // Zod schema for form validation
 const loginSchema = z.object({

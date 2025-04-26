@@ -25,7 +25,7 @@ const Event = () => {
         {/* event brief */}
         <div className="flex sm:justify-start items-center sm:h-[128px] h-auto sm:flex-row flex-col gap-4 sm:gap-0">
           {/* event mobile topic */}
-          <h1 className="font-semibold text-xl block sm:hidden">
+          <h1 className="font-semibold text-xl block sm:hidden pt-8 ">
             {event.title}
           </h1>
 
@@ -43,7 +43,7 @@ const Event = () => {
             </h1>
 
             {/* Event date */}
-            <div className="flex items-center mb-2">
+            <div className="flex items-start mb-2">
               <img 
                 src="/icons/calendar-event.svg" 
                 alt="icons calendar-event"
@@ -54,7 +54,7 @@ const Event = () => {
             </div>
 
             {/* place */}
-            <div className="flex items-center">
+            <div className="flex items-start">
               <img 
                 src="/icons/map-pin.svg" 
                 alt="icon map-pin"
@@ -94,7 +94,7 @@ const Event = () => {
               src="/icons/link.svg" 
               alt="website-link"
               className="w-5 h-5" />
-            <a href={event.website} target="_blank"  className="ml-2 break-words text-blue-600 hover:underline">
+            <a href={event.website} target="_blank"  className="ml-2 break-words truncate text-blue-600 hover:underline">
               {event.website}
             </a>
           </div>
@@ -116,7 +116,7 @@ const Event = () => {
               src="/icons/mail.svg" 
               alt="icon-mail"
               className="w-5 h-5" />
-            <a href={`mailto:${event.email}`} className="ml-2 break-words text-blue-600 hover:underline">  
+            <a href={`mailto:${event.email}`} className="ml-2 break-words truncate text-blue-600 hover:underline">  
               {event.email}
             </a>
           </div>
@@ -127,7 +127,7 @@ const Event = () => {
               src="/icons/at.svg" 
               alt="icon-at"
               className="w-5 h-5" />
-            <a href={`https://${event.linkedin}`} target="_blank" rel="" className="ml-2 break-words text-blue-600 hover:underline"> 
+            <a href={`https://${event.linkedin}`} target="_blank" rel="" className="ml-2 break-words truncate text-blue-600 hover:underline"> 
               {event.linkedin}
             </a>
           </div>

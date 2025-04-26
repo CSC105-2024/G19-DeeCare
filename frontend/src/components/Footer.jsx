@@ -3,15 +3,18 @@ const Footer = () => {
   return (
     <>
         {/* blue section */}
-        <footer className="bg-pri w-full h-min-screen pt-14 px-[32px]">
-            <div className="grid md:grid-cols-6 sm:grid-cols-2 sm:gap-10 min-h-S[300px] text-white text-wrap pb-10 ">
+        <footer className="bg-pri max-w-screen max-h-screen overflow-x-hidden
+        pt-8 sm:pt-14 px-5
+        ">
+            {/* Footer info */}
+            <div className="grid md:grid-cols-6 sm:grid-cols-2 gap-3 sm:gap-10 h-full text-white text-wrap pb-10 w-full">
                 {/* Left part -col1 */}
                 <div className="col-span-2 sm:pl-5 pr-3 pb-5">
                     {/* logo part */}
                     <a href="/">
                         <img src="/icons/fullLogo.png" 
                         alt="Deecare Logo" 
-                        className="sm:w-[164px] w-[124px] pb-3"/>
+                        className="sm:w-[164px] w-[124px] pb-3 sm:pb-4"/>
                     </a>
                     {/* text */}
                     <p className="text-sm">
@@ -36,7 +39,7 @@ const Footer = () => {
                     <h2 className='pb-3 font-medium sm:text-lg text-base'>
                         Call Us
                     </h2>
-                    <div className="flex items-start gap-2 pb-3">
+                    <div className="flex items-start gap-1 sm:gap-2 pb-3">
                         <img src="/icons/phone-white.svg" alt="icon phone" className='w-5'/>
                         <p className='text-sm pr-5'>+1 800 854-36-00</p>
                     </div>
@@ -47,14 +50,13 @@ const Footer = () => {
                     <h2 className='sm:text-lg text-base pb-3 font-medium'>
                         Our Services
                     </h2>
-                    <a href="/FindDoctor" className='text-sm'>
-                        Book Appointment
-                    </a>
-                    <p className='text-sm'>Hospital Review</p>
-                    <p className='text-sm'>Find a doctor</p>
-                    <a href="/Event" className='text-sm'>
+                    <a href="/FindDoctor"
+                    className='text-sm'
+                    >Book Appointment</a><br />
+                    <a href="#eventCard" className='text-sm text-white'>
                         Hospital Event
-                    </a>
+                    </a><br />
+                    <p className='text-sm'>Hospital Review</p>
                 </div>
 
                 
@@ -68,7 +70,7 @@ const Footer = () => {
                 </div>
 
                 {/* col-5 map */}
-                <div className="sm:px-5 text-wrap pr-5">
+                <div className="sm:px-5 text-wrap">
                     {/* <h2 className='sm:text-lg text-base font-medium pb-3'>
                     </h2>   */}
                     <div className="w-full h-full">
@@ -87,8 +89,8 @@ const Footer = () => {
 
             </div>
 
-            <div className="px-5 py-3 w-full bottom-0 ">
-                <div className='h-[1px] bg-white'></div>
+            <div className="px-5 py-3 w-full bottom-0 overflow-x-hidden">
+                <div className='h-[1px] pr-10 bg-white'></div>
                 <p className='sm:text-lg text-base flex items-center justify-center  text-white pt-3'>© 2025 DeeCare</p>
             </div>
         </footer >

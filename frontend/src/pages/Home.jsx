@@ -7,22 +7,28 @@ const Home = () => {
     return (
         <>
             {/* Hospital Hero section */}
-            <div className="relative z-10 w-screen">
+            <div className="relative z-10 w-full">
                 {/* hospital image */}
                 <img
                     src="/images/hospital-final.jpg"
                     alt="Hospital"
-                    className="block h-[236px] max-w-screen sm:min-h-[700px] sm:w-screen object-cover z-20"
+                    className="block object-cover z-20 object-bottom
+                    h-[236px] w-full 
+                    sm:h-[700px]"
                 />
 
                 {/* text-block */}
-                <div className="absolute flex flex-col items-start justify-center text-white bg-pri/80 z-30 rounded-2xl left-[22px] top-[22px] w-[272px] h-[190px] px-[16px] sm:left-20  sm:top-[168px] sm:w-[508px] sm:h-[363px] sm:px-[51px]">
+                <div className="absolute flex flex-col items-start justify-center text-white bg-pri/80 z-30 rounded-2xl 
+                left-[22px] top-[22px] 
+                sm:left-20  sm:top-[168px] 
+                h-[78%] w-[80%] 
+                sm:max-w-[508px] sm:max-h-[363px]
+                px-[16px]  sm:px-[51px]">
 
                     {/* Deecare */}
                     <div className="z-50 font-semibold sm:text-[64px] text-[24px]">
                         DeeCare
                     </div>
-
 
                     {/* hospital motto */}
                     <p className="break-words z-40 text-xs sm:text-[20px]">
@@ -40,12 +46,13 @@ const Home = () => {
             </div>
 
             {/* Explore Events */}
-            <section className="sm:h-[659px] h-[289px] w-full sm:py-[108px] py-[30px]">
+            <section className="h-[289px] sm:min-h-[600px] w-full py-[30px] sm:py-[100px]"
+            id="eventCard">
                 <div>
                     <h2 className="sm:text-2xl text-base font-medium sm:mb-3 px-[28px] sm:px-[125px] ">
                         Explore Events 🩺
                     </h2>
-                    <div className=" px-[16px] sm:px-[113px]">
+                    <div className="px-[16px] sm:px-[112px]">
                         <HorizontalScrollCarousel/>
                     </div>
                 </div>
@@ -74,7 +81,7 @@ const HorizontalScrollCarousel = () => {
                     <Link to = {`/Event/${event.id}`} 
                         // event box
                         key={event.id}
-                        className="bg- cursor-pointer rounded-2xl shadow-md sm:min-w-[366px] w-[172px] sm:min-h-full h-full"
+                        className="flex-none bg- cursor-pointer rounded-2xl shadow-md sm:min-w-[366px] w-[172px]"
                         // h-[182px] sm:h-[355px]
                         >
 

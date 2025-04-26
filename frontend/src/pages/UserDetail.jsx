@@ -30,7 +30,7 @@ const UserDetail = () => {
       date: "XX/XX/XX",
       time: "XX:XX AM",
       location: "SIT-building 2rd floor room 203",
-      daysLeft: 5
+      daysLeft: 4
     }
   ]);
   
@@ -65,7 +65,7 @@ const UserDetail = () => {
       setFormData(JSON.parse(savedData));
     }
     
-    // Load appointments from localStorage if available
+    // load Appoinment storage 
     const savedAppointments = localStorage.getItem('appointments');
     if (savedAppointments) {
       setAppointments(JSON.parse(savedAppointments));
@@ -114,19 +114,19 @@ const UserDetail = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row justify-center">
-      {/*profile and appointment*/}
+    <div className="flex flex-col lg:flex-row justify-center items-center">
+      {/* profile and appointment reminder */}
       <div>
-        <div className="bg-gradient-to-b from-cyan-400 to-blue-600 m-5 p-1 w-115 rounded-xl hover:from-blue-500 hover:to-violet-600 hover:shadow-indigo-700 hover:shadow-lg ">
-          <div className="bg-white w-113 flex items-center p-2 transition rounded-lg">
+        <div className="bg-gradient-to-b from-cyan-400 to-blue-600 m-5 p-1 w-116 rounded-xl hover:from-blue-500 hover:to-violet-600 hover:shadow-indigo-700/30 hover:shadow-lg ">
+          <div className="bg-white w-114 flex items-center p-6 transition rounded-lg">
             {formData.profileImage ? (
               <img 
                 src={formData.profileImage} 
-                className="w-30 h-30 bg-gray-200 rounded-full object-cover"
+                className="w-24 h-24 bg-gray-200 rounded-full object-cover"
                 alt="User profile"
               />
             ) : (
-              <div className="w-30 h-30 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+              <div className="w-24 h-24 p-10 bg-pri rounded-full flex items-center justify-center text-white text-3xl font-medium">
                 {getUserInitials()}
               </div>
             )}
@@ -147,17 +147,36 @@ const UserDetail = () => {
                 />
                 <label 
                   htmlFor="profileImage" 
-                  className="cursor-pointer bg-pri text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                  className="cursor-pointer px-3 py-1  rounded-lg w-full"
                 >
-                  Change Photo
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="30" 
+                    height="30" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    className="icon icon-tabler icons-tabler-outline icon-tabler-camera-up text-pri"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M12 20h-7a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v3.5" />
+                    <path d="M12 16a3 3 0 1 0 0 -6a3 3 0 0 0 0 6z" />
+                    <path d="M19 22v-6" />
+                    <path d="M22 19l-3 -3l-3 3" />
+                    
+                  </svg>
+                  
                 </label>
               </div>
             )}
           </div>
         </div>
 
-        <div className="m-5 w-119 max-h-75 overflow-auto">
-          <div className="bg-pri py-2 pl-4 text-white">Appointment Reminder</div>
+        <div className="m-5 w-116 max-h-75 overflow-auto rounded-2xl">
+          <div className="bg-pri py-2 pl-4 text-white font-medium text-xl">Appointment Reminder</div>
           <div className="bg-light-blue p-4">
             <ul className="space-x-2">
               {appointments.length > 0 ? (
@@ -283,7 +302,7 @@ const UserDetail = () => {
             <input
               type="text"
               name="chronicDisease"
-              value={formData.chronicDisease || "-"}
+              value={formData.chronicDisease || ""}
               onChange={handleChange}
               className="bg-white p-2 px-4 rounded-lg w-full"
             />
@@ -300,7 +319,7 @@ const UserDetail = () => {
             <input
               type="text"
               name="allergicDrugs"
-              value={formData.allergicDrugs || "-"}
+              value={formData.allergicDrugs || ""}
               onChange={handleChange}
               className="bg-white p-2 px-4 rounded-lg w-full"
             />
