@@ -6,10 +6,7 @@ import {
     IconEye,
     IconEyeClosed
 } from "@tabler/icons-react";
-// Import useNavigate if using React Router
-// import { useNavigate } from "react-router-dom";
-// OR import useRouter if using Next.js
-// import { useRouter } from "next/router";
+import { useNavigate } from "react-router-dom";
 
 const stepTitle = [
     'PATIENT INFORMATION',
@@ -41,13 +38,6 @@ function Register() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [formVisible, setFormVisible] = useState(true);
-
-    // Uncomment one of these depending on your routing solution:
-    // For React Router:
-    // const navigate = useNavigate();
-
-    // For Next.js:
-    // const router = useRouter();
 
     const [form, setForm] = useState({
         idNumber: "",
