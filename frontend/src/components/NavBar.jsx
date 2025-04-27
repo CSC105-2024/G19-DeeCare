@@ -56,12 +56,6 @@ const NavBar = () => {
                                 />
                             )}
                         </div>
-                        {/*<NavLink*/}
-                        {/*    to="/Login"*/}
-                        {/*    className="bg-yellow border-2 border-yellow text-white px-4 py-2 rounded text-sm font-medium hover:bg-yellow transition-all"*/}
-                        {/*>*/}
-                        {/*    Login*/}
-                        {/*</NavLink>*/}
                         <NavLink
                             to="/Register"
                             className="border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-white hover:text-[#0D47A1] transition-all"
@@ -86,10 +80,19 @@ const NavBar = () => {
                         onClick={() => setMenuOpen(false)}>
                             Appointment
                         </NavLink>
-                        <NavLink to="/Login" className="block hover:text-blue-600" 
-                        onClick={() => setMenuOpen(false)}>
-                            Login
-                        </NavLink>
+                        <div className="justify-center bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all">
+                            <button onClick={() => setShowLogin(true)}>Login</button>
+                            {showLogin && (
+                                <LoginOverlay
+                                    onClose={() => setShowLogin(false)}
+                                    onLogin={handleLogin}
+                                />
+                            )}
+                        </div>
+                        {/*<NavLink to="/Login" className="block hover:text-blue-600" */}
+                        {/*onClick={() => setMenuOpen(false)}>*/}
+                        {/*    Login*/}
+                        {/*</NavLink>*/}
                         <NavLink to="/Register" className="block hover:text-blue-600" 
                         onClick={() => setMenuOpen(false)}>
                             Register

@@ -1,8 +1,7 @@
 import React from 'react';
-import { format } from 'date-fns';
 
 /**
- * TimeSlotSelector component for displaying available time slots in a grid
+ * TimeSlotSelector component for displaying available time slots in a list format
  *
  * @param {Object} props
  * @param {Array} props.availableSlots - Array of available time slots
@@ -26,6 +25,8 @@ const TimeSlotSelector = ({ availableSlots, selectedSlot, onSlotSelect, isLoadin
         const groupedSlots = {};
 
         availableSlots.forEach(slot => {
+            if (!slot.isAvailable) return;
+
             const startTime = getTimePart(slot.start);
             const hour = startTime.split(':')[0]; // Get the hour part
 
@@ -62,33 +63,43 @@ const TimeSlotSelector = ({ availableSlots, selectedSlot, onSlotSelect, isLoadin
     }
 
     return (
-        <div className="p-4 bg-white rounded-lg shadow">
+        <div className="p-4 bg-white rounded-lg">
             <h3 className="text-lg font-semibold mb-4">Available Time Slots</h3>
 
-            <div className="grid grid-cols-3 gap-3 md:grid-cols-4 lg:grid-cols-6">
-                {sortedHours.map(hour =>
-                    groupedSlots[hour].map(slot => {
-                        // Only show available slots
-                        if (!slot.isAvailable) return null;
+            <div className="space-y-4">
+                {sortedHours.map(hour => {
+                    const hourTime = parseInt(hour);
+                    const hourLabel = `${hourTime}:00`;
 
-                        const isSelected = selectedSlot && selectedSlot.id === slot.id;
-                        const startTime = getTimePart(slot.start);
-                        const endTime = getTimePart(slot.end);
+                    return (
+                        <div key={hour} className="mb-4">
+                            <div className="font-medium text-gray-700">{hourLabel}</div>
+                            <div className="grid grid-cols-2 gap-2 mt-1">
+                                {groupedSlots[hour].map(slot => {
+                                    // Only show available slots
+                                    if (!slot.isAvailable) return null;
 
-                        return (
-                            <button
-                                key={slot.id}
-                                className={`py-2 px-4 rounded-lg transition-colors duration-200 text-center
-                                 ${isSelected
-                                    ? 'bg-yellow text-white'
-                                    : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
-                                onClick={() => onSlotSelect(slot)}
-                            >
-                                {startTime} - {endTime}
-                            </button>
-                        );
-                    })
-                )}
+                                    const isSelected = selectedSlot && selectedSlot.id === slot.id;
+                                    const startTime = getTimePart(slot.start);
+                                    const endTime = getTimePart(slot.end);
+
+                                    return (
+                                        <button
+                                            key={slot.id}
+                                            className={`p-2 rounded transition-colors duration-200
+                                             ${isSelected
+                                                ? 'bg-yellow text-white'
+                                                : 'bg-yellow-100 hover:bg-yellow-200 text-gray-800'}`}
+                                            onClick={() => onSlotSelect(slot)}
+                                        >
+                                            {startTime} - {endTime}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { format, isWithinInterval, parseISO } from 'date-fns';
+import calendar from "daisyui/components/calendar/index.js";
 
+calendar.plugins.eventModalPlugin = undefined;
 /**
  * Custom plugin to manage available time slots for booking
  * @param {Object} props - Component props
@@ -12,10 +14,9 @@ import { format, isWithinInterval, parseISO } from 'date-fns';
 const AvailableTime = ({ calendar, onTimeSlotSelected, availableSlots = [], selectedDate }) => {
     const [selectedSlot, setSelectedSlot] = useState(null);
 
-    // Check if date is within the allowed booking period (Apr 28, 2025 - May 16, 2025)
     const isDateInBookingPeriod = (date) => {
-        const startDate = new Date(2025, 3, 28); // April 28, 2025
-        const endDate = new Date(2025, 4, 16);   // May 16, 2025
+        const startDate = new Date(2025, 3, 28);
+        const endDate = new Date(2025, 8, 16);
 
         return isWithinInterval(date, { start: startDate, end: endDate });
     };

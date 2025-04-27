@@ -32,7 +32,7 @@ const useAvailableTime = (initialDate) => {
     const saveBooking = (doctorInfo) => {
         if (!selectedTimeSlot) return false;
 
-        // In a real app, you'd save to backend here
+        //backend here
         console.log('Booking saved:', {
             date: format(selectedDate, 'yyyy-MM-dd'),
             timeSlot: selectedTimeSlot,
@@ -57,12 +57,11 @@ const useAvailableTime = (initialDate) => {
 function generateTimeSlots(date) {
     const slots = [];
     const startHour = 8; // 8 AM
-    const endHour = 16; // 4 PM
+    const endHour = 18; // 6 PM
     const slotDuration = 30; // 30 minutes per slot
 
     const dateStr = format(date, 'yyyy-MM-dd');
 
-    // Generate slots from 8 AM to 4 PM
     for (let hour = startHour; hour < endHour; hour++) {
         for (let minute = 0; minute < 60; minute += slotDuration) {
             const slotDate = new Date(date);
@@ -71,7 +70,6 @@ function generateTimeSlots(date) {
             const endSlotDate = new Date(slotDate);
             endSlotDate.setMinutes(endSlotDate.getMinutes() + slotDuration);
 
-            // Format times for display using ISO format for Schedule-X
             const start = `${dateStr}T${format(slotDate, 'HH:mm:ss')}`;
             const end = `${dateStr}T${format(endSlotDate, 'HH:mm:ss')}`;
 

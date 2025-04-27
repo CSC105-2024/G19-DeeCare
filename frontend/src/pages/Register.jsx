@@ -6,13 +6,16 @@ import {
     IconEye,
     IconEyeClosed
 } from "@tabler/icons-react";
+// Import useNavigate if using React Router
+// import { useNavigate } from "react-router-dom";
+// OR import useRouter if using Next.js
+// import { useRouter } from "next/router";
 
 const stepTitle = [
     'PATIENT INFORMATION',
     'EMERGENCY CONTACT',
 ];
 
-// Define Zod validation schemas
 const patientSchema = z.object({
     idNumber: z.string().length(13, "ID Number must be exactly 13 digits").regex(/^\d+$/, "ID Number must contain only digits"),
     firstName: z.string().min(1, "First name is required"),
@@ -32,11 +35,19 @@ const emergencyContactSchema = z.object({
 });
 
 function Register() {
-    const {page} = useFormContext();
+    const {page, setPage} = useFormContext();
     const [currentStep, setCurrentStep] = useState(1);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [formVisible, setFormVisible] = useState(true);
+
+    // Uncomment one of these depending on your routing solution:
+    // For React Router:
+    // const navigate = useNavigate();
+
+    // For Next.js:
+    // const router = useRouter();
 
     const [form, setForm] = useState({
         idNumber: "",
@@ -69,7 +80,6 @@ function Register() {
     const handleChange = (e) => {
         const {name, value} = e.target;
 
-        // Special handling for ID number - restrict to digits only and max 13 digits
         if (name === "idNumber") {
             const numericValue = value.replace(/\D/g, '');
             const truncatedValue = numericValue.slice(0, 13);
@@ -131,6 +141,49 @@ function Register() {
         setCurrentStep(prev => prev - 1);
     };
 
+    const resetForm = () => {
+        setForm({
+            idNumber: "",
+            firstName: "",
+            lastName: "",
+            dob: "",
+            age: "",
+            bloodType: "",
+            password: "",
+            email: "",
+            contactName: "",
+            contactPhone: "",
+            relationship: "",
+            contactEmail: "",
+        });
+        setCurrentStep(1);
+        setErrors({});
+    };
+
+    const navigateToHomepage = () => {
+        // Choose one of these approaches based on your routing setup:
+
+        // 1. If you're using FormContext for navigation:
+        if (setPage) {
+            setPage('home'); // Navigate to home page using context
+            return;
+        }
+
+        // 2. For React Router:
+        // navigate('/'); // Navigate to home page
+
+        // 3. For Next.js:
+        // router.push('/'); // Navigate to home page
+
+        // 4. For plain HTML navigation:
+        window.location.href = '/'; // Navigate to home page
+    };
+
+    const closeForm = () => {
+        setFormVisible(false);
+        // We'll keep this separate from navigation for clarity
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -139,7 +192,15 @@ function Register() {
             try {
                 // Simulate sending to backend
                 console.log("Submitting form data:", form);
-                alert("Registration successfully submitted!");
+
+                // Use a custom alert with a callback for the OK button
+                const confirmed = window.confirm("Registration successfully submitted!");
+
+                // When user clicks OK on the alert, close the form
+                if (confirmed) {
+                    closeForm();
+                }
+
             } catch (error) {
                 console.error("Error submitting form:", error);
             } finally {
@@ -151,6 +212,24 @@ function Register() {
     const ErrorMessage = ({name}) => (
         errors[name] ? <p className="text-red-500 text-xs mt-1">{errors[name]}</p> : null
     );
+
+    // If form is closed, show a success message or redirect
+    if (!formVisible) {
+        return (
+            <div className="flex justify-center items-center min-h-screen bg-background p-4">
+                <div className="bg-light-blue p-8 rounded-xl shadow-md max-w-md w-full text-center">
+                    <h2 className="text-2xl font-bold text-yellow mb-4">Registration Complete!</h2>
+                    <p className="text-pri mb-6">Your registration was successfully submitted.</p>
+                    <button
+                        onClick={navigateToHomepage}
+                        className="bg-pri text-white px-6 py-3 rounded-lg mx-auto"
+                    >
+                        BACK TO HOMEPAGE
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-background p-4">
@@ -164,7 +243,8 @@ function Register() {
                     <div className="flex flex-row justify-center items-center gap-2 sm:gap-4 relative z-10 w-fit">
                         <div className="bg-pri w-1/2 h-1 absolute top-[30%] rounded -z-10"></div>
                         {stepTitle.map((title, index) => (
-                            <div key={index + 1} className="flex flex-col items-center justify-center md:text-2xl relative px-1">
+                            <div key={index + 1}
+                                 className="flex flex-col items-center justify-center md:text-2xl relative px-1">
                                 <div className={cn(
                                     "flex items-center justify-center text-white rounded-full size-16 sm:size-14 md:size-18",
                                     currentStep >= index + 1 ? "bg-ivory border-2 border-pri text-pri" : "bg-gray-400 border-2 border-gray-400",
@@ -206,7 +286,8 @@ function Register() {
                             />
                             <ErrorMessage name="idNumber"/>
                             {form.idNumber && form.idNumber.length !== 13 && !errors.idNumber && (
-                                <p className="text-yellow-600 text-xs mt-1">ID Number must be exactly 13 digits ({form.idNumber.length}/13)</p>
+                                <p className="text-yellow-600 text-xs mt-1">ID Number must be exactly 13 digits
+                                    ({form.idNumber.length}/13)</p>
                             )}
                         </div>
 
@@ -255,7 +336,7 @@ function Register() {
                                     onChange={handleChange}
                                     className={`w-full p-3 rounded-md bg-gray-50 border ${errors.dob ? 'border-red-500' : 'border-blue-100'} text-gray-700 outline-0`}
                                 />
-                                <ErrorMessage name="dob" />
+                                <ErrorMessage name="dob"/>
                             </div>
                             <div className="md:mt-3">
                                 <label className="block font-semibold text-lg text-pri ">
@@ -286,7 +367,7 @@ function Register() {
                                     <option value="O">O</option>
                                     <option value="AB">AB</option>
                                 </select>
-                                <ErrorMessage name="bloodType" />
+                                <ErrorMessage name="bloodType"/>
                             </div>
                         </div>
 
@@ -326,7 +407,7 @@ function Register() {
                                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 focus:outline-none"
                                     aria-label={showPassword ? "Hide password" : "Show password"}
                                 >
-                                    {showPassword ? <IconEye /> : <IconEyeClosed />}
+                                    {showPassword ? <IconEye/> : <IconEyeClosed/>}
                                 </button>
                             </div>
                             <ErrorMessage name="password"/>
@@ -349,9 +430,6 @@ function Register() {
                                 Emergency Contact
                             </h2>
                         </div>
-                        {/*<h3 className="text-xl font-bold text-blue-900 mb-3 sm:mb-4">*/}
-                        {/*    Emergency Contact*/}
-                        {/*</h3>*/}
                         <div className="w-full">
                             {/* Name */}
                             <label className="block font-semibold text-lg text-pri mb-1 mt-2">

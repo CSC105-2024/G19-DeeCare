@@ -6,7 +6,6 @@ import {
     IconEyeClosed
 } from "@tabler/icons-react";
 
-// Zod schema for form validation
 const loginSchema = z.object({
     id: z.string().min(1, "ID is required").max(50),
     password: z.string().min(6, "Password must be at least 6 characters")
@@ -43,11 +42,9 @@ const LoginOverlay = ({ onClose, onLogin }) => {
         setIsLoading(true);
 
         try {
-            // Validate form data
             const validatedData = loginSchema.parse(formData);
             console.log("Form is valid:", validatedData);
 
-            // Simulate API call
             setTimeout(() => {
                 if (onLogin) onLogin(validatedData);
                 setIsLoading(false);
@@ -70,8 +67,8 @@ const LoginOverlay = ({ onClose, onLogin }) => {
     };
 
     const handleRegisterClick = () => {
-        onClose(); // Close overlay first
-        navigate("/register"); // Then navigate to register page
+        onClose();
+        navigate("/register");
     };
 
     // Prevent background scrolling when overlay is open
