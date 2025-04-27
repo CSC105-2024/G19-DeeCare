@@ -7,44 +7,44 @@ const FindDoctor = () => {
   const doctors = [
     {
       id: 1,
-      name: "Dr.Apple Mac",
+      name: "Dr.One pen",
       department: "Cardiology",
-      photo: "images/Dr_Apple.jpg",
+      photo: "images/Dr1.jpg",
       specialization: "Interventional Cardiology",
     },
     {
       id: 2,
-      name: "Dr.Banana Choco",
+      name: "Dr.Double Wilson",
       department: "Neurology",
-      photo: "images/Dr_Banana.jpg",
+      photo: "images/Dr2.jpg",
       specialization: "Movement Disorders",
     },
     {
       id: 3,
-      name: "Dr.Orange Juice",
+      name: "Dr.Pongsak",
       department: "Pediatrics",
-      photo: "images/Dr_Orange.jpg",
+      photo: "images/Dr3.jpg",
       specialization: "Pediatric Immunology",
     },
     {
       id: 4,
-      name: "Dr.StrawBerry ShortCake",
+      name: "Dr.John Carter",
       department: "Orthopedics",
-      photo: "images/Dr_Strawberry.jpg",
+      photo: "images/Dr4.jpg",
       specialization: "Sports Medicine",
     },
     {
       id: 5,
-      name: "Dr.Durian Thailand",
+      name: "Dr.Jennifer lopez",
       department: "Orthopedics",
-      photo: "images/Dr_Durian.jpg",
+      photo: "images/Dr5.jpg",
       specialization: "King of fruit",
     },
     {
       id: 6,
-      name: "Dr.Mango Teen",
+      name: "Dr.Siriporn",
       department: "Orthopedics",
-      photo: "images/Dr_Mango.jpg",
+      photo: "images/Dr6.jpg",
       specialization: "Queen of fruit",
     },
   ];
@@ -62,38 +62,37 @@ const FindDoctor = () => {
     <div>
       <div className="hidden md:block">   
        <button >
-        <Link to="/FilterBar"> <img src="icons/Back.png" className='fixed mx-15 my-15 lg:35 xl:mx-50 bottom-1 left-1 rounded-4xl h-15 w-15 object-cover'></img> </Link>
+        <Link to="/FilterBar"> <img src="icons/Back.png" className='fixed mx-15 my-15 lg:35 xl:mx-50 bottom-1 left-1 rounded-4xl h-15 w-15 object-cover '></img> </Link>
       </button>
       </div>
 
       <div className="w-auto mt-15 container object-center justify-self-center ">
 
-      <div >
-                <div className=" justify-between w-auto bg-pri">
-                  <form action="/FindDoctor" className="flex justify-between">
+      <div className="max-w-screen" >
+                <div className=" justify-between  bg-pri">
+                  <form action="/FindDoctor" className=" justify-between flex flex-row">
                   <input type="text" placeholder="Search Doctor"
                   
-                  className=" bg-pri text-white container px-4 outline-0
-                  h-9 w-90 sm:w-120 md:w-130">
+                  className="w-auto bg-pri text-white container px-4 outline-0
+                  h-9  " >
                   </input>
-                  <div className="justify-end">
+                  <div className="flex flex-row justify-end">
                     <button type="submit" className="justify-items-center bg-pri hover:bg-blue-700 duration-300 py-2 w-9"><img src="icons/search.png" className=' h-5 w-5 object-cover'></img></button>
                     <Link to="/FilterBar">
-                    <button className="p-2 object-left bg-pri  hover:bg-blue-700 duration-300">
-                      <img src="icons/filter.png" className=' h-5 w-5 object-cover'></img></button>
+                    <button className="p-2 object-left bg-pri  hover:bg-blue-700 duration-300"><img src="icons/filter.png" className=' h-5 w-5 object-cover'></img></button>
                     </Link>
                   </div>
                   </form>
                  
                   </div>
               </div>
-      <ul className="space-y-4 p-5 bg-light-blue mt-5">
+      <ul className="space-y-4 p-5 bg-light-blue mt-5 ">
         {doctors.map((doctor) => (
           <li 
             key={doctor.id}
             className="bg-white rounded-lg overflow-hidden"
           >
-            <div className="flex items-center p-3 transition">
+            <div className="flex items-center  p-3 transition">
               <div className="flex-shrink-0 ">
                 <img 
                   src={doctor.photo} 
@@ -101,22 +100,22 @@ const FindDoctor = () => {
                   className="w-25 h-25 rounded-full object-cover"
                 />
               </div>
-              <div className="ml-3 flex-grow">
-                <h2 className=" font-semibold text-gray-800">{doctor.name}</h2>
+              <div className="ml-3 flex-grow ">
+                <h2 className="font-semibold text-gray-800">{doctor.name}</h2>
                 <p className="text-gray-600 text-sm">{doctor.department}</p>
                
               </div>
-              <div className="flex-col">
+              <div className="flex-col ">
               <Link to="/Timeslot">
               <div>
-                  <p className="w-30 py-2 text-sm bg-yellow text-white text-center rounded-lg hover:bg-amber-500 duration-200 transition mr-2 ">
+                  <p className="w-30 py-2 ml-2 text-sm bg-yellow text-white text-center rounded-lg hover:bg-amber-500 duration-200 transition mr-2 ">
                     Select Doctor
                   </p>
               </div>
               </Link>
               <button 
                 onClick={() => toggleDetails(doctor.id)}
-                className="mt-2 w-30 py-1 text-pri border-1 text-sm text-center rounded-lg hover:text-white hover:bg-pri duration-300 transition"
+                className="mt-1 w-30 py-1 ml-2 text-pri border-1 text-sm text-center rounded-lg hover:text-white hover:bg-pri duration-300 transition"
               >
                 {selectedDoctor === doctor.id ? "Hide Details" : "View Details"}
               </button>
@@ -135,7 +134,7 @@ const FindDoctor = () => {
           </li>
         ))}
         <footer>
-        <div className="my-5 sm:my-10 text-center text-2xl text-gray-700 ">
+        <div className="m-10 text-center text-2xl text-gray-700">
           End of search results
         </div>
       </footer>
