@@ -1,97 +1,46 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
-/**
- * Custom hook to manage available time slots
- * @param {Date} initialDate - Initial selected date
- * @returns {Object} - State and methods for managing available time slots
- */
-const useAvailableTime = (initialDate = new Date()) => {
+const useAvailableTime = (initialDate) => {
     const [selectedDate, setSelectedDate] = useState(initialDate);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
     const [availableSlots, setAvailableSlots] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Fetch available slots for the selected date
-    const fetchAvailableSlots = async (date) => {
+    // Generate time slots for the selected date
+    useEffect(() => {
         setIsLoading(true);
-        try {
-            // Replace this with your actual API call
-            // For now, we'll simulate with sample data
-            const formattedDate = format(date, 'yyyy-MM-dd');
 
-            // Simulated API response (replace with actual API call)
-            // In a real implementation, you would fetch this from your backend
-            const sampleSlots = [
-                {
-                    id: `slot-${formattedDate}-1`,
-                    title: 'Available',
-                    start: `${formattedDate} 08:00`,
-                    end: `${formattedDate} 09:00`,
-                    color: '#f9a825', // Orange color
-                    editable: false,
-                    isAvailable: true
-                },
-                {
-                    id: `slot-${formattedDate}-2`,
-                    title: 'Available',
-                    start: `${formattedDate} 09:00`,
-                    end: `${formattedDate} 10:00`,
-                    color: '#f9a825',
-                    editable: false,
-                    isAvailable: true
-                },
-                {
-                    id: `slot-${formattedDate}-3`,
-                    title: 'Available',
-                    start: `${formattedDate} 10:00`,
-                    end: `${formattedDate} 11:00`,
-                    color: '#f9a825',
-                    editable: false,
-                    isAvailable: true
-                }
-            ];
+        // Generate slots immediately (could be replaced with API call)
+        const newSlots = generateTimeSlots(selectedDate);
+        setAvailableSlots(newSlots);
+        setIsLoading(false);
 
-            setAvailableSlots(sampleSlots);
-        } catch (error) {
-            console.error('Error fetching available slots:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+        // Clear selected time slot when date changes
+        setSelectedTimeSlot(null);
+    }, [selectedDate]);
 
-    // Change selected date and fetch available slots
     const handleDateChange = (date) => {
         setSelectedDate(date);
-        setSelectedTimeSlot(null);
     };
 
-    // Handle time slot selection
     const handleTimeSlotSelected = (slot) => {
+        console.log("Time slot selected:", slot);
         setSelectedTimeSlot(slot);
     };
 
-    // Store selected booking in session storage
     const saveBooking = (doctorInfo) => {
         if (!selectedTimeSlot) return false;
 
-        const bookingData = {
+        //backend here
+        console.log('Booking saved:', {
             date: format(selectedDate, 'yyyy-MM-dd'),
-            startTime: selectedTimeSlot.start.split(' ')[1],
-            endTime: selectedTimeSlot.end.split(' ')[1],
-            doctorName: doctorInfo.name || 'Unknown Doctor',
-            department: doctorInfo.department || 'General',
-            slotId: selectedTimeSlot.id
-        };
+            timeSlot: selectedTimeSlot,
+            doctor: doctorInfo
+        });
 
-        sessionStorage.setItem('selectedBooking', JSON.stringify(bookingData));
-        return true;
+        return true; // Indicate success
     };
-
-    // Load available slots when date changes
-    useEffect(() => {
-        fetchAvailableSlots(selectedDate);
-    }, [selectedDate]);
 
     return {
         selectedDate,
@@ -103,5 +52,47 @@ const useAvailableTime = (initialDate = new Date()) => {
         saveBooking
     };
 };
+
+// Helper function to generate time slots
+function generateTimeSlots(date) {
+    const slots = [];
+    const startHour = 8; // 8 AM
+    const endHour = 18; // 6 PM
+    const slotDuration = 30; // 30 minutes per slot
+
+    const dateStr = format(date, 'yyyy-MM-dd');
+
+    for (let hour = startHour; hour < endHour; hour++) {
+        for (let minute = 0; minute < 60; minute += slotDuration) {
+            const slotDate = new Date(date);
+            slotDate.setHours(hour, minute, 0, 0);
+
+            const endSlotDate = new Date(slotDate);
+            endSlotDate.setMinutes(endSlotDate.getMinutes() + slotDuration);
+
+            const start = `${dateStr}T${format(slotDate, 'HH:mm:ss')}`;
+            const end = `${dateStr}T${format(endSlotDate, 'HH:mm:ss')}`;
+
+            // Randomly determine if slot is available (for demo)
+            const isAvailable = Math.random() > 0.3; // 70% chance of being available
+
+            slots.push({
+                id: `slot-${dateStr}-${hour}-${minute}`,
+                title: `${format(slotDate, 'HH:mm')} - ${format(endSlotDate, 'HH:mm')}`,
+                start,
+                end,
+                isAvailable,
+                // Color based on availability
+                color: isAvailable ? '#4CAF50' : '#F44336',
+                backgroundColor: isAvailable ? '#FFD700' : '#F44336',
+                // Make sure events are configured correctly for Schedule-X
+                allDay: false,
+                editable: false
+            });
+        }
+    }
+
+    return slots;
+}
 
 export default useAvailableTime;

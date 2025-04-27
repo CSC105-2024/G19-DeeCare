@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { format, isWithinInterval, parseISO } from 'date-fns';
+import calendar from "daisyui/components/calendar/index.js";
 
+calendar.plugins.eventModalPlugin = undefined;
 /**
  * Custom plugin to manage available time slots for booking
  * @param {Object} props - Component props
@@ -12,14 +14,32 @@ import { format } from 'date-fns';
 const AvailableTime = ({ calendar, onTimeSlotSelected, availableSlots = [], selectedDate }) => {
     const [selectedSlot, setSelectedSlot] = useState(null);
 
+    const isDateInBookingPeriod = (date) => {
+        const startDate = new Date(2025, 3, 28);
+        const endDate = new Date(2025, 8, 16);
+
+        return isWithinInterval(date, { start: startDate, end: endDate });
+    };
+
+    // Filter available slots based on booking period
+    const getFilteredSlots = () => {
+        if (!selectedDate || !isDateInBookingPeriod(selectedDate)) {
+            return [];
+        }
+
+        const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+
+        return availableSlots.filter(slot =>
+            slot.start.startsWith(formattedDate) &&
+            slot.isAvailable
+        );
+    };
+
     // Initialize plugin when calendar or available slots change
     useEffect(() => {
         if (!calendar || !availableSlots.length) return;
 
         // Add event click handler using the event modal plugin
-        // For schedule-x, we need to access the eventModalPlugin instead of using .on() directly
-
-        // Check if the event modal plugin is available in the calendar instance
         if (calendar.plugins && calendar.plugins.eventModalPlugin) {
             // Override the onEventClick method of the eventModalPlugin
             const originalOnEventClick = calendar.plugins.eventModalPlugin.onEventClick;
@@ -34,7 +54,9 @@ const AvailableTime = ({ calendar, onTimeSlotSelected, availableSlots = [], sele
                 const clickedSlot = availableSlots.find(slot => slot.id === eventId);
                 if (clickedSlot && clickedSlot.isAvailable) {
                     setSelectedSlot(clickedSlot);
-                    onTimeSlotSelected(clickedSlot);
+                    if (typeof onTimeSlotSelected === 'function') {
+                        onTimeSlotSelected(clickedSlot);
+                    }
                 }
             };
 
@@ -51,25 +73,37 @@ const AvailableTime = ({ calendar, onTimeSlotSelected, availableSlots = [], sele
     useEffect(() => {
         if (!calendar || !selectedDate) return;
 
-        // Set events to available slots for the selected date
-        const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+        // Check if date is within booking period
+        if (!isDateInBookingPeriod(selectedDate)) {
+            // If outside booking period, clear events
+            if (calendar.setEvents) {
+                calendar.setEvents([]);
+            }
 
-        // Filter slots for the selected date
-        const slotsForDate = availableSlots.filter(slot =>
-            slot.start.startsWith(formattedDate)
-        );
+            // Clear selection
+            setSelectedSlot(null);
+            if (typeof onTimeSlotSelected === 'function') {
+                onTimeSlotSelected(null);
+            }
+            return;
+        }
+
+        // Get filtered slots for the selected date
+        const filteredSlots = getFilteredSlots();
 
         // Update calendar events
         if (calendar.setEvents) {
-            calendar.setEvents(slotsForDate);
+            calendar.setEvents(filteredSlots);
         } else if (calendar.calendarState && calendar.calendarState.events) {
             // Alternative approach if setEvents is not available
-            calendar.calendarState.events.value = slotsForDate;
+            calendar.calendarState.events.value = filteredSlots;
         }
 
         // Clear selection when date changes
         setSelectedSlot(null);
-        onTimeSlotSelected(null);
+        if (typeof onTimeSlotSelected === 'function') {
+            onTimeSlotSelected(null);
+        }
 
     }, [selectedDate, availableSlots, calendar, onTimeSlotSelected]);
 

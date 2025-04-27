@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as z from "zod";
-// import {
-//     IconEye,
-//     IconEyeClosed
-// } from "@tabler/icons-react";
+import {
+    IconEye,
+    IconEyeClosed
+} from "@tabler/icons-react";
 
-// Zod schema for form validation
 const loginSchema = z.object({
     id: z.string().min(1, "ID is required").max(50),
     password: z.string().min(6, "Password must be at least 6 characters")
@@ -43,11 +42,9 @@ const LoginOverlay = ({ onClose, onLogin }) => {
         setIsLoading(true);
 
         try {
-            // Validate form data
             const validatedData = loginSchema.parse(formData);
             console.log("Form is valid:", validatedData);
 
-            // Simulate API call
             setTimeout(() => {
                 if (onLogin) onLogin(validatedData);
                 setIsLoading(false);
@@ -70,11 +67,7 @@ const LoginOverlay = ({ onClose, onLogin }) => {
     };
 
     const handleRegisterClick = () => {
-        if (typeof onClose === "function") {
-            onClose(); 
-        } else {
-            console.error("onClose is not a function");
-        }
+        onClose();
         navigate("/register");
     };
 
@@ -102,7 +95,7 @@ const LoginOverlay = ({ onClose, onLogin }) => {
 
     return (
         <div
-            className="fixed inset-0 flex items-center justify-center backdrop-blur-3xl bg-opacity-50 z-50"
+            className="fixed inset-0 flex items-center justify-center backdrop-blur-lg bg-opacity-40 z-50"
             onClick={handleOverlayClick}
         >
             <div className="bg-blue-100 p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl shadow-lg w-11/12 sm:w-96 relative mx-4 sm:mx-auto">

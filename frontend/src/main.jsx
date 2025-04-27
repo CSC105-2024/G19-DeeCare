@@ -8,7 +8,7 @@ import Event from "./pages/Event.jsx";
 import FilterBar from "./components/FilterBar.jsx";
 import FindDoctor from "./pages/FindDoctor.jsx";
 import Timeslot from "./pages/Timeslot.jsx";
-import Confirm from "./pages/Confirm.jsx";
+import Confirm from "./pages/ConfirmAppointment.jsx";
 import Register from "./pages/Register.jsx";
 import UserDetail from "./pages/UserDetail.jsx";
 import Admin_post from "./pages/Admin_post.jsx";

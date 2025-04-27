@@ -62,60 +62,22 @@ const NavBar = () => {
                         >
                             Appointment
                         </NavLink>
-
-                        {user ? (
-                            <div className="flex items-center gap-4">
-                                <a href="/UserDetail" className="flex items-center gap-2 ">
-                                    <img
-                                        src={user.photo}
-                                        alt="Profile"
-                                        className="h-8 w-8 rounded-full object-cover"
-                                    />
-                                </a>
-                                <button
-                                    onClick={handleLogout}
-                                    className="text-sm  px-3 py-1 rounded-lg transition-all"
-                                >
-                                    <svg  
-                                        xmlns="http://www.w3.org/2000/svg"  width="24"  
-                                        height="24"  
-                                        viewBox="0 0 24 24"  
-                                        fill="none"  
-                                        stroke="white"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  className="icon icon-tabler icons-tabler-outline icon-tabler-logout">
-                                        <path 
-                                            stroke="none" 
-                                            d="M0 0h24v24H0z" fill="none"/>
-                                        <path 
-                                            d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
-                                        <path d="M9 12h12l-3 -3" />
-                                        <path d="M18 15l3 -3" />
-                                    </svg>
-                                </button>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all">
-                                <NavLink
-                                    to="/Login"
-                                    className="bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all"
-                                    onClick={() => {
-                                        setShowLogin(true); // เปิด LoginOverlay
-                                        setMenuOpen(false);  // ปิดเมนู hamburger
-                                    }}
-                                >
-                                    Login
-                                </NavLink>
-
-                                </div>
-                                <NavLink
-                                    to="/Register"
-                                    className="border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-white hover:text-[#0D47A1] transition-all"
-                                    onClick={() => setMenuOpen(false)} 
-                                >
-                                    Register
-                                </NavLink>
-                            </>
-                        )}
+                        {/* Auth Buttons */}
+                        <div className="bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all">
+                            <button onClick={() => setShowLogin(true)}>Login</button>
+                            {showLogin && (
+                                <LoginOverlay
+                                    onClose={() => setShowLogin(false)}
+                                    onLogin={handleLogin}
+                                />
+                            )}
+                        </div>
+                        <NavLink
+                            to="/Register"
+                            className="border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-white hover:text-[#0D47A1] transition-all"
+                        >
+                            Register
+                        </NavLink>
                     </div>
 
                     <div className="flex items-center gap-2 md:hidden">
@@ -151,36 +113,19 @@ const NavBar = () => {
                             Appointment
                         </NavLink>
 
-                        {user ? (
-                            <div className="flex flex-col gap-2 py-2">
-                                <button
-                                    onClick={handleLogout}
-                                    className="text-left hover:text-red-500"
-                                >
-                                    Logout
-                                </button>
-                            </div>
-                        ) : (
-                            <>
-                                <NavLink
-                                    to="/Login"
-                                    className="block hover:text-blue-600"
-                                    onClick={() => {
-                                        setMenuOpen(false);
-                                        setShowLogin(true);
-                                    }}
-                                >
-                                    Login
-                                </NavLink>
-                                <NavLink
-                                    to="/Register"
-                                    className="block hover:text-blue-600"
-                                    onClick={() => setMenuOpen(false)} 
-                                >
-                                    Register
-                                </NavLink>
-                            </>
-                        )}
+                     <div className="justify-center bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all">
+                            <button onClick={() => setShowLogin(true)}>Login</button>
+                            {showLogin && (
+                                <LoginOverlay
+                                    onClose={() => setShowLogin(false)}
+                                    onLogin={handleLogin}
+                                />
+                            )}
+                        </div>
+                        <NavLink to="/Register" className="block hover:text-blue-600" 
+                        onClick={() => setMenuOpen(false)}>
+                            Register
+                        </NavLink>
                     </div>
                 )}
             </nav>
