@@ -5,7 +5,7 @@ import './App.css'
 
 function App() {
   const [complete,setComplete] = useState(true)
-  function
+  
   const Todo = [
     {
       id: 1,
@@ -62,8 +62,8 @@ function App() {
         {Todo.map((todo) => (
         <div className="flex flex-row justify-between bg-white p-3 rounded-lg">
           <div className='flex flex-row'>
-          <div className={`${todo.success ? 'bg-green-400 rounded-full w-10 h-10'
-           : 'bg-red-400  rounded-full w-10 h-10'}`}
+          <div className={`${todo.success ? 'bg-green-400 rounded-full w-10 h-10 my-auto'
+           : 'bg-red-400  rounded-full w-10 h-10 my-auto'}`}
               
           ></div> 
           <div className='break-words max-w-xs w-61 p-1.5    px-3 '>{todo.name}</div>
