@@ -5,7 +5,6 @@ const GetTodo =  async () => {
   return todo;
 };
 
-
 const AddTodo = async (newTodoName: string) => {
   const todo = await db.todo.create({
     data: {
@@ -16,6 +15,7 @@ const AddTodo = async (newTodoName: string) => {
 };
 
 const EditTodo = async (todoId: number, editTodoName: string) => {
+  //patch
   const todo = await db.todo.update({
     where: {
       id: todoId,
@@ -23,26 +23,28 @@ const EditTodo = async (todoId: number, editTodoName: string) => {
     data: {
       name: editTodoName,
     },
-  })
+  });
+  return todo;
 };
 
 const SuccessTodo = async (todoId: number) => {
   const todo = await db.todo.update({
     where: {
-      id:todoId
+      id: todoId
     },
     data:{
       success: true,
-   },
-  })
+    },
+  });
+  return todo;
 };
 
 const DeleteTodo = async (todoId: number) => {
-  const todo = await db.todo.delete({
+   await db.todo.delete({
     where: {
       id: todoId,
     }
-  })
+  });
 };
 
 export { GetTodo, AddTodo, EditTodo, SuccessTodo, DeleteTodo };
