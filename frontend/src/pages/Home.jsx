@@ -32,7 +32,7 @@ const Home = () => {
 
                     {/* hospital motto */}
                     <p className="break-words z-40 text-xs sm:text-[20px]">
-                        No more long waits. Book your appointment in seconds and stay informed.
+                        No more long waits. Book your appointment now and stay informed.
                         {/* A smarter way to book your doctor — quick, safe, and designed with care. */}
                     </p>
 
@@ -62,7 +62,6 @@ const Home = () => {
 }; 
 
 const HorizontalScrollCarousel = () => {
-    // const navigate = useNavigate();
     const targetRef = useRef(null);
     const {scrollXProgress} = useScroll({
         container: targetRef,
@@ -82,7 +81,6 @@ const HorizontalScrollCarousel = () => {
                         // event box
                         key={event.id}
                         className="flex-none bg- cursor-pointer rounded-2xl shadow-md sm:min-w-[366px] w-[172px]"
-                        // h-[182px] sm:h-[355px]
                         >
 
                         {/* inside box */}
