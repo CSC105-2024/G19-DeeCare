@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Patient {
+  id              Int              @id @default(autoincrement())
+  idNumber        String           @unique
+  firstName       String
+  lastName        String
+  dob             String
+  age             String?
+  bloodType       String
+  password        String
+  email           String           @unique
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  appointments    Appointment[]
+  emergencyContact EmergencyContact?
+}
+
+model EmergencyContact {
+  id              Int      @id @default(autoincrement())
+  contactName     String?
+  relationship    String?
+  contactPhone    String?
+  contactEmail    String?
+  patient         Patient  @relation(fields: [patientId], references: [id])
+  patientId       Int      @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Doctor {
+  id              Int      @id @default(autoincrement())
+  firstName       String
+  lastName        String
+  specialty       String
+  email           String   @unique
+  phoneNumber     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  appointments    Appointment[]
+  availableTimes  AvailableTime[]
+}
+
+model Appointment {
+  id              Int      @id @default(autoincrement())
+  patient         Patient  @relation(fields: [patientId], references: [id])
+  patientId       Int
+  doctor          Doctor   @relation(fields: [doctorId], references: [id])
+  doctorId        Int
+  date            String
+  time            String
+  reason          String
+  status          String   @default("scheduled") // scheduled, completed, cancelled
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model AvailableTime {
+  id              Int      @id @default(autoincrement())
+  doctor          Doctor   @relation(fields: [doctorId], references: [id])
+  doctorId        Int
+  day             String   // Monday, Tuesday, etc.
+  startTime       String
+  endTime         String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  username        String   @unique
+  email           String   @unique
+  password        String
+  role            String   @default("user") // user, admin, doctor
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

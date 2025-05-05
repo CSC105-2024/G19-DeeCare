@@ -1,392 +1,626 @@
-import {useNavigate} from "react-router-dom";
-import {useState, useEffect, useRef} from "react";
-import Calendar from 'react-calendar';
-import '../styles/react-calendar.css';
-import {format, isWithinInterval} from 'date-fns';
+import { useState } from 'react';
 
-// import { ScheduleXCalendar } from '@schedule-x/react';
-import {createCalendar, createViewWeek} from '@schedule-x/calendar';
-import {createEventsServicePlugin} from '@schedule-x/events-service';
-import {createEventModalPlugin} from '@schedule-x/event-modal';
-import '@schedule-x/theme-default/dist/index.css';
-
-import useAvailableTime from '../hook/useAvailableTime.jsx';
-import {AvailableTimePlugin} from '../plugin/AvailableTimePlugin.jsx';
-
-function Timeslot() {
-    const navigate = useNavigate();
-    const calendarRef = useRef(null);
-
-    // Define booking period (Apr 28, 2025 - May 16, 2025)
-    const bookingStartDate = new Date(2025, 3, 28);
-    const bookingEndDate = new Date(2025, 7, 16);
-
-    // Initialize with booking start date if today is outside the range
+const DeeCare = () => {
+    // Date setup for time slot display - matches the calendar
     const today = new Date();
-    const initialDate = isWithinInterval(today, {
-        start: bookingStartDate,
-        end: bookingEndDate
-    }) ? today : bookingStartDate;
+    const firstDay = new Date(today);
+    // Set to the first day of the current week (Sunday)
+    const day = firstDay.getDay();
+    firstDay.setDate(firstDay.getDate() - day);
 
-    // Doctor information
-    const doctorInfo = {
-        name: "Dr. Apple",
-        department: "General Health",
-        workHours: "8:00-16:00",
-        image: "/images/Dr_Apple.jpg"
+    // Generate date strings for the current week
+    const generateDateStrings = (startDate) => {
+        const dates = [];
+        for (let i = 0; i < 5; i++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + i);
+            const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
+            const day = date.getDate();
+            const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()];
+            dates.push({
+                display: `${dayName}, ${day} ${month}`,
+                date: date
+            });
+        }
+        return dates;
     };
 
-    // Use our custom hook
-    const {
-        selectedDate,
-        selectedTimeSlot,
-        availableSlots,
-        isLoading,
-        handleDateChange,
-        handleTimeSlotSelected,
-        saveBooking
-    } = useAvailableTime(initialDate);
+    const [currentWeekStart, setCurrentWeekStart] = useState(firstDay);
+    const [dateStrings, setDateStrings] = useState(generateDateStrings(firstDay));
 
-    // Toggle between calendar and list view
-    const [showCalendarView, setShowCalendarView] = useState(false);
+    // Sample doctor data with 30-min slots
+    const generateSlots = (date, slots) => {
+        const formattedDate = `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()]}, ${date.getDate()} ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()]}`;
 
-    // Store the calendar app and plugins as refs
-    const calendarAppRef = useRef(null);
-    const eventsServicePluginRef = useRef(null);
-    const eventModalPluginRef = useRef(null);
-    const availableTimePluginRef = useRef(null);
+        const available = {};
+        available[formattedDate] = slots;
+        return available;
+    };
 
-    // Initialize or update the available time plugin when availableSlots change
-    useEffect(() => {
-        if (!availableTimePluginRef.current) {
-            availableTimePluginRef.current = new AvailableTimePlugin({
-                onTimeSlotSelected: handleTimeSlotSelected,
-                availableSlots: availableSlots,
-                selectedDate: selectedDate
-            });
-        } else {
-            availableTimePluginRef.current.updateAvailableSlots(availableSlots);
-            availableTimePluginRef.current.updateSelectedDate(selectedDate);
+    // Initial slots for doctors
+    const initialSlots = {
+        1: {
+            availableSlots: {
+                ...generateSlots(dateStrings[0].date, ['8:00', '8:30', '9:30', '10:00']),
+                ...generateSlots(dateStrings[1].date, ['9:00', '9:30', '10:30', '11:00', '14:00', '14:30', '15:00']),
+                ...generateSlots(dateStrings[2].date, ['8:00', '8:30', '10:00', '10:30', '11:00', '11:30', '15:00', '15:30', '16:00']),
+                ...generateSlots(dateStrings[3].date, ['13:00', '13:30', '16:00', '16:30', '17:00', '17:30']),
+                ...generateSlots(dateStrings[4].date, ['9:00', '9:30', '10:00', '10:30', '11:00', '14:00', '14:30', '15:00', '15:30'])
+            }
+        },
+        2: {
+            availableSlots: {
+                ...generateSlots(dateStrings[0].date, []),
+                ...generateSlots(dateStrings[1].date, ['9:00', '9:30', '14:00', '14:30']),
+                ...generateSlots(dateStrings[2].date, ['11:00', '11:30', '16:00', '16:30']),
+                ...generateSlots(dateStrings[3].date, ['13:00', '13:30', '17:00', '17:30']),
+                ...generateSlots(dateStrings[4].date, ['15:00', '15:30', '16:00', '16:30'])
+            }
         }
-    }, [availableSlots, selectedDate, handleTimeSlotSelected]);
+    };
 
-    // Create or recreate the Schedule-X calendar when needed
-    useEffect(() => {
-        if (showCalendarView) {
-            // Only attempt to create calendar when we have slots and the plugin
-            if (isLoading || !availableSlots.length) return;
+    // Doctors data
+    const [doctors] = useState([
+        {
+            id: 1,
+            name: 'Dr. Good Doctor',
+            department: 'General Health',
+            workHours: '8:00-18:00',
+            image: '/api/placeholder/200/200',
+            availableSlots: initialSlots[1].availableSlots
+        },
+        {
+            id: 2,
+            name: 'Dr. Jane Smith',
+            department: 'Cardiology',
+            workHours: '9:00-17:00',
+            image: '/api/placeholder/200/200',
+            availableSlots: initialSlots[2].availableSlots
+        }
+    ]);
 
-            // Create plugins if they don't exist
-            if (!eventsServicePluginRef.current) {
-                eventsServicePluginRef.current = createEventsServicePlugin();
-            }
-            if (!eventModalPluginRef.current) {
-                eventModalPluginRef.current = createEventModalPlugin();
-            }
+    // State variables
+    const [selectedDoctor, setSelectedDoctor] = useState(doctors[0]);
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+    const [currentMonth, setCurrentMonth] = useState(new Date());
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [showLoginForm, setShowLoginForm] = useState(false);
+    const [loginDetails, setLoginDetails] = useState({ email: '', password: '' });
+    const [notification, setNotification] = useState(null);
+    const [selectedDay, setSelectedDay] = useState(null);
+    const [activeTab, setActiveTab] = useState('appointment');
 
-            // Create or recreate calendar
-            if (calendarAppRef.current) {
-                calendarAppRef.current.destroy();
-            }
+    // Calendar navigation
+    const handlePrevWeek = () => {
+        const newStart = new Date(currentWeekStart);
+        newStart.setDate(newStart.getDate() - 7);
+        setCurrentWeekStart(newStart);
 
-            const calendarApp = createCalendar({
-                views: [createViewWeek()],
-                defaultView: 'week',
-                dayBoundaries: {
-                    start: '08:00',
-                    end: '16:00',
-                },
-                isResponsive: true,
-                initialDate: format(selectedDate, 'yyyy-MM-dd')
-            }, [
-                eventsServicePluginRef.current,
-                eventModalPluginRef.current,
-                availableTimePluginRef.current
-            ]);
+        // Update date strings for the grid
+        const newDateStrings = generateDateStrings(newStart);
+        setDateStrings(newDateStrings);
 
-            // Store ref to calendar app
-            calendarAppRef.current = calendarApp;
+        // Update available slots based on new dates
+        updateAvailableSlots(newDateStrings);
+    };
 
-            // Render calendar
-            if (calendarRef.current) {
-                calendarAppRef.current.render(calendarRef.current);
-                console.log("Calendar rendered");
-            }
+    const handleNextWeek = () => {
+        const newStart = new Date(currentWeekStart);
+        newStart.setDate(newStart.getDate() + 7);
+        setCurrentWeekStart(newStart);
 
-            // Cleanup on unmount
-            return () => {
-                if (calendarAppRef.current) {
-                    calendarAppRef.current.destroy();
-                }
+        // Update date strings for the grid
+        const newDateStrings = generateDateStrings(newStart);
+        setDateStrings(newDateStrings);
+
+        // Update available slots based on new dates
+        updateAvailableSlots(newDateStrings);
+    };
+
+    // Update available slots when week changes
+    const updateAvailableSlots = (dates) => {
+        // Generate new random slots for each doctor
+        const newSlots = {};
+
+        doctors.forEach(doctor => {
+            newSlots[doctor.id] = {
+                availableSlots: {}
             };
-        }
-    }, [selectedDate, availableSlots, isLoading, showCalendarView]);
 
-    // Custom tileDisabled function for Calendar component
-    const tileDisabled = ({date, view}) => {
-        // Disable dates outside booking period
-        if (view === 'month') {
-            return !isWithinInterval(date, {
-                start: bookingStartDate,
-                end: bookingEndDate
+            dates.forEach(dateObj => {
+                // Skip weekends for some doctors
+                if (doctor.id === 2 && dateObj.date.getDay() === 0) {
+                    newSlots[doctor.id].availableSlots[dateObj.display] = [];
+                    return;
+                }
+
+                // Generate random slots
+                const slots = [];
+                for (let hour = 8; hour < 18; hour++) {
+                    // Add slots with some randomness
+                    if (Math.random() > 0.7) slots.push(`${hour}:00`);
+                    if (Math.random() > 0.7) slots.push(`${hour}:30`);
+                }
+
+                newSlots[doctor.id].availableSlots[dateObj.display] = slots;
+            });
+        });
+
+        // Update doctors with new slots
+        const updatedDoctors = doctors.map(doctor => ({
+            ...doctor,
+            availableSlots: newSlots[doctor.id].availableSlots
+        }));
+
+        // Update selected doctor
+        const updatedSelectedDoctor = updatedDoctors.find(d => d.id === selectedDoctor.id);
+        setSelectedDoctor(updatedSelectedDoctor);
+    };
+
+    // Calendar generation
+    const getDaysInMonth = (year, month) => {
+        return new Date(year, month + 1, 0).getDate();
+    };
+
+    const getFirstDayOfMonth = (year, month) => {
+        return new Date(year, month, 1).getDay();
+    };
+
+    const generateCalendarDays = () => {
+        const year = currentMonth.getFullYear();
+        const month = currentMonth.getMonth();
+
+        const daysInMonth = getDaysInMonth(year, month);
+        const firstDay = getFirstDayOfMonth(year, month);
+
+        const prevMonthDays = firstDay === 0 ? 0 : firstDay;
+        const totalCells = Math.ceil((daysInMonth + prevMonthDays) / 7) * 7;
+
+        const days = [];
+
+        // Previous month days
+        const prevMonth = new Date(year, month, 0);
+        const prevMonthDaysCount = getDaysInMonth(prevMonth.getFullYear(), prevMonth.getMonth());
+
+        for (let i = 0; i < prevMonthDays; i++) {
+            days.push({
+                day: prevMonthDaysCount - prevMonthDays + i + 1,
+                isCurrentMonth: false,
+                isPrevMonth: true,
+                date: new Date(year, month - 1, prevMonthDaysCount - prevMonthDays + i + 1)
             });
         }
-        return false;
+
+        // Current month days
+        for (let i = 1; i <= daysInMonth; i++) {
+            days.push({
+                day: i,
+                isCurrentMonth: true,
+                date: new Date(year, month, i)
+            });
+        }
+
+        // Next month days
+        const remainingCells = totalCells - days.length;
+        for (let i = 1; i <= remainingCells; i++) {
+            days.push({
+                day: i,
+                isCurrentMonth: false,
+                isNextMonth: true,
+                date: new Date(year, month + 1, i)
+            });
+        }
+
+        return days;
     };
 
-    const handleMiniCalendarChange = (date) => {
-        handleDateChange(date);
+    // Generate time slots (30 min intervals)
+    const generateTimeSlots = () => {
+        const slots = [];
+        for (let hour = 8; hour < 18; hour++) {
+            slots.push(`${hour}:00`);
+            slots.push(`${hour}:30`);
+        }
+        return slots;
     };
 
-    const handleConfirmClick = () => {
-        if (!selectedTimeSlot) {
-            alert("Please select an available time slot first");
+    // Check if a time slot is available
+    const isTimeSlotAvailable = (date, time) => {
+        if (!selectedDoctor || !date) return false;
+
+        const availableSlots = selectedDoctor.availableSlots[date] || [];
+        return availableSlots.includes(time);
+    };
+
+    // Handle login
+    const handleLogin = () => {
+        // Simple mock login
+        if (loginDetails.email && loginDetails.password) {
+            setIsLoggedIn(true);
+            setShowLoginForm(false);
+            setNotification({
+                type: 'success',
+                message: 'Successfully logged in!'
+            });
+
+            setTimeout(() => {
+                setNotification(null);
+            }, 3000);
+        }
+    };
+
+    // Handle appointment confirmation
+    const handleConfirmAppointment = () => {
+        if (!selectedDate || !selectedTimeSlot) {
+            setNotification({
+                type: 'error',
+                message: 'Please select a date and time slot'
+            });
+
+            setTimeout(() => {
+                setNotification(null);
+            }, 3000);
             return;
         }
 
-        // Instead of calling saveBooking here, let's navigate to confirm page with data
-        navigate("/Confirm", {
-            state: {
-                appointmentDetails: {
-                    doctorInfo,
-                    selectedDate,
-                    selectedTimeSlot
-                }
-            }
-        });
-    };
+        if (!isLoggedIn) {
+            setShowLoginForm(true);
+            return;
+        }
 
-    // Group time slots by hour for display
-    const groupTimeSlotsByHour = () => {
-        const groupedSlots = {};
-
-        availableSlots.forEach(slot => {
-            if (!slot.isAvailable) return;
-
-            const startTime = slot.start.includes('T')
-                ? slot.start.split('T')[1].substring(0, 5)
-                : slot.start.split(' ')[1].substring(0, 5);
-
-            const hour = startTime.split(':')[0];
-
-            if (!groupedSlots[hour]) {
-                groupedSlots[hour] = [];
-            }
-
-            groupedSlots[hour].push(slot);
+        setNotification({
+            type: 'success',
+            message: `Appointment confirmed with ${selectedDoctor.name} on ${selectedDate} at ${selectedTimeSlot}`
         });
 
-        return groupedSlots;
+        setTimeout(() => {
+            setNotification(null);
+        }, 3000);
     };
 
-    const groupedTimeSlots = groupTimeSlotsByHour();
+    // Handle day selection
+    const handleDaySelection = (day) => {
+        setSelectedDay(day);
+
+        // Format the date to match the format used in dateStrings
+        const formatted = day.date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short'
+        });
+
+        // Update the weekday grid if the selected day is not in the current week view
+        const isInCurrentWeek = dateStrings.some(d =>
+            d.date.getDate() === day.date.getDate() &&
+            d.date.getMonth() === day.date.getMonth() &&
+            d.date.getFullYear() === day.date.getFullYear()
+        );
+
+        if (!isInCurrentWeek) {
+            // Find the start of the week for this day
+            const newWeekStart = new Date(day.date);
+            newWeekStart.setDate(day.date.getDate() - day.date.getDay());
+            setCurrentWeekStart(newWeekStart);
+
+            // Update date strings
+            const newDateStrings = generateDateStrings(newWeekStart);
+            setDateStrings(newDateStrings);
+
+            // Update available slots
+            updateAvailableSlots(newDateStrings);
+
+            // Find the matching date in the new strings
+            const matchingDate = newDateStrings.find(d =>
+                d.date.getDate() === day.date.getDate() &&
+                d.date.getMonth() === day.date.getMonth()
+            );
+
+            if (matchingDate) {
+                setSelectedDate(matchingDate.display);
+            }
+        } else {
+            // Find the matching date in current dateStrings
+            const matchingDate = dateStrings.find(d =>
+                d.date.getDate() === day.date.getDate() &&
+                d.date.getMonth() === day.date.getMonth()
+            );
+
+            if (matchingDate) {
+                setSelectedDate(matchingDate.display);
+            }
+        }
+
+        // Clear the time slot when date changes
+        setSelectedTimeSlot(null);
+    };
+
+    // Switch doctor
+    const switchDoctor = (direction) => {
+        const currentIndex = doctors.findIndex(doc => doc.id === selectedDoctor.id);
+        let newIndex;
+
+        if (direction === 'prev') {
+            newIndex = currentIndex === 0 ? doctors.length - 1 : currentIndex - 1;
+        } else {
+            newIndex = currentIndex === doctors.length - 1 ? 0 : currentIndex + 1;
+        }
+
+        setSelectedDoctor(doctors[newIndex]);
+
+        // Clear selections when switching doctors
+        setSelectedTimeSlot(null);
+    };
+
+    // Sync calendar month with current week
+    const synchronizeCalendarMonth = () => {
+        // If the current week spans across two months, use the month with more days
+        const monthCounts = {};
+        dateStrings.forEach(d => {
+            const month = d.date.getMonth();
+            monthCounts[month] = (monthCounts[month] || 0) + 1;
+        });
+
+        let dominantMonth = currentMonth.getMonth();
+        let maxCount = 0;
+
+        for (const [month, count] of Object.entries(monthCounts)) {
+            if (count > maxCount) {
+                maxCount = count;
+                dominantMonth = parseInt(month);
+            }
+        }
+
+        // Update calendar if needed
+        if (dominantMonth !== currentMonth.getMonth()) {
+            const newMonth = new Date(currentMonth);
+            newMonth.setMonth(dominantMonth);
+            setCurrentMonth(newMonth);
+        }
+    };
+
+    // Get weekday names
+    const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+    // Format time display (for better readability)
+    const formatTimeDisplay = (time) => {
+        const [hours, minutes] = time.split(':');
+        const hourInt = parseInt(hours);
+
+        // Calculate the end time (30 min later)
+        let endHour = hourInt;
+        let endMinutes = parseInt(minutes) + 30;
+
+        if (endMinutes >= 60) {
+            endHour += 1;
+            endMinutes = 0;
+        }
+
+        return `${time}-${endHour}:${endMinutes === 0 ? '00' : endMinutes}`;
+    };
 
     return (
-        <>
-            <div className="px-6 py-8">
-                <div className="max-w-6xl mx-auto mt-4">
-                    {/* Doctor */}
-                    <div className="flex flex-col sm:flex-row justify-start items-center bg-light-blue gap-6 mb-6 p-6 rounded-xl border-1 border-pri">
+        <div className="flex flex-col min-h-screen bg-gray-100">
+            {/* Notification */}
+            {notification && (
+                <div className={`fixed top-4 right-4 p-4 rounded shadow-lg z-50 
+          ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}>
+                    {notification.message}
+                </div>
+            )}
+
+            {/* Main Content */}
+            <main className="container mx-auto flex-grow p-4 bg-white my-4 rounded-lg shadow">
+                {/* Doctor Profile */}
+                <div className="bg-blue-100 p-4 rounded-lg mb-6 flex items-center">
+                    <button
+                        className="bg-blue-500 text-white rounded-full p-2 mr-4 hover:bg-blue-600 active:bg-blue-700"
+                        onClick={() => switchDoctor('prev')}
+                    >
+                        &lt;
+                    </button>
+                    <div className="bg-white rounded-full p-2 mr-4">
                         <img
-                            src={doctorInfo.image}
-                            alt={doctorInfo.name}
-                            className="rounded-full w-[120px] sm:w-[150px]"
+                            src={selectedDoctor.image}
+                            alt={selectedDoctor.name}
+                            className="w-16 h-16 rounded-full"
                         />
-                        <div className="flex flex-col text-pri text-lg md:text-xl">
-                            <p className="font-extrabold">Name: {doctorInfo.name}</p>
-                            <p>Department: {doctorInfo.department}</p>
-                            <p>Work hour: {doctorInfo.workHours}</p>
+                    </div>
+                    <div>
+                        <h2 className="text-blue-800 font-medium">NAME: {selectedDoctor.name}</h2>
+                        <p className="text-blue-800">DEPARTMENT: {selectedDoctor.department}</p>
+                        <p className="text-blue-800">WORK HOUR: {selectedDoctor.workHours}</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    {/* Calendar */}
+                    <div className="bg-blue-100 p-4 rounded-lg col-span-1">
+                        <div className="flex justify-between mb-2">
+                            <button
+                                className="text-blue-800 hover:text-blue-600"
+                                onClick={() => {
+                                    const newDate = new Date(currentMonth);
+                                    newDate.setMonth(newDate.getMonth() - 1);
+                                    setCurrentMonth(newDate);
+                                }}
+                            >
+                                &lt;
+                            </button>
+                            <div className="text-blue-800 font-medium">
+                                {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                            </div>
+                            <button
+                                className="text-blue-800 hover:text-blue-600"
+                                onClick={() => {
+                                    const newDate = new Date(currentMonth);
+                                    newDate.setMonth(newDate.getMonth() + 1);
+                                    setCurrentMonth(newDate);
+                                }}
+                            >
+                                &gt;
+                            </button>
                         </div>
+
+                        <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                            {weekdays.map((day, index) => (
+                                <div key={index} className="text-blue-800 font-medium">
+                                    {day}
+                                </div>
+                            ))}
+
+                            {generateCalendarDays().map((day, index) => (
+                                <div
+                                    key={index}
+                                    className={`p-1 rounded-full cursor-pointer text-sm ${
+                                        day.isCurrentMonth
+                                            ? selectedDay && day.date.toDateString() === selectedDay.date.toDateString()
+                                                ? 'bg-blue-500 text-white'
+                                                : 'text-blue-800 hover:bg-blue-200'
+                                            : 'text-gray-400'
+                                    } ${
+                                        day.day === new Date().getDate() &&
+                                        currentMonth.getMonth() === new Date().getMonth() &&
+                                        currentMonth.getFullYear() === new Date().getFullYear() &&
+                                        (!selectedDay || day.date.toDateString() !== selectedDay.date.toDateString())
+                                            ? 'bg-blue-300'
+                                            : ''
+                                    }`}
+                                    onClick={() => handleDaySelection(day)}
+                                >
+                                    {day.day}
+                                </div>
+                            ))}
+                        </div>
+
+                        <button
+                            className="w-full bg-orange-400 text-white py-2 rounded mt-4 hover:bg-orange-500 active:bg-orange-600"
+                            onClick={handleConfirmAppointment}
+                        >
+                            Confirm
+                        </button>
                     </div>
 
-                    {/*<div className="bg-light-blue rounded-2xl p-6 mb-6">*/}
-                    {/*    <div className="flex justify-start items-center">*/}
-                    {/*        <img src={doctorInfo.image}*/}
-                    {/*             alt={doctorInfo.name}*/}
-                    {/*             className="rounded-full w-[150px] mr-[64px]"*/}
-                    {/*        />*/}
-                    {/*        <div className="flex flex-col justify-center text-pri text-lg md:xl font-semibold">*/}
-                    {/*            <p className="font-extrabold">Name: {doctorInfo.name}</p>*/}
-                    {/*            <p>Department: {doctorInfo.department}</p>*/}
-                    {/*            <p>Work hour: {doctorInfo.workHours}</p>*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
-
-                    {/* Booking period notice */}
-                    {/*<div className="mb-4 p-3 bg-ivory border border-yellow rounded-lg text-pri">*/}
-                    {/*    <p className="font-bold">Booking Period: April 28, 2025 - May 16, 2025</p>*/}
-                    {/*    <p>Please select a date within this range to see available time slots.</p>*/}
-                    {/*</div>*/}
-
-                    {/* View toggle button */}
-                    <button
-                        className="mb-4 px-4 py-2 bg-ivory rounded-lg border-1 border-pri hover:bg-ivory-600 text-pri"
-                        onClick={() => setShowCalendarView(!showCalendarView)}
-                    >
-                        Switch to {showCalendarView ? 'List' : 'Calendar'} View
-                    </button>
-
-                    {showCalendarView ? (
-                        // Calendar view layout
-                        <div className='flex flex-col lg:flex-row gap-6'>
-                            {/* Left part */}
-                            <div className="flex flex-col lg:w-1/4">
-                                {/* Mini Calendar */}
-                                <div className="mb-4">
-                                    <Calendar
-                                        onChange={handleMiniCalendarChange}
-                                        value={selectedDate}
-                                        locale="en-US"
-                                        tileDisabled={tileDisabled}
-                                        minDate={bookingStartDate}
-                                        maxDate={bookingEndDate}
-                                    />
-                                </div>
-
-                                {/* Selected time slot display */}
-                                {selectedTimeSlot && (
-                                    <div className="mb-4 p-3 border-2 border-yellow rounded-lg">
-                                        <p className="font-bold">Selected Time:</p>
-                                        <p>{format(selectedDate, 'MMMM d, yyyy')}</p>
-                                        <p>
-                                            {selectedTimeSlot.start.includes('T')
-                                                ? selectedTimeSlot.start.split('T')[1].substring(0, 5)
-                                                : selectedTimeSlot.start.split(' ')[1]
-                                            } -
-                                            {selectedTimeSlot.end.includes('T')
-                                                ? selectedTimeSlot.end.split('T')[1].substring(0, 5)
-                                                : selectedTimeSlot.end.split(' ')[1]
-                                            }
-                                        </p>
-                                    </div>
-                                )}
-
-                                {/* Confirm button - Yellow when enabled */}
-                                <button
-                                    className={`w-full rounded-lg py-2 text-white ${selectedTimeSlot ? 'bg-yellow hover:bg-yellow-600' : 'bg-gray-300 cursor-not-allowed'}`}
-                                    onClick={handleConfirmClick}
-                                    disabled={!selectedTimeSlot}
-                                >
-                                    CONFIRM
-                                </button>
-                            </div>
-
-                            {/* Right part - ScheduleX Calendar */}
-                            <div className="lg:w-3/4">
-                                {isLoading ? (
-                                    <div className="min-h-[500px] flex justify-center items-center">
-                                        <p>Loading calendar...</p>
-                                    </div>
-                                ) : (
-                                    <div className="min-h-[500px] border rounded-lg">
-                                        <div ref={calendarRef} style={{width: '100%', height: '500px'}}>
-                                            {/* ScheduleX calendar will render here */}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                    {/* Time Slots */}
+                    <div className="md:col-span-4">
+                        <div className="flex justify-between mb-4">
+                            <button
+                                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                onClick={handlePrevWeek}
+                            >
+                                &lt; Previous Week
+                            </button>
+                            <button
+                                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                onClick={handleNextWeek}
+                            >
+                                Next Week &gt;
+                            </button>
                         </div>
-                    ) : (
-                        // List view layout
-                        <div className='flex flex-col lg:flex-row gap-6'>
-                            {/* Left part - Calendar */}
-                            <div className="lg:w-1/3">
-                                <Calendar
-                                    onChange={handleMiniCalendarChange}
-                                    value={selectedDate}
-                                    locale="en-US"
-                                    tileDisabled={tileDisabled}
-                                    minDate={bookingStartDate}
-                                    maxDate={bookingEndDate}
-                                />
 
-                                {/* Selected time slot display */}
-                                {selectedTimeSlot && (
-                                    <div className="mt-4 p-3 border-2 border-yellow rounded-lg text-pri">
-                                        <p className="font-bold">Selected Time:</p>
-                                        <p>{format(selectedDate, 'MMMM d, yyyy')}</p>
-                                        <p>
-                                            {selectedTimeSlot.start.includes('T')
-                                                ? selectedTimeSlot.start.split('T')[1].substring(0, 5)
-                                                : selectedTimeSlot.start.split(' ')[1]
-                                            } -
-                                            {selectedTimeSlot.end.includes('T')
-                                                ? selectedTimeSlot.end.split('T')[1].substring(0, 5)
-                                                : selectedTimeSlot.end.split(' ')[1]
-                                            }
-                                        </p>
+                        <div className="overflow-x-auto">
+                            <div className="min-w-max grid grid-cols-6 gap-1">
+                                <div className="sticky left-0 text-center font-medium"></div>
+                                {dateStrings.map((dateObj, index) => (
+                                    <div
+                                        key={index}
+                                        className={`text-center font-medium text-sm p-1 ${
+                                            selectedDate === dateObj.display ? 'bg-blue-100 rounded' : ''
+                                        }`}
+                                    >
+                                        {dateObj.display}
                                     </div>
-                                )}
+                                ))}
 
-                                {/* Confirm button - Yellow when enabled */}
-                                <button
-                                    className={`w-full mt-4 rounded-lg py-2 text-white ${selectedTimeSlot ? 'bg-yellow hover:bg-yellow-600' : 'bg-gray-300 cursor-not-allowed'}`}
-                                    onClick={handleConfirmClick}
-                                    disabled={!selectedTimeSlot}
-                                >
-                                    CONFIRM
-                                </button>
-                            </div>
-
-                            {/* Right part - Time slots */}
-                            <div className="lg:w-2/3">
-                                <div className="border-1 border-pri rounded-lg p-4">
-                                    <h2 className="text-xl font-bold text-pri mb-4">Available Time Slots</h2>
-
-                                    {isLoading ? (
-                                        <div className="h-64 flex justify-center items-center">
-                                            <p>Loading time slots...</p>
+                                {generateTimeSlots().map((time, timeIndex) => (
+                                    <>
+                                        <div key={`time-${timeIndex}`} className="sticky left-0 text-center font-medium bg-white">
+                                            {time}
                                         </div>
-                                    ) : availableSlots.filter(slot => slot.isAvailable).length === 0 ? (
-                                        <div className="h-64 flex justify-center items-center">
-                                            <p>No available slots for the selected date.</p>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-4">
-                                            {Object.keys(groupedTimeSlots).sort().map(hour => {
-                                                const hourTime = parseInt(hour);
-                                                const hourLabel = `${hourTime}:00`;
+                                        {dateStrings.map((dateObj, dateIndex) => {
+                                            const isAvailable = isTimeSlotAvailable(dateObj.display, time);
+                                            const isSelected = selectedDate === dateObj.display && selectedTimeSlot === time;
 
-                                                return (
-                                                    <div key={hour} className="mb-4">
-                                                        <div className="font-medium text-pri">{hourLabel}</div>
-                                                        <div className="grid grid-cols-2 gap-2 mt-1">
-                                                            {groupedTimeSlots[hour].map(slot => {
-                                                                const startTime = slot.start.includes('T')
-                                                                    ? slot.start.split('T')[1].substring(0, 5)
-                                                                    : slot.start.split(' ')[1].substring(0, 5);
-
-                                                                const endTime = slot.end.includes('T')
-                                                                    ? slot.end.split('T')[1].substring(0, 5)
-                                                                    : slot.end.split(' ')[1].substring(0, 5);
-
-                                                                const isSelected = selectedTimeSlot && selectedTimeSlot.id === slot.id;
-
-                                                                return (
-                                                                    <button
-                                                                        key={slot.id}
-                                                                        className={`p-2 rounded text-pri ${isSelected ? 'bg-yellow text-white' : 'bg-yellow-100 hover:bg-yellow-200'}`}
-                                                                        onClick={() => handleTimeSlotSelected(slot)}
-                                                                    >
-                                                                        {startTime} - {endTime}
-                                                                    </button>
-                                                                );
-                                                            })}
+                                            return (
+                                                <div
+                                                    key={`slot-${timeIndex}-${dateIndex}`}
+                                                    className={`h-10 ${
+                                                        isAvailable
+                                                            ? 'bg-orange-300 cursor-pointer hover:bg-orange-400 active:bg-orange-500'
+                                                            : 'bg-gray-100'
+                                                    } ${
+                                                        isSelected
+                                                            ? 'ring-2 ring-blue-500'
+                                                            : ''
+                                                    }`}
+                                                    onClick={() => {
+                                                        if (isAvailable) {
+                                                            setSelectedDate(dateObj.display);
+                                                            setSelectedTimeSlot(time);
+                                                        }
+                                                    }}
+                                                >
+                                                    {isAvailable && (
+                                                        <div className="text-center pt-2 text-xs">
+                                                            {formatTimeDisplay(time)}
                                                         </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
-                                </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </>
+                                ))}
                             </div>
                         </div>
-                    )}
+                    </div>
                 </div>
-            </div>
-        </>
-    );
-}
+            </main>
 
-export default Timeslot;
+            {/* Login Modal */}
+            {showLoginForm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-full max-w-md">
+                        <h2 className="text-xl font-bold mb-4">Login to DeeCare</h2>
+
+                        <div className="mb-4">
+                            <label className="block text-gray-700 mb-2">Email</label>
+                            <input
+                                type="email"
+                                className="w-full p-2 border rounded"
+                                value={loginDetails.email}
+                                onChange={(e) => setLoginDetails({...loginDetails, email: e.target.value})}
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-gray-700 mb-2">Password</label>
+                            <input
+                                type="password"
+                                className="w-full p-2 border rounded"
+                                value={loginDetails.password}
+                                onChange={(e) => setLoginDetails({...loginDetails, password: e.target.value})}
+                            />
+                        </div>
+
+                        <div className="flex justify-between">
+                            <button
+                                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 active:bg-gray-500"
+                                onClick={() => setShowLoginForm(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="bg-orange-400 text-white px-4 py-2 rounded hover:bg-orange-500 active:bg-orange-600"
+                                onClick={handleLogin}
+                            >
+                                Login
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default DeeCare;
