@@ -1,10 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import {eventData} from "../Data/EventData.jsx";
+// import {eventData} from "../Data/EventData.jsx";
+import { Axios } from "../utils/axiosInstance.js";
+import { getEventAPI } from "../api/getEvents.js";
+// import { getEventAPI } from "../api/getEvents.js";
 
 const Event = () => {
-  const { id } = useParams();
-  const event = eventData.find((event) => event.id === parseInt(id));
+  const [ events, setEvents] = useState([]); 
+  const fetchEventData = async () => {
+    try{
+      const response = await getEventAPI('id');
+      if (response.data.success) {
+        setEvents(response.data.data);
+      } else {
+        console.error("Failed to fetch events");
+      }
+    } catch (e) {
+      console.error("Error fetching events:", e);
+    } finally {
+      // setLoading(false);
+    }
+	};
+
+  useEffect(() => {
+    fetchEventData();
+  }, []);
+
+  
+//   console.log("param id", id);
+// console.log("event ids:", events.map(e => e.id));
+const { id } = useParams();
+const event = events.find((event) => event.id === Number(id));  
 
   if (!event) {
     return (
@@ -26,7 +52,7 @@ const Event = () => {
         <div className="flex sm:justify-start items-center sm:h-[128px] h-auto sm:flex-row flex-col gap-4 sm:gap-0">
           {/* event mobile topic */}
           <h1 className="font-semibold text-xl block sm:hidden pt-8 ">
-            {event.title}
+            {event.name}
           </h1>
 
           {/* event date */}
@@ -39,7 +65,7 @@ const Event = () => {
           <div>
             {/* event desktop topic */}
             <h1 className="font-semibold text-2xl hidden sm:block mb-3">
-              {event.title}
+              {event.name}
             </h1>
 
             {/* Event date */}
@@ -49,7 +75,7 @@ const Event = () => {
                 alt="icons calendar-event"
                 className="w-5 h-5" />
               <p className="ml-2 break-words">
-                {event.date}
+                {event.eventDates}
               </p>
             </div>
 
