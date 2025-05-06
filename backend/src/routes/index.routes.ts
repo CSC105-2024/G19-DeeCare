@@ -1,8 +1,8 @@
 import { Hono } from "hono";
-import { router } from "./routes.ts";
+import { eventRouter } from "./event.routes.ts";
 
 const mainRouter = new Hono();
 
-mainRouter.route("/todo", router);
+mainRouter.route("/events", eventRouter);
 
 export { mainRouter };
