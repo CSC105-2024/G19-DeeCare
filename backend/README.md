@@ -16,6 +16,13 @@
 
 # How to Run the Project
 
+## frontend (vite)
+npm create vite@latest
+Select React 
+Select Javascript 
+cd frontend
+npm i
+npm run dev
 ## Backend (Hono + Prisma)
 # Go to the backend directory
 cd backend
@@ -34,3 +41,4 @@ npx prisma db pull
 
 # Run the server
 npm run dev
+
