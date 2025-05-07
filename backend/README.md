@@ -1,6 +1,7 @@
 # CRUD Features
 - Get Events endpoint work correctly with postman 
 - Create login and Register
+
 # Available Endpoints
 
 | Method | Route | Description |
@@ -24,22 +25,23 @@ Select Javascript
 cd frontend
 npm i
 npm run dev
+
 ## Backend (Hono + Prisma)
-# Go to the backend directory
+### Go to the backend directory
 cd backend
 
-# Install dependencies
+### Install dependencies
 npm install
 
-# make change to the database
+### make change to the database
 npx prisma migrate dev
 
-# update Prisma Client
+### update Prisma Client
 npx prisma generate
 
-# update the Prisma schema
+### update the Prisma schema
 npx prisma db pull
 
-# Run the server
+### Run the server
 npm run dev
 
