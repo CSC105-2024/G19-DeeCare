@@ -3,7 +3,6 @@
 - Create login and Register
 
 # Available Endpoints
-
 | Method | Route | Description |
 |--------|-------|-------------|
 | GET    | /     | Get welcome message. |
