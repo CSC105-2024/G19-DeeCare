@@ -3,16 +3,17 @@
 - Create login and Register
 # Available Endpoints
 
-| Method |        Route       |    Description   |
-| :...: | :...: |  :...: |
-| Get    | /  | Get welcome message. |
-| Get    | /events/getOne/:id  | Read and display specific information of event data |
-| Get    | /events/getAll  |  Read and display all the event datas |
-| Post   | /events/create  | Create event entries |
-| Patch  | /events/update/:id | Update event data by event id |
-| Delete | /events/del/:id | Delete event from the database | 
-| Post   | /auth/login  | Create Login entries |
-| Post   | /auth/register  | Create register entries |
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET    | /     | Get welcome message. |
+| GET    | /events/getOne/:id | Read and display specific information of event data |
+| GET    | /events/getAll | Read and display all the event datas |
+| POST   | /events/create | Create event entries |
+| PATCH  | /events/update/:id | Update event data by event id |
+| DELETE | /events/del/:id | Delete event from the database |
+| POST   | /auth/login | Create Login entries |
+| POST   | /auth/register | Create register entries |
+
 
 # How to Run the Project
 
