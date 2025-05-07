@@ -1,20 +1,22 @@
-# Project Iteration#1 - Task#7 & #8: CRUD Operations and Integration
+# CRUD Features
+- Get Events endpoint work correctly with postman 
+- Create login and Register
+# Available Endpoints
 
-## Overview
-This project implements full CRUD operations (Create, Read, Update, Delete) with integration between a React frontend and a Hono backend using Prisma for database management. 
+| Method |        Route       |    Description   |
+| :...: | :...: |  :...: |
+| Get    | /  | Get welcome message. |
+| Get    | /events/getOne/:id  | Read and display specific information of event data |
+| Get    | /events/getAll  |  Read and display all the event datas |
+| Post   | /events/create  | Create event entries |
+| Patch  | /events/update/:id | Update event data by event id |
+| Delete | /events/del/:id | Delete event from the database | 
+| Post   | /auth/login  | Create Login entries |
+| Post   | /auth/register  | Create register entries |
 
-## Features
-- Create event entries
-- Read and display event data
-- Update event data
-- Delete event from the database
-// others features
-- Frontend-backend integration via RESTful API
-- CORS properly handled in backend
+# How to Run the Project
 
-## How to Run the Project
-
-### Backend (Hono + Prisma)
+## Backend (Hono + Prisma)
 # Go to the backend directory
 cd backend
 
