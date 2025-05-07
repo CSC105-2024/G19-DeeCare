@@ -576,49 +576,49 @@ const DeeCare = () => {
                 </div>
             </main>
 
-            {/* Login Modal */}
-            {showLoginForm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg w-full max-w-md">
-                        <h2 className="text-xl font-bold mb-4">Login to DeeCare</h2>
+            {/*/!* Login Modal *!/*/}
+            {/*{showLoginForm && (*/}
+            {/*    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">*/}
+            {/*        <div className="bg-white p-6 rounded-lg w-full max-w-md">*/}
+            {/*            <h2 className="text-xl font-bold mb-4">Login to DeeCare</h2>*/}
 
-                        <div className="mb-4">
-                            <label className="block text-gray-700 mb-2">Email</label>
-                            <input
-                                type="email"
-                                className="w-full p-2 border rounded"
-                                value={loginDetails.email}
-                                onChange={(e) => setLoginDetails({...loginDetails, email: e.target.value})}
-                            />
-                        </div>
+            {/*            <div className="mb-4">*/}
+            {/*                <label className="block text-gray-700 mb-2">Email</label>*/}
+            {/*                <input*/}
+            {/*                    type="email"*/}
+            {/*                    className="w-full p-2 border rounded"*/}
+            {/*                    value={loginDetails.email}*/}
+            {/*                    onChange={(e) => setLoginDetails({...loginDetails, email: e.target.value})}*/}
+            {/*                />*/}
+            {/*            </div>*/}
 
-                        <div className="mb-4">
-                            <label className="block text-gray-700 mb-2">Password</label>
-                            <input
-                                type="password"
-                                className="w-full p-2 border rounded"
-                                value={loginDetails.password}
-                                onChange={(e) => setLoginDetails({...loginDetails, password: e.target.value})}
-                            />
-                        </div>
+            {/*            <div className="mb-4">*/}
+            {/*                <label className="block text-gray-700 mb-2">Password</label>*/}
+            {/*                <input*/}
+            {/*                    type="password"*/}
+            {/*                    className="w-full p-2 border rounded"*/}
+            {/*                    value={loginDetails.password}*/}
+            {/*                    onChange={(e) => setLoginDetails({...loginDetails, password: e.target.value})}*/}
+            {/*                />*/}
+            {/*            </div>*/}
 
-                        <div className="flex justify-between">
-                            <button
-                                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 active:bg-gray-500"
-                                onClick={() => setShowLoginForm(false)}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="bg-orange-400 text-white px-4 py-2 rounded hover:bg-orange-500 active:bg-orange-600"
-                                onClick={handleLogin}
-                            >
-                                Login
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/*            <div className="flex justify-between">*/}
+            {/*                <button*/}
+            {/*                    className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 active:bg-gray-500"*/}
+            {/*                    onClick={() => setShowLoginForm(false)}*/}
+            {/*                >*/}
+            {/*                    Cancel*/}
+            {/*                </button>*/}
+            {/*                <button*/}
+            {/*                    className="bg-orange-400 text-white px-4 py-2 rounded hover:bg-orange-500 active:bg-orange-600"*/}
+            {/*                    onClick={handleLogin}*/}
+            {/*                >*/}
+            {/*                    Login*/}
+            {/*                </button>*/}
+            {/*            </div>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*)}*/}
         </div>
     );
 };
