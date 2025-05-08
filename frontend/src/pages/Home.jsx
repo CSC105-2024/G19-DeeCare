@@ -1,9 +1,29 @@
 import {Link} from "react-router-dom";
 import {motion, useTransform, useScroll} from "framer-motion";
-import {useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import {eventData} from "../Data/EventData.jsx";
+import { Axios } from "../utils/axiosInstance.js";
 
 const Home = () => {
+    const [ events, setEvents] = useState([]);
+    const fetchEventData = async () => {
+        try{
+          const response = await Axios.get('/events/getAll');
+          if (response.data.success) {
+            setEvents(response.data.data);
+          } else {
+            console.error("Failed to fetch events");
+          }
+        } catch (e) {
+          console.error("Error fetching events:", e);
+        } finally {
+          // setLoading(false);
+        }
+        };
+    
+      useEffect(() => {
+        fetchEventData();
+      }, []);
     return (
         <>
             {/* Hospital Hero section */}

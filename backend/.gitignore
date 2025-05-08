@@ -26,3 +26,9 @@ lerna-debug.log*
 
 # misc
 .DS_Store
+
+## Prisma
+src/generated/prisma/
+prisma/dev.db
+prisma/dev.db-journal
+prisma/migrations/
