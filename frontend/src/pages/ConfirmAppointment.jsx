@@ -31,7 +31,7 @@ function ConfirmAppointment() {
     const handleFinalConfirm = () => {
         // Save notification preference if needed
         localStorage.setItem('sendEmailNotification', sendEmailNotification);
-
+        alert('Appointment Confirmed Successfully');
         navigate("/userdetail", {
             state: {
                 appointmentDetails: {

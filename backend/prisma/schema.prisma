@@ -12,30 +12,22 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  idNumber  String   @unique //13 digits
-  username  String   @unique
-  email     String   @unique
-  password  String
-  role      String   @default("user") // user, admin, doctor
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Patient {
-  id               Int               @id @default(autoincrement())
-  idNumber         String            @unique
-  firstName        String
-  lastName         String
-  dob              String
-  age              String?
-  bloodType        String
-  password         String
-  email            String            @unique
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  appointments     Appointment[]
-  emergencyContact EmergencyContact?
+  id                 Int               @id @default(autoincrement())
+  idNumber           String            @unique //13 digits
+  firstName          String
+  lastName           String
+  dob                String
+  age                String?
+  bloodType          String
+  username           String            @unique
+  email              String            @unique
+  password           String
+  role               String            @default("user") // user, admin, doctor
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  appointments       Appointment[]
+  emergencyContact   EmergencyContact? @relation(fields: [emergencyContactId], references: [id])
+  emergencyContactId Int?
 }
 
 model EmergencyContact {
@@ -44,10 +36,11 @@ model EmergencyContact {
   relationship String?
   contactPhone String?
   contactEmail String?
-  patient      Patient  @relation(fields: [patientId], references: [id])
+  patient      User     @relation(fields: [patientId], references: [id])
   patientId    Int      @unique
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  User         User[]
 }
 
 model Doctor {
@@ -65,39 +58,39 @@ model Doctor {
 
 model Appointment {
   id        Int      @id @default(autoincrement())
-  patient   Patient  @relation(fields: [patientId], references: [id])
+  patient   User     @relation(fields: [patientId], references: [id])
   patientId Int
   doctor    Doctor   @relation(fields: [doctorId], references: [id])
   doctorId  Int
-  date      String
-  time      String
+  date      DateTime
   reason    String
   status    String   @default("scheduled") // scheduled, completed, cancelled
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    Int?
 }
 
 model AvailableTime {
   id        Int      @id @default(autoincrement())
   doctor    Doctor   @relation(fields: [doctorId], references: [id])
   doctorId  Int
-  day       String // Monday, Tuesday, etc.
-  startTime String
-  endTime   String
+  startTime DateTime
+  endTime   DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Event {
-  id            Int     @id @default(autoincrement())
-  name          String
-  eventDates    String
-  image         String?
-  place         String
-  website       String?
-  organizer     String
-  phone         String
-  email         String
-  linkedin      String?
-  description   String
+  id          Int     @id @default(autoincrement())
+  name        String
+  eventDates  String
+  image       String?
+  place       String
+  website     String?
+  organizer   String
+  phone       String
+  email       String
+  linkedin    String?
+  description String
 }
