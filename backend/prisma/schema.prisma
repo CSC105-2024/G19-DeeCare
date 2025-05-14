@@ -16,31 +16,25 @@ model User {
   idNumber           String            @unique //13 digits
   firstName          String
   lastName           String
-  dob                String
-  age                String?
+  dob                DateTime
+  age                Int
   bloodType          String
-  username           String            @unique
   email              String            @unique
   password           String
   role               String            @default("user") // user, admin, doctor
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
   appointments       Appointment[]
-  emergencyContact   EmergencyContact? @relation(fields: [emergencyContactId], references: [id])
+  emergencyContact   EmergencyContact?
   emergencyContactId Int?
 }
 
 model EmergencyContact {
-  id           Int      @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   contactName  String?
   relationship String?
   contactPhone String?
   contactEmail String?
-  patient      User     @relation(fields: [patientId], references: [id])
-  patientId    Int      @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  User         User[]
+  user         User    @relation(fields: [userId], references: [id])
+  userId       Int     @unique
 }
 
 model Doctor {
@@ -49,21 +43,15 @@ model Doctor {
   lastName       String
   specialty      String
   email          String          @unique
-  phoneNumber    String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
   appointments   Appointment[]
   availableTimes AvailableTime[]
 }
 
 model Appointment {
   id        Int      @id @default(autoincrement())
-  patient   User     @relation(fields: [patientId], references: [id])
-  patientId Int
   doctor    Doctor   @relation(fields: [doctorId], references: [id])
   doctorId  Int
   date      DateTime
-  reason    String
   status    String   @default("scheduled") // scheduled, completed, cancelled
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

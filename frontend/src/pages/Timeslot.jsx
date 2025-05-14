@@ -1,6 +1,11 @@
-import { useState } from 'react';
+import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import ConfirmAppointmentOverlay from '../components/ConfirmAppointment.jsx';
 
-const DeeCare = () => {
+
+const Timeslot = () => {
+    const navigate = useNavigate();
+
     // Date setup for time slot display - matches the calendar
     const today = new Date();
     const firstDay = new Date(today);
@@ -8,10 +13,10 @@ const DeeCare = () => {
     const day = firstDay.getDay();
     firstDay.setDate(firstDay.getDate() - day);
 
-    // Generate date strings for the current week
+    // Generate date strings for the current week (7 days instead of 5)
     const generateDateStrings = (startDate) => {
         const dates = [];
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 7; i++) { // Changed from 5 to 7 to include Friday and Saturday
             const date = new Date(startDate);
             date.setDate(startDate.getDate() + i);
             const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
@@ -37,7 +42,7 @@ const DeeCare = () => {
         return available;
     };
 
-    // Initial slots for doctors
+    // Initial slots for doctors - extended to include Friday and Saturday
     const initialSlots = {
         1: {
             availableSlots: {
@@ -45,7 +50,9 @@ const DeeCare = () => {
                 ...generateSlots(dateStrings[1].date, ['9:00', '9:30', '10:30', '11:00', '14:00', '14:30', '15:00']),
                 ...generateSlots(dateStrings[2].date, ['8:00', '8:30', '10:00', '10:30', '11:00', '11:30', '15:00', '15:30', '16:00']),
                 ...generateSlots(dateStrings[3].date, ['13:00', '13:30', '16:00', '16:30', '17:00', '17:30']),
-                ...generateSlots(dateStrings[4].date, ['9:00', '9:30', '10:00', '10:30', '11:00', '14:00', '14:30', '15:00', '15:30'])
+                ...generateSlots(dateStrings[4].date, ['9:00', '9:30', '10:00', '10:30', '11:00', '14:00', '14:30', '15:00', '15:30']),
+                ...generateSlots(dateStrings[5].date, ['10:00', '10:30', '11:00', '11:30', '14:00']), // Friday
+                ...generateSlots(dateStrings[6].date, ['9:00', '9:30', '13:00', '13:30']) // Saturday
             }
         },
         2: {
@@ -54,7 +61,9 @@ const DeeCare = () => {
                 ...generateSlots(dateStrings[1].date, ['9:00', '9:30', '14:00', '14:30']),
                 ...generateSlots(dateStrings[2].date, ['11:00', '11:30', '16:00', '16:30']),
                 ...generateSlots(dateStrings[3].date, ['13:00', '13:30', '17:00', '17:30']),
-                ...generateSlots(dateStrings[4].date, ['15:00', '15:30', '16:00', '16:30'])
+                ...generateSlots(dateStrings[4].date, ['15:00', '15:30', '16:00', '16:30']),
+                ...generateSlots(dateStrings[5].date, ['9:00', '10:00', '11:00']), // Friday
+                ...generateSlots(dateStrings[6].date, []) // Saturday - no slots
             }
         }
     };
@@ -84,12 +93,10 @@ const DeeCare = () => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
     const [currentMonth, setCurrentMonth] = useState(new Date());
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [showLoginForm, setShowLoginForm] = useState(false);
-    const [loginDetails, setLoginDetails] = useState({ email: '', password: '' });
     const [notification, setNotification] = useState(null);
     const [selectedDay, setSelectedDay] = useState(null);
-    const [activeTab, setActiveTab] = useState('appointment');
+    const [showConfirmOverlay, setShowConfirmOverlay] = useState(false);
+    const [appointmentDetails, setAppointmentDetails] = useState(null);
 
     // Calendar navigation
     const handlePrevWeek = () => {
@@ -103,6 +110,11 @@ const DeeCare = () => {
 
         // Update available slots based on new dates
         updateAvailableSlots(newDateStrings);
+
+        // Clear selections when changing week
+        setSelectedDate(null);
+        setSelectedTimeSlot(null);
+        setSelectedDay(null);
     };
 
     const handleNextWeek = () => {
@@ -116,6 +128,11 @@ const DeeCare = () => {
 
         // Update available slots based on new dates
         updateAvailableSlots(newDateStrings);
+
+        // Clear selections when changing week
+        setSelectedDate(null);
+        setSelectedTimeSlot(null);
+        setSelectedDay(null);
     };
 
     // Update available slots when week changes
@@ -233,23 +250,6 @@ const DeeCare = () => {
         return availableSlots.includes(time);
     };
 
-    // Handle login
-    const handleLogin = () => {
-        // Simple mock login
-        if (loginDetails.email && loginDetails.password) {
-            setIsLoggedIn(true);
-            setShowLoginForm(false);
-            setNotification({
-                type: 'success',
-                message: 'Successfully logged in!'
-            });
-
-            setTimeout(() => {
-                setNotification(null);
-            }, 3000);
-        }
-    };
-
     // Handle appointment confirmation
     const handleConfirmAppointment = () => {
         if (!selectedDate || !selectedTimeSlot) {
@@ -264,19 +264,51 @@ const DeeCare = () => {
             return;
         }
 
-        if (!isLoggedIn) {
-            setShowLoginForm(true);
-            return;
-        }
+        // Format the time slot for the confirmation page
+        const [hour, minute] = selectedTimeSlot.split(':');
+        const startDateTime = new Date(selectedDay.date);
+        startDateTime.setHours(parseInt(hour), parseInt(minute), 0);
 
+        const endDateTime = new Date(startDateTime);
+        endDateTime.setMinutes(endDateTime.getMinutes() + 30);
+
+        const details = {
+            doctorInfo: selectedDoctor,
+            selectedDate: selectedDay.date,
+            selectedTimeSlot: {
+                start: startDateTime.toISOString(),
+                end: endDateTime.toISOString()
+            }
+        };
+
+        // Set the appointment details and show the overlay
+        setAppointmentDetails(details);
+        setShowConfirmOverlay(true);
+    };
+
+    // Handle overlay close
+    const handleOverlayClose = () => {
+        setShowConfirmOverlay(false);
+    };
+
+    // Handle final confirmation from overlay
+    const handleFinalConfirm = (confirmedDetails) => {
+        // Here you can handle saving the appointment data
+        console.log('Appointment confirmed with details:', confirmedDetails);
+        setShowConfirmOverlay(false);
+
+        // Show success notification
         setNotification({
             type: 'success',
-            message: `Appointment confirmed with ${selectedDoctor.name} on ${selectedDate} at ${selectedTimeSlot}`
+            message: 'Appointment has been confirmed!'
         });
 
         setTimeout(() => {
             setNotification(null);
         }, 3000);
+
+        // Optional: Navigate to another page or reset the form
+        // navigate('/dashboard');
     };
 
     // Handle day selection
@@ -352,33 +384,6 @@ const DeeCare = () => {
         setSelectedTimeSlot(null);
     };
 
-    // Sync calendar month with current week
-    const synchronizeCalendarMonth = () => {
-        // If the current week spans across two months, use the month with more days
-        const monthCounts = {};
-        dateStrings.forEach(d => {
-            const month = d.date.getMonth();
-            monthCounts[month] = (monthCounts[month] || 0) + 1;
-        });
-
-        let dominantMonth = currentMonth.getMonth();
-        let maxCount = 0;
-
-        for (const [month, count] of Object.entries(monthCounts)) {
-            if (count > maxCount) {
-                maxCount = count;
-                dominantMonth = parseInt(month);
-            }
-        }
-
-        // Update calendar if needed
-        if (dominantMonth !== currentMonth.getMonth()) {
-            const newMonth = new Date(currentMonth);
-            newMonth.setMonth(dominantMonth);
-            setCurrentMonth(newMonth);
-        }
-    };
-
     // Get weekday names
     const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
@@ -399,20 +404,49 @@ const DeeCare = () => {
         return `${time}-${endHour}:${endMinutes === 0 ? '00' : endMinutes}`;
     };
 
+    // Handle time slot selection
+    const handleTimeSlotSelection = (dateStr, time) => {
+        // Only allow selection if the slot is available
+        if (isTimeSlotAvailable(dateStr, time)) {
+            // Find the corresponding day object based on the dateStr
+            const selectedDateObj = dateStrings.find(d => d.display === dateStr);
+
+            if (selectedDateObj) {
+                // Update all state variables consistently
+                setSelectedDate(dateStr);
+                setSelectedTimeSlot(time);
+                setSelectedDay({
+                    date: selectedDateObj.date,
+                    isCurrentMonth: true, // These properties are needed for consistency with calendar selection
+                    day: selectedDateObj.date.getDate()
+                });
+            }
+        }
+    };
+
     return (
-        <div className="flex flex-col min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-100">
             {/* Notification */}
             {notification && (
                 <div className={`fixed top-4 right-4 p-4 rounded shadow-lg z-50 
-          ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}>
+                ${notification.type === 'success' ? 'bg-green-400' : 'bg-red-500'} text-white`}>
                     {notification.message}
                 </div>
+            )}
+
+            {/* Confirmation Overlay */}
+            {showConfirmOverlay && (
+                <ConfirmAppointmentOverlay
+                    appointmentDetails={appointmentDetails}
+                    onClose={handleOverlayClose}
+                    onConfirm={handleFinalConfirm}
+                />
             )}
 
             {/* Main Content */}
             <main className="container mx-auto flex-grow p-4 bg-white my-4 rounded-lg shadow">
                 {/* Doctor Profile */}
-                <div className="bg-blue-100 p-4 rounded-lg mb-6 flex items-center">
+                <div className="bg-light-blue p-4 rounded-xl mb-6 flex items-center">
                     <button
                         className="bg-blue-500 text-white rounded-full p-2 mr-4 hover:bg-blue-600 active:bg-blue-700"
                         onClick={() => switchDoctor('prev')}
@@ -431,14 +465,20 @@ const DeeCare = () => {
                         <p className="text-blue-800">DEPARTMENT: {selectedDoctor.department}</p>
                         <p className="text-blue-800">WORK HOUR: {selectedDoctor.workHours}</p>
                     </div>
+                    <button
+                        className="bg-blue-500 text-white rounded-full p-2 ml-auto hover:bg-blue-600 active:bg-blue-700"
+                        onClick={() => switchDoctor('next')}
+                    >
+                        &gt;
+                    </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                     {/* Calendar */}
-                    <div className="bg-blue-100 p-4 rounded-lg col-span-1">
+                    <div className="bg-light-blue p-4 rounded-xl col-span-1">
                         <div className="flex justify-between mb-2">
                             <button
-                                className="text-blue-800 hover:text-blue-600"
+                                className="text-primary hover:text-blue-600"
                                 onClick={() => {
                                     const newDate = new Date(currentMonth);
                                     newDate.setMonth(newDate.getMonth() - 1);
@@ -448,7 +488,7 @@ const DeeCare = () => {
                                 &lt;
                             </button>
                             <div className="text-blue-800 font-medium">
-                                {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                                {currentMonth.toLocaleDateString('en-US', {month: 'long', year: 'numeric'})}
                             </div>
                             <button
                                 className="text-blue-800 hover:text-blue-600"
@@ -472,11 +512,11 @@ const DeeCare = () => {
                             {generateCalendarDays().map((day, index) => (
                                 <div
                                     key={index}
-                                    className={`p-1 rounded-full cursor-pointer text-sm ${
+                                    className={`p-1 rounded cursor-pointer text-sm ${
                                         day.isCurrentMonth
                                             ? selectedDay && day.date.toDateString() === selectedDay.date.toDateString()
-                                                ? 'bg-blue-500 text-white'
-                                                : 'text-blue-800 hover:bg-blue-200'
+                                                ? 'bg-yellow text-white'
+                                                : 'text-blue-800 hover:bg-yellow-200'
                                             : 'text-gray-400'
                                     } ${
                                         day.day === new Date().getDate() &&
@@ -493,11 +533,13 @@ const DeeCare = () => {
                             ))}
                         </div>
 
+                        {/* Only show confirm button when date and time are selected */}
                         <button
-                            className="w-full bg-orange-400 text-white py-2 rounded mt-4 hover:bg-orange-500 active:bg-orange-600"
+                            className={`w-full ${selectedDate && selectedTimeSlot ? 'bg-orange-400 hover:bg-orange-500 active:bg-orange-600' : 'bg-gray-400 cursor-not-allowed'} text-white px-2 py-2 rounded-lg mt-4`}
                             onClick={handleConfirmAppointment}
+                            disabled={!selectedDate || !selectedTimeSlot}
                         >
-                            Confirm
+                            {selectedDate && selectedTimeSlot ? 'Confirm Appointment' : 'Select a time slot'}
                         </button>
                     </div>
 
@@ -505,27 +547,43 @@ const DeeCare = () => {
                     <div className="md:col-span-4">
                         <div className="flex justify-between mb-4">
                             <button
-                                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                className="bg-pri text-white text-sm px-4 py-2 rounded-xl hover:bg-blue-600"
                                 onClick={handlePrevWeek}
                             >
-                                &lt; Previous Week
+                                <div className="flex flex-row justify-between items-center">
+                                    <p>&lt; </p>
+                                    <p>Previous Week</p>
+                                </div>
                             </button>
+                            <div className="text-pri font-medium pl-8 pr-8">
+                                {selectedDay ?
+                                    `Selected: ${selectedDay.date.toLocaleDateString('en-US', {
+                                        weekday: 'long',
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })}` :
+                                    'Select a date from calendar or time slot grid'
+                                }
+                            </div>
                             <button
-                                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                className="bg-pri text-white text-sm px-4 py-2 rounded-xl hover:bg-blue-600"
                                 onClick={handleNextWeek}
                             >
-                                Next Week &gt;
+                                <div className="flex flex-row justify-between items-center">
+                                    <p>Next Week</p>
+                                    <p>&gt; </p>
+                                </div>
                             </button>
                         </div>
 
                         <div className="overflow-x-auto">
-                            <div className="min-w-max grid grid-cols-6 gap-1">
+                            <div className="min-w-max grid grid-cols-8 gap-1">
                                 <div className="sticky left-0 text-center font-medium"></div>
                                 {dateStrings.map((dateObj, index) => (
                                     <div
                                         key={index}
-                                        className={`text-center font-medium text-sm p-1 ${
-                                            selectedDate === dateObj.display ? 'bg-blue-100 rounded' : ''
+                                        className={`text-center font-medium text-sm p-1 text-pri ${
+                                            selectedDate === dateObj.display ? 'bg-blue-100 rounded-lg' : ''
                                         }`}
                                     >
                                         {dateObj.display}
@@ -534,7 +592,8 @@ const DeeCare = () => {
 
                                 {generateTimeSlots().map((time, timeIndex) => (
                                     <>
-                                        <div key={`time-${timeIndex}`} className="sticky left-0 text-center font-medium bg-white">
+                                        <div key={`time-${timeIndex}`}
+                                             className="sticky left-0 text-center font-medium text-pri bg-ivory pt-2">
                                             {time}
                                         </div>
                                         {dateStrings.map((dateObj, dateIndex) => {
@@ -542,21 +601,21 @@ const DeeCare = () => {
                                             const isSelected = selectedDate === dateObj.display && selectedTimeSlot === time;
 
                                             return (
+
                                                 <div
                                                     key={`slot-${timeIndex}-${dateIndex}`}
-                                                    className={`h-10 ${
+                                                    className={`h-10 text-center pt-1 text-pri ${
                                                         isAvailable
-                                                            ? 'bg-orange-300 cursor-pointer hover:bg-orange-400 active:bg-orange-500'
-                                                            : 'bg-gray-100'
+                                                            ? 'bg-orange-200 cursor-pointer hover:bg-orange-400 active:bg-yellow rounded-lg'
+                                                            : 'bg-gray-100 rounded-lg'
                                                     } ${
                                                         isSelected
-                                                            ? 'ring-2 ring-blue-500'
+                                                            ? 'bg-yellow ring-2 ring-background'
                                                             : ''
                                                     }`}
                                                     onClick={() => {
                                                         if (isAvailable) {
-                                                            setSelectedDate(dateObj.display);
-                                                            setSelectedTimeSlot(time);
+                                                            handleTimeSlotSelection(dateObj.display, time);
                                                         }
                                                     }}
                                                 >
@@ -566,6 +625,7 @@ const DeeCare = () => {
                                                         </div>
                                                     )}
                                                 </div>
+
                                             );
                                         })}
                                     </>
@@ -579,4 +639,4 @@ const DeeCare = () => {
     );
 };
 
-export default DeeCare;
+export default Timeslot;

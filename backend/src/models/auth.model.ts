@@ -1,25 +1,8 @@
-import { db } from "../index.ts";
+import {db} from "../index.ts";
 import * as bcrypt from "bcrypt";
+import type {userData} from "../types/type.js";
 
-/**
- * Register a new user with their details
- */
-const Register = async (userData: {
-    idNumber: string;
-    firstName: string;
-    lastName: string;
-    dob: string;
-    age: number;
-    bloodType?: string;
-    email: string;
-    password: string;
-    emergencyContact?: {
-        contactName: string;
-        relationship: string;
-        contactPhone: string;
-        contactEmail?: string;
-    };
-}) => {
+const Register = async (userData: userData) => {
     try {
         // Hash the password before storing
         const hashedPassword = await bcrypt.hash(userData.password, 10);
@@ -52,7 +35,7 @@ const Register = async (userData: {
         });
 
         // Return the user without the password
-        const { password, ...userWithoutPassword } = user;
+        const {password, ...userWithoutPassword} = user;
         return userWithoutPassword;
     } catch (error) {
         console.error("Error registering user:", error);
@@ -60,9 +43,6 @@ const Register = async (userData: {
     }
 };
 
-/**
- * Authenticate a user by idNumber and password
- */
 const Login = async (idNumber: string, password: string) => {
     try {
         // Find the user by idNumber
@@ -73,19 +53,19 @@ const Login = async (idNumber: string, password: string) => {
         });
 
         if (!user) {
-            return { success: false, message: "User not found" };
+            return {success: false, message: "User not found"};
         }
 
         // Compare the provided password with the stored hash
         const isValidPassword = await bcrypt.compare(password, user.password);
 
         if (!isValidPassword) {
-            return { success: false, message: "Invalid password" };
+            return {success: false, message: "Invalid password"};
         }
 
         // Return user without password
-        const { password: _, ...userWithoutPassword } = user;
-        return { success: true, user: userWithoutPassword };
+        const {password: _, ...userWithoutPassword} = user;
+        return {success: true, user: userWithoutPassword};
     } catch (error) {
         console.error("Error during login:", error);
         throw error;
@@ -95,24 +75,21 @@ const Login = async (idNumber: string, password: string) => {
 /**
  * Get user by ID
  */
-const GetUserById = async (userId: number) => {
+const GetUserByEmail = async (email: string) => {
     try {
-        const user = await db.user.findUnique({
+        const mail = await db.user.findUnique({
             where: {
-                id: userId,
-            },
-            include: {
-                emergencyContact: true,
+                email,
             },
         });
 
-        if (!user) {
+        if (!mail) {
             return null;
         }
-
+        return mail;
         // Return user without password
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+        // const {password, ...userWithoutPassword} = user;
+        // return userWithoutPassword;
     } catch (error) {
         console.error("Error getting user:", error);
         throw error;
@@ -137,7 +114,7 @@ const UpdateUser = async (userId: number, userData: {
         });
 
         // Return user without password
-        const { password, ...userWithoutPassword } = updatedUser;
+        const {password, ...userWithoutPassword} = updatedUser;
         return userWithoutPassword;
     } catch (error) {
         console.error("Error updating user:", error);
@@ -145,4 +122,4 @@ const UpdateUser = async (userId: number, userData: {
     }
 };
 
-export { Register, Login, GetUserById, UpdateUser };
+export {Register, Login, GetUserByEmail, UpdateUser};
