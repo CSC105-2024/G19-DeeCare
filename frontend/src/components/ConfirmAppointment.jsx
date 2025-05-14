@@ -1,17 +1,21 @@
-import {useNavigate, useLocation} from "react-router-dom";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {format} from 'date-fns';
 
-function ConfirmAppointment() {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const {appointmentDetails} = location.state || {};
-
+function ConfirmAppointmentOverlay({appointmentDetails, onClose, onConfirm}) {
     const [sendEmailNotification, setSendEmailNotification] = useState(true);
+    const [isVisible, setIsVisible] = useState(false);
 
-    // If no appointment details were passed, redirect back to timeslot selection
+    useEffect(() => {
+        // Add animation by delaying visibility
+        const timer = setTimeout(() => {
+            setIsVisible(true);
+        }, 50);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    // If no appointment details were passed, don't render
     if (!appointmentDetails) {
-        navigate("/Timeslot");
         return null;
     }
 
@@ -31,28 +35,45 @@ function ConfirmAppointment() {
     const handleFinalConfirm = () => {
         // Save notification preference if needed
         localStorage.setItem('sendEmailNotification', sendEmailNotification);
-
-        navigate("/userdetail", {
-            state: {
-                appointmentDetails: {
-                    ...appointmentDetails,
-                    sendEmailNotification
-                }
-            }
+        onConfirm({
+            ...appointmentDetails,
+            sendEmailNotification
         });
     };
 
     return (
-        <div className="px-4 md:px-0">
-            <div className="max-w-2xl mx-auto mt-8 mb-8 p-6 bg-light-blue rounded-xl">
-                <div className="max-w-2xl mx-auto mt-8 mb-8 p-6 bg-light-blue rounded-xl ">
-                    <h1 className="text-3xl font-bold text-center text-pri mt-4 mb-6">APPOINTMENT CONFIRMED</h1>
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+            {/* Overlay background */}
+            <div
+                className="absolute inset-0 backdrop-blur-lg bg-opacity-50"
+                onClick={onClose}
+            ></div>
+
+            {/* Modal content */}
+            <div
+                className={`max-w-2xl w-full mx-4 bg-light-blue rounded-xl transform transition-all duration-300 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+            >
+                <div className="p-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h1 className="text-3xl font-bold text-pri">APPOINTMENT CONFIRMED</h1>
+                        <button
+                            onClick={onClose}
+                            className="text-pri hover:text-gray-700"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                      d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+
                     <p className="text-center mb-4 text-pri text-lg">
                         YOUR APPOINTMENT IS SCHEDULED FOR<br/>
                         <span className="font-bold">{formattedDate}</span>
                     </p>
 
-                    <div className="bg-ivory rounded-xl p-4 mb-4 text-pri flex items-center border-1 border-pri">
+                    <div className="bg-ivory rounded-xl p-4 mb-4 text-pri flex items-center border border-pri">
                         <div className="w-16 h-16 bg-gray-200 rounded-full flex-shrink-0 mr-4">
                             {doctorInfo.image ? (
                                 <img src={doctorInfo.image} alt={doctorInfo.name}
@@ -78,7 +99,7 @@ function ConfirmAppointment() {
                         </div>
                     </div>
 
-                    <div className="bg-background rounded-xl p-4 mb-4 text-pri flex items-center border-1 border-pri">
+                    <div className="bg-background rounded-xl p-4 mb-4 text-pri flex items-center border border-pri">
                         <div className="flex items-center">
                             <div className="w-16 h-16 bg-gray-200 rounded-full flex-shrink-0 mr-4">
                                 <div className="w-full h-full flex items-center justify-center">
@@ -98,7 +119,7 @@ function ConfirmAppointment() {
                     </div>
 
                     {/* Email notification toggle */}
-                    <div className="flex items-center justify-between text-pri  bg-light-blue rounded-lg mb-0">
+                    <div className="flex items-center justify-between text-pri bg-light-blue rounded-lg mb-4">
                         <div className="flex-grow">
                             <p className="font-semibold">Send notification via email</p>
                         </div>
@@ -111,14 +132,20 @@ function ConfirmAppointment() {
                                     className="sr-only peer"
                                 />
                                 <div className="relative w-11 h-6 bg-gray-200
-                        peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-pri rounded-full peer peer-checked:after:translate-x-full
-                        peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300
-                        after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pri"></div>
+                    peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-pri rounded-full peer peer-checked:after:translate-x-full
+                    peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300
+                    after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pri"></div>
                             </label>
                         </div>
                     </div>
 
-                    <div className="flex justify-center mt-4">
+                    <div className="flex justify-between mt-6">
+                        <button
+                            onClick={onClose}
+                            className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-lg"
+                        >
+                            CANCEL
+                        </button>
                         <button
                             onClick={handleFinalConfirm}
                             className="px-12 py-2 bg-yellow hover:bg-yellow-600 text-background font-semibold rounded-lg"
@@ -132,4 +159,4 @@ function ConfirmAppointment() {
     );
 }
 
-export default ConfirmAppointment;
+export default ConfirmAppointmentOverlay;
