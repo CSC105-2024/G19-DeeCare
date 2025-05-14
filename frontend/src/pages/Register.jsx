@@ -1,4 +1,3 @@
-import {useFormContext} from "../context/FormContext";
 import {useState} from "react";
 import {cn} from "../lib/utils.js";
 import {z} from "zod";
@@ -32,7 +31,6 @@ const emergencyContactSchema = z.object({
 });
 
 function Register() {
-    const {page, setPage} = useFormContext();
     const [currentStep, setCurrentStep] = useState(1);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
