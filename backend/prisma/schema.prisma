@@ -24,3 +24,6 @@ model Event {
   linkedin      String?
   description   String
 }
+
+
+

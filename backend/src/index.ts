@@ -7,19 +7,14 @@ import { cors } from 'hono/cors';
 
 const app = new Hono();
 export const db = new PrismaClient();
-
+app.use('*', cors());
 app.get("/", (c) => {
     return c.text("Hello Hono!");
 });
 
 app.route("", mainRouter);
 
-app.use(
-	cors({
-		origin: ['http://localhost:5173'], 
-    // Your frontend application
-	})
-);
+
 
 db.$connect()
 	.then(() => {
