@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState, useRef ,  useEffect } from 'react';
-
+import { Axios } from "../utils/axiosInstance";
 
 function Popup({ isOpen, onClose, title, children }) {
   const [isVisible, setIsVisible] = useState(false);

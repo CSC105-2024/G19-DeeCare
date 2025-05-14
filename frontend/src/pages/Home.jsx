@@ -6,6 +6,7 @@ import { Axios } from "../utils/axiosInstance.js";
 
 const Home = () => {
     const [ events, setEvents] = useState([]);
+
     const fetchEventData = async () => {
         try{
           const response = await Axios.get('/events/getAll');
@@ -81,7 +82,7 @@ const Home = () => {
     );
 }; 
 
-const HorizontalScrollCarousel = () => {
+const HorizontalScrollCarousel = ({ events }) => {
     const targetRef = useRef(null);
     const {scrollXProgress} = useScroll({
         container: targetRef,

@@ -70,15 +70,18 @@ model AvailableTime {
 }
 
 model Event {
-  id          Int     @id @default(autoincrement())
-  name        String
-  eventDates  String
-  image       String?
-  place       String
-  website     String?
-  organizer   String
-  phone       String
-  email       String
-  linkedin    String?
-  description String
+  id            Int     @id @default(autoincrement())
+  name          String
+  eventDates    String
+  image         String? 
+  place         String
+  website       String?
+  organizer     String
+  phone         String
+  email         String
+  linkedin      String?
+  description   String
 }
+
+
+
