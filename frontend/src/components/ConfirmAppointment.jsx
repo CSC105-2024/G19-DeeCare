@@ -55,7 +55,7 @@ function ConfirmAppointmentOverlay({appointmentDetails, onClose, onConfirm}) {
             >
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-4">
-                        <h1 className="text-3xl font-bold text-pri">APPOINTMENT CONFIRMED</h1>
+                        <h1 className="text-3xl font-bold text-pri items-center">APPOINTMENT CONFIRMED</h1>
                         <button
                             onClick={onClose}
                             className="text-pri hover:text-gray-700"
