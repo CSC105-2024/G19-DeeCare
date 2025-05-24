@@ -1,15 +1,16 @@
 import {Link} from "react-router-dom";
 import {motion, useTransform, useScroll} from "framer-motion";
 import {useEffect, useRef, useState} from "react";
-import {eventData} from "../Data/EventData.jsx";
-import { Axios } from "../utils/axiosInstance.js";
+// import {eventData} from "../Data/EventData.jsx";
+// import { Axios } from "../utils/axiosInstance.js";
+import { getEventAPI } from "../api/getEvents.js";
 
 const Home = () => {
-    const [ events, setEvents] = useState([]);
+    const [ Events, setEvents] = useState([]);
 
     const fetchEventData = async () => {
         try{
-          const response = await Axios.get('/events/getAll');
+          const response = await getEventAPI();
           if (response.data.success) {
             setEvents(response.data.data);
           } else {
@@ -74,7 +75,7 @@ const Home = () => {
                         Explore Events 🩺
                     </h2>
                     <div className="px-[16px] sm:px-[112px]">
-                        <HorizontalScrollCarousel/>
+                        <HorizontalScrollCarousel Events={Events}/>
                     </div>
                 </div>
             </section>
@@ -82,7 +83,7 @@ const Home = () => {
     );
 }; 
 
-const HorizontalScrollCarousel = ({ events }) => {
+const HorizontalScrollCarousel = ({ Events }) => {
     const targetRef = useRef(null);
     const {scrollXProgress} = useScroll({
         container: targetRef,
@@ -97,7 +98,7 @@ const HorizontalScrollCarousel = ({ events }) => {
             <motion.div 
                 style={{x}} 
                 className="flex w-full sm:gap-[58px] gap-[16px] ">   
-                {eventData.map((event) => (
+                {Events.map((event) => (
                     <Link to = {`/Event/${event.id}`} 
                         // event box
                         key={event.id}
@@ -108,7 +109,7 @@ const HorizontalScrollCarousel = ({ events }) => {
                         {/* image */}
                         <img
                             src={event.image}
-                            alt={event.title}
+                            alt={event.name}
                             className="w-full rounded-3xl sm:h-[223px] sm:p-[12px] p-[10px] h-[110px] object-cover "
                         />
 
@@ -127,7 +128,7 @@ const HorizontalScrollCarousel = ({ events }) => {
                             <div className="flex-1 min-w-0">
                                 {/* event topic */}
                                 <h1 className="sm:font-medium truncate w-full sm:text-base text-[10px]">
-                                    {event.title}
+                                    {event.name}
                                 </h1>
 
                                 {/* Event date */}
@@ -138,7 +139,7 @@ const HorizontalScrollCarousel = ({ events }) => {
                                         className="sm:w-[20px] sm:h-[20px] w-[8px] h-[8px]"
                                     />
                                     <p className="ml-2 text-ellipsis overflow-hidden whitespace-nowrap w-full text-[8px] font-normal sm:text-base">
-                                        {event.date}
+                                        {event.eventDates}
                                     </p>
                                 </div>
 

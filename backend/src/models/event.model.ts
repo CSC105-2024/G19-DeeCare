@@ -16,6 +16,8 @@ export const read1Event = async (id: number) => {
 type CreateEventData = {
   name: string;
   eventDates: string;
+  day: string;
+  month: string;
   image?: string;
   place: string;
   website?: string;
@@ -38,6 +40,8 @@ export const createEvent = async (eventData: CreateEventData) => {
 type UpdateEventData = Partial<{
   name: string;
   eventDates: string;
+  day: string;
+  month: string;
   image?: string;
   place: string;
   website?: string;
