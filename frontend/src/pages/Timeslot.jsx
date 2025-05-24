@@ -2,7 +2,6 @@ import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import ConfirmAppointmentOverlay from '../components/ConfirmAppointment.jsx';
 
-
 const Timeslot = () => {
     const navigate = useNavigate();
 
@@ -367,23 +366,6 @@ const Timeslot = () => {
         setSelectedTimeSlot(null);
     };
 
-    // Switch doctor
-    const switchDoctor = (direction) => {
-        const currentIndex = doctors.findIndex(doc => doc.id === selectedDoctor.id);
-        let newIndex;
-
-        if (direction === 'prev') {
-            newIndex = currentIndex === 0 ? doctors.length - 1 : currentIndex - 1;
-        } else {
-            newIndex = currentIndex === doctors.length - 1 ? 0 : currentIndex + 1;
-        }
-
-        setSelectedDoctor(doctors[newIndex]);
-
-        // Clear selections when switching doctors
-        setSelectedTimeSlot(null);
-    };
-
     // Get weekday names
     const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
@@ -447,12 +429,7 @@ const Timeslot = () => {
             <main className="container mx-auto flex-grow p-4 bg-white my-4 rounded-lg shadow">
                 {/* Doctor Profile */}
                 <div className="bg-light-blue p-4 rounded-xl mb-6 flex items-center">
-                    <button
-                        className="bg-blue-500 text-white rounded-full p-2 mr-4 hover:bg-blue-600 active:bg-blue-700"
-                        onClick={() => switchDoctor('prev')}
-                    >
-                        &lt;
-                    </button>
+
                     <div className="bg-white rounded-full p-2 mr-4">
                         <img
                             src={selectedDoctor.image}
@@ -461,16 +438,11 @@ const Timeslot = () => {
                         />
                     </div>
                     <div>
-                        <h2 className="text-blue-800 font-medium">NAME: {selectedDoctor.name}</h2>
-                        <p className="text-blue-800">DEPARTMENT: {selectedDoctor.department}</p>
-                        <p className="text-blue-800">WORK HOUR: {selectedDoctor.workHours}</p>
+                        <h2 className="text-pri font-medium">NAME: {selectedDoctor.name}</h2>
+                        <p className="text-pri">DEPARTMENT: {selectedDoctor.department}</p>
+                        <p className="text-pri">WORK HOUR: {selectedDoctor.workHours}</p>
                     </div>
-                    <button
-                        className="bg-blue-500 text-white rounded-full p-2 ml-auto hover:bg-blue-600 active:bg-blue-700"
-                        onClick={() => switchDoctor('next')}
-                    >
-                        &gt;
-                    </button>
+
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -478,7 +450,7 @@ const Timeslot = () => {
                     <div className="bg-light-blue p-4 rounded-xl col-span-1">
                         <div className="flex justify-between mb-2">
                             <button
-                                className="text-primary hover:text-blue-600"
+                                className="text-pri hover:text-blue-600"
                                 onClick={() => {
                                     const newDate = new Date(currentMonth);
                                     newDate.setMonth(newDate.getMonth() - 1);
@@ -487,11 +459,11 @@ const Timeslot = () => {
                             >
                                 &lt;
                             </button>
-                            <div className="text-blue-800 font-medium">
+                            <div className="text-pri font-medium">
                                 {currentMonth.toLocaleDateString('en-US', {month: 'long', year: 'numeric'})}
                             </div>
                             <button
-                                className="text-blue-800 hover:text-blue-600"
+                                className="text-pri hover:text-blue-600"
                                 onClick={() => {
                                     const newDate = new Date(currentMonth);
                                     newDate.setMonth(newDate.getMonth() + 1);
@@ -504,7 +476,7 @@ const Timeslot = () => {
 
                         <div className="grid grid-cols-7 gap-1 text-center mb-2">
                             {weekdays.map((day, index) => (
-                                <div key={index} className="text-blue-800 font-medium">
+                                <div key={index} className="text-pri font-medium">
                                     {day}
                                 </div>
                             ))}
@@ -515,8 +487,8 @@ const Timeslot = () => {
                                     className={`p-1 rounded cursor-pointer text-sm ${
                                         day.isCurrentMonth
                                             ? selectedDay && day.date.toDateString() === selectedDay.date.toDateString()
-                                                ? 'bg-yellow text-white'
-                                                : 'text-blue-800 hover:bg-yellow-200'
+                                                ? 'bg-yellow text-background'
+                                                : 'text-pri hover:bg-yellow-200'
                                             : 'text-gray-400'
                                     } ${
                                         day.day === new Date().getDate() &&
@@ -555,7 +527,7 @@ const Timeslot = () => {
                                     <p>Previous Week</p>
                                 </div>
                             </button>
-                            <div className="text-pri font-medium pl-8 pr-8">
+                            <div className=" text-pri font-medium pl-8 pr-8">
                                 {selectedDay ?
                                     `Selected: ${selectedDay.date.toLocaleDateString('en-US', {
                                         weekday: 'long',

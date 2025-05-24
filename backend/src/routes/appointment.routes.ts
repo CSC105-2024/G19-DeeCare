@@ -1,5 +1,5 @@
 import {Hono} from "hono";
-import * as appointmentController from "../controllers/auth.controller.js";
+import {appointmentController} from "../controllers/appointment.controller.ts";
 import {authMiddleware} from "../middlewares/auth.middlewares.js";
 
 const appointmentRouter = new Hono();
