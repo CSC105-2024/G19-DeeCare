@@ -1,20 +1,57 @@
 import {db} from "../index.js";
 
+type Doctortype = {
+    doctorId: string,
+    name:string,
+    department:string,
+    DRimage:string,
+    specialization:string,
+    email:string
+}
+
 export const doctorModel = {
+
+    newDoctor:async (Doctordata:Doctortype) => {
+    const doctor = await db.doctor.create({
+        data: Doctordata,
+    });
+    return doctor;
+    },
+
+    EditDoctor:async (Doctordata:Doctortype,id : number) => {
+        const doctor = await db.doctor.update({
+            where: {
+                id:id,
+            },
+            data: Doctordata,
+        });
+        return doctor;
+    },
+
+     DeleteDoctor:async (id:number) => {
+    await db.doctor.delete({
+     where: {
+       id:id,
+     }
+    });
+    },
     /**
      * Get all doctors
      */
-    findAll: async () => {
+    findAllDoc: async () => {
         return db.doctor.findMany({
             select: {
                 id: true,
-                firstName: true,
-                lastName: true,
-                specialty: true,
-                email: true
+                doctorId:true,
+                name:true,
+                department:true,
+                DRimage:true,
+                specialization:true,
+                email:true,
             }
         });
     },
+
 
     /**
      * Find a doctor by ID
@@ -27,6 +64,28 @@ export const doctorModel = {
             }
         });
     },
+    findBySearch: async (searchTerm : string) => {
+        return db.doctor.findMany({
+            where: {
+                name:{
+                    contains: searchTerm,
+                }
+            },
+            include: {
+                availableTimes: true
+            }
+        });
+    },
+
+    findByde: async (department : string) => {
+        return db.doctor.findMany({
+            where: {department:department},
+            include: {
+                availableTimes: true
+            }
+        });
+    },
+
 
     /**
      * Get available time slots for a doctor
