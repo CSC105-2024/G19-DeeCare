@@ -3,19 +3,18 @@ import { useParams, Link } from "react-router-dom";
 // import {eventData} from "../Data/EventData.jsx";
 import { Axios } from "../utils/axiosInstance.js";
 import { getEventAPIbyID } from "../api/getEvents.js";
-import axios from "axios";
+// import axios from "axios";
 // import { getEventAPI } from "../api/getEvents.js";
 
 const  Event = () => {
-  const [ Events, setEvents] = useState([]); 
-const {id} = useParams();
- 
-
+  const [ Events, setEvents] = useState({}); 
+  const {id} = useParams();
+ //const day = Events.eventDates.charAt(0);
   const fetchEventData = async (id) => {
     try{
-     
       console.log(id);
       const response = await getEventAPIbyID(id);
+      // const response = await Axios.getEventAPIbyID(id);
       if (response.data.success) {
         setEvents(response.data.data);
       } else {
@@ -23,7 +22,8 @@ const {id} = useParams();
       }
     } catch (e) {
       console.error("Error fetching events:", e);
-    } finally {
+    }
+     finally {
       // setLoading(false);
     }
 	};
@@ -50,7 +50,8 @@ const {id} = useParams();
       </div>
     );
   }
-
+  // const firstDay = Events.eventDates.charAt(0);
+  // console.log("First character of eventDates:", firstDay);
   return (
     <>
       {/* page content */}

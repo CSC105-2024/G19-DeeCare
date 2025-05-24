@@ -73,6 +73,8 @@ model Event {
   id            Int     @id @default(autoincrement())
   name          String
   eventDates    String
+  day           String  @default("0")
+  month         String  @default("Month")
   image         String? 
   place         String
   website       String?
