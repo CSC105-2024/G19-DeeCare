@@ -130,9 +130,6 @@ const Login = async (idNumber: string, password: string) => {
     }
 };
 
-/**
- * Get user by email
- */
 const GetUserByEmail = async (email: string) => {
     try {
         const user = await db.user.findUnique({
@@ -156,9 +153,6 @@ const GetUserByEmail = async (email: string) => {
     }
 };
 
-/**
- * Get user by ID
- */
 const GetUserById = async (id: number) => {
     try {
         const user = await db.user.findUnique({
@@ -273,9 +267,6 @@ const UpdatePassword = async (userId: number, currentPassword: string, newPasswo
     }
 };
 
-/**
- * Create or update emergency contact
- */
 const UpdateEmergencyContact = async (userId: number, contactData: emergencyContactData) => {
     try {
         // Check if user has an emergency contact
@@ -327,9 +318,6 @@ const UpdateEmergencyContact = async (userId: number, contactData: emergencyCont
     }
 };
 
-/**
- * Delete a user account
- */
 const DeleteUser = async (userId: number) => {
     try {
         // Delete emergency contact if exists
