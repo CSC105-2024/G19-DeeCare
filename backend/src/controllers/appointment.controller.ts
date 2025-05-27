@@ -270,7 +270,7 @@ async function sendAppointmentConfirmationEmail(emailData: AppointmentConfirmati
     `;
 
     const {data, error} = await resend.emails.send({
-        from: 'Healthcare System <appointments@yourdomain.com>', // Replace with your domain
+        from: 'Healthcare System <appointments@deecare.com>',
         to: [patientEmail],
         subject: `Appointment Confirmed - ${formattedDate} at ${formattedTime}`,
         html: emailHtml,

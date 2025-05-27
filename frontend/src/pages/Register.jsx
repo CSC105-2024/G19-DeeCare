@@ -1,11 +1,12 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
+import {useNavigate} from "react-router-dom";
 import {cn} from "../lib/utils.js";
 import {z} from "zod";
+import {authAPI, authEvents} from "../api/authService.js";
 import {
     IconEye,
     IconEyeClosed
 } from "@tabler/icons-react";
-// import { useNavigate } from "react-router-dom";
 
 const stepTitle = [
     'PATIENT INFORMATION',
@@ -31,11 +32,13 @@ const emergencyContactSchema = z.object({
 });
 
 function Register() {
+    const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(1);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [formVisible, setFormVisible] = useState(true);
+    const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
     const [form, setForm] = useState({
         idNumber: "",
@@ -51,6 +54,29 @@ function Register() {
         relationship: "",
         contactEmail: "",
     });
+
+    // Listen for registration success events
+    useEffect(() => {
+        const handleRegisterSuccess = (event) => {
+            console.log('Registration success event received:', event.detail);
+            setRegistrationSuccess(true);
+            setFormVisible(false);
+        };
+
+        authEvents.onRegisterSuccess(handleRegisterSuccess);
+
+        // Cleanup
+        return () => {
+            authEvents.removeListener('auth:register-success', handleRegisterSuccess);
+        };
+    }, []);
+
+    // Check if user is already authenticated
+    useEffect(() => {
+        if (authAPI.isAuthenticated()) {
+            navigate('/'); // Redirect to home if already logged in
+        }
+    }, [navigate]);
 
     const calculateAge = (dob) => {
         if (!dob) return "";
@@ -146,30 +172,20 @@ function Register() {
         });
         setCurrentStep(1);
         setErrors({});
+        setRegistrationSuccess(false);
+        setFormVisible(true);
     };
 
     const navigateToHomepage = () => {
-        // Choose one of these approaches based on your routing setup:
+        navigate('/');
+    };
 
-        // 1. If you're using FormContext for navigation:
-        if (setPage) {
-            setPage('home'); // Navigate to home page using context
-            return;
-        }
-
-        // 2. For React Router:
-        // navigate('/'); // Navigate to home page
-
-        // 3. For Next.js:
-        // router.push('/'); // Navigate to home page
-
-        // 4. For plain HTML navigation:
-        window.location.href = '/'; // Navigate to home page
+    const navigateToLogin = () => {
+        navigate('/login'); // Or show login modal if you have one
     };
 
     const closeForm = () => {
         setFormVisible(false);
-        // We'll keep this separate from navigation for clarity
     };
 
     const handleSubmit = async (e) => {
@@ -177,20 +193,71 @@ function Register() {
 
         if (validateStep(currentStep)) {
             setIsSubmitting(true);
+            setErrors({});
+
             try {
-                // Simulate sending to backend
-                console.log("Submitting form data:", form);
+                // Prepare data for backend
+                const userData = {
+                    idNumber: form.idNumber,
+                    firstName: form.firstName,
+                    lastName: form.lastName,
+                    dob: form.dob,
+                    age: parseInt(form.age),
+                    bloodType: form.bloodType,
+                    password: form.password,
+                    email: form.email,
+                };
 
-                // Use a custom alert with a callback for the OK button
-                const confirmed = window.confirm("Registration successfully submitted!");
+                // Add emergency contact if provided
+                if (form.contactName || form.relationship || form.contactPhone || form.contactEmail) {
+                    userData.emergencyContact = {
+                        contactName: form.contactName || null,
+                        relationship: form.relationship || null,
+                        contactPhone: form.contactPhone || null,
+                        contactEmail: form.contactEmail || null,
+                    };
+                }
 
-                // When user clicks OK on the alert, close the form
-                if (confirmed) {
-                    closeForm();
+                console.log("Submitting registration data:", {...userData, password: '[HIDDEN]'});
+
+                // Submit to backend using authAPI
+                const response = await authAPI.register(userData);
+
+                if (response.success) {
+                    console.log('Registration successful:', response);
+                    // The authAPI will automatically store the token and user data
+                    // and dispatch the success event which we're listening for
+
+                    // Show success message
+                    alert("Registration successful! You are now logged in.");
+
+                    // Navigate to home page or dashboard
+                    navigate('/');
+                } else {
+                    // Handle validation errors from backend
+                    setErrors({general: response.message || 'Registration failed'});
                 }
 
             } catch (error) {
-                console.error("Error submitting form:", error);
+                console.error("Registration error:", error);
+
+                // Handle different types of errors
+                if (error.message) {
+                    setErrors({general: error.message});
+
+                    // If it's a duplicate email/ID error, go back to step 1
+                    if (error.message.includes('email') ||
+                        error.message.includes('ID number') ||
+                        error.message.includes('already exists') ||
+                        error.message.includes('already registered')) {
+                        setCurrentStep(1);
+                    }
+                } else if (error.errors) {
+                    // Handle field-specific errors if backend returns them
+                    setErrors(error.errors);
+                } else {
+                    setErrors({general: 'An error occurred during registration. Please try again.'});
+                }
             } finally {
                 setIsSubmitting(false);
             }
@@ -201,19 +268,63 @@ function Register() {
         errors[name] ? <p className="text-red-500 text-xs mt-1">{errors[name]}</p> : null
     );
 
-    // If form is closed, show a success message or redirect
-    if (!formVisible) {
+    // If registration was successful but form is still visible, show success message
+    if (registrationSuccess && !formVisible) {
         return (
             <div className="flex justify-center items-center min-h-screen bg-background p-4">
                 <div className="bg-light-blue p-8 rounded-xl shadow-md max-w-md w-full text-center">
-                    <h2 className="text-2xl font-bold text-yellow mb-4">Registration Complete!</h2>
-                    <p className="text-pri mb-6">Your registration was successfully submitted.</p>
-                    <button
-                        onClick={navigateToHomepage}
-                        className="bg-pri text-white px-6 py-3 rounded-lg mx-auto"
-                    >
-                        BACK TO HOMEPAGE
-                    </button>
+                    <div className="mb-4">
+                        <div
+                            className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                      d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <h2 className="text-2xl font-bold text-yellow mb-4">Welcome!</h2>
+                    <p className="text-pri mb-6">Your registration was successful and you are now logged in.</p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button
+                            onClick={navigateToHomepage}
+                            className="bg-pri text-white px-6 py-3 rounded-lg"
+                        >
+                            GO TO HOMEPAGE
+                        </button>
+                        <button
+                            onClick={resetForm}
+                            className="bg-white text-pri border border-pri px-6 py-3 rounded-lg"
+                        >
+                            REGISTER ANOTHER
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // If form is closed without success, show different message
+    if (!formVisible && !registrationSuccess) {
+        return (
+            <div className="flex justify-center items-center min-h-screen bg-background p-4">
+                <div className="bg-light-blue p-8 rounded-xl shadow-md max-w-md w-full text-center">
+                    <h2 className="text-2xl font-bold text-blue-900 mb-4">Registration Cancelled</h2>
+                    <p className="text-pri mb-6">You can continue browsing or try registering again.</p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button
+                            onClick={navigateToHomepage}
+                            className="bg-pri text-white px-6 py-3 rounded-lg"
+                        >
+                            BACK TO HOMEPAGE
+                        </button>
+                        <button
+                            onClick={resetForm}
+                            className="bg-white text-pri border border-pri px-6 py-3 rounded-lg"
+                        >
+                            TRY AGAIN
+                        </button>
+                    </div>
                 </div>
             </div>
         );
@@ -225,6 +336,20 @@ function Register() {
                 <h1 className="text-2xl mt-6 sm:text-4xl font-semibold text-blue-900 text-center mb-4">
                     REGISTER
                 </h1>
+
+                {/* General error message */}
+                {errors.general && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm mb-4">
+                        <div className="flex items-center">
+                            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd"
+                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                      clipRule="evenodd"/>
+                            </svg>
+                            {errors.general}
+                        </div>
+                    </div>
+                )}
 
                 {/* Progress bar / steps */}
                 <div className="flex items-center justify-center mb-6 sm:mb-8 overflow-x-auto">
@@ -415,8 +540,12 @@ function Register() {
                     <div className={currentStep === 2 ? "block" : "hidden"}>
                         <div className="">
                             <h2 className="text-xl mb-4 font-bold text-blue-900 ">
-                                Emergency Contact
+                                Emergency Contact (Optional)
                             </h2>
+                            <p className="text-sm text-gray-600 mb-4">
+                                This information helps us contact someone in case of emergency. You can skip this step
+                                if needed.
+                            </p>
                         </div>
                         <div className="w-full">
                             {/* Name */}
@@ -487,14 +616,38 @@ function Register() {
                             </button>
                             <button
                                 type="submit"
-                                className="btn bg-yellow text-background w-full sm:w-auto px-6 py-3 rounded-md text-sm sm:text-base"
+                                className={`btn ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-yellow hover:bg-yellow-600'} text-background w-full sm:w-auto px-6 py-3 rounded-md text-sm sm:text-base transition-colors`}
                                 disabled={isSubmitting}
                             >
-                                {isSubmitting ? "Saving..." : "Save"}
+                                {isSubmitting ? (
+                                    <div className="flex items-center justify-center">
+                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                    strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor"
+                                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Creating Account...
+                                    </div>
+                                ) : "Create Account"}
                             </button>
                         </div>
                     </div>
                 </form>
+
+                {/* Login Link */}
+                <div className="text-center mt-6 pt-4 border-t border-gray-200">
+                    <p className="text-gray-600">
+                        Already have an account?{' '}
+                        <button
+                            onClick={navigateToLogin}
+                            className="text-pri hover:text-blue-800 font-medium underline"
+                        >
+                            Login here
+                        </button>
+                    </p>
+                </div>
             </div>
         </div>
     );
