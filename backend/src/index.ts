@@ -5,14 +5,13 @@ import {mainRouter} from "./routes/index.routes.ts";
 import {cors} from 'hono/cors';
 import dotenv from 'dotenv';
 
-
 dotenv.config()
 const app = new Hono();
 export const db = new PrismaClient();
 
 // Apply CORS middleware
 app.use('*', cors({
-    origin: ['http://localhost:5173'], // Your frontend application
+    origin: ['http://localhost:5173'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
     exposeHeaders: ['Content-Length'],

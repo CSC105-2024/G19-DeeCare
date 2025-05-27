@@ -1,6 +1,7 @@
 import * as AuthModel from "../models/auth.model.js";
 import type {Context} from "hono";
 import type {userData} from "../types/type.js";
+import {setAuthCookie, clearAuthCookie} from "../middlewares/auth.middlewares.js";
 
 /**
  * Register a new user
@@ -31,13 +32,20 @@ const register = async (c: Context) => {
         // Register the user
         const result = await AuthModel.Register(userData);
 
-        if (!result.success) {
+        if (!result.success || !result.user) {
             return c.json(result, 400);
         }
+
+        // Set authentication cookie for the newly registered user
+        const token = await setAuthCookie(c, {
+            userId: result.user.id,
+            role: result.user.role
+        });
 
         return c.json({
             success: true,
             data: result.user,
+            token: token, // Still return token for API clients
             message: "User registered successfully"
         }, 201);
     } catch (error) {
@@ -67,14 +75,20 @@ const login = async (c: Context) => {
         // Attempt login
         const result = await AuthModel.Login(idNumber, password);
 
-        if (!result.success) {
+        if (!result.success || !result.user) {
             return c.json(result, 401);
         }
+
+        // Set authentication cookie
+        const token = await setAuthCookie(c, {
+            userId: result.user.id,
+            role: result.user.role
+        });
 
         return c.json({
             success: true,
             user: result.user,
-            token: result.token,
+            token: token, // Still return token for API clients
             message: "Login successful"
         });
     } catch (error) {
@@ -82,6 +96,27 @@ const login = async (c: Context) => {
         return c.json({
             success: false,
             message: "Server error during login"
+        }, 500);
+    }
+};
+
+/**
+ * Logout a user
+ */
+const logout = async (c: Context) => {
+    try {
+        // Clear the authentication cookie
+        clearAuthCookie(c);
+
+        return c.json({
+            success: true,
+            message: "Logout successful"
+        });
+    } catch (error) {
+        console.error("Error in logout controller:", error);
+        return c.json({
+            success: false,
+            message: "Server error during logout"
         }, 500);
     }
 };
@@ -269,6 +304,11 @@ const deleteAccount = async (c: Context) => {
 
         const result = await AuthModel.DeleteUser(userId);
 
+        // Clear the authentication cookie when account is deleted
+        if (result.success) {
+            clearAuthCookie(c);
+        }
+
         return c.json(result);
     } catch (error) {
         console.error("Error in deleteAccount controller:", error);
@@ -282,6 +322,7 @@ const deleteAccount = async (c: Context) => {
 export {
     register,
     login,
+    logout,
     getProfile,
     updateProfile,
     updatePassword,

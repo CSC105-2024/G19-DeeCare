@@ -9,6 +9,7 @@ authRouter.post("/register", authController.register);
 authRouter.post("/login", authController.login);
 
 // Protected routes that require authentication
+authRouter.post("/logout", authMiddleware, authController.logout);
 authRouter.get("/profile", authMiddleware, authController.getProfile);
 authRouter.put("/profile", authMiddleware, authController.updateProfile);
 authRouter.put("/password", authMiddleware, authController.updatePassword);

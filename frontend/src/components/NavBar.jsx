@@ -1,36 +1,48 @@
-import React, { useState, useEffect } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import React, {useState, useEffect} from "react";
+import {NavLink, Outlet, useNavigate} from "react-router-dom";
 import LoginOverlay from "./LoginOverlay.jsx";
 
 const NavBar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [user, setUser] = useState(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
-        if (storedUser) {
+        const storedToken = localStorage.getItem('authToken');
+
+        if (storedUser && storedToken) {
             setUser(JSON.parse(storedUser));
+            setIsAuthenticated(true);
         }
     }, []);
 
     const handleLogin = (data) => {
-        const newUser = {
-            name: data.name,
-            photo: data.photo,
-        };
-        setUser(newUser);
-        localStorage.setItem('user', JSON.stringify(newUser));
+        // data contains { user, token } from the API response
+        setUser(data.user);
+        setIsAuthenticated(true);
         setShowLogin(false);
-        setMenuOpen(false); 
-        navigate("/"); 
+        setMenuOpen(false);
+
+        // Optional: navigate to dashboard or stay on current page
+        // navigate("/dashboard");
+        console.log('User logged in:', data.user);
     };
 
     const handleLogout = () => {
         setUser(null);
+        setIsAuthenticated(false);
         localStorage.removeItem('user');
+        localStorage.removeItem('authToken');
         setMenuOpen(false);
+        navigate("/");
+    };
+
+    const handleProfileClick = () => {
+        setMenuOpen(false);
+        navigate("/profile"); // or wherever your profile page is
     };
 
     return (
@@ -48,7 +60,7 @@ const NavBar = () => {
                     <div className="hidden md:flex items-center gap-6">
                         <NavLink
                             to="/"
-                            className={({ isActive }) =>
+                            className={({isActive}) =>
                                 isActive ? "text-yellow-300" : "hover:text-yellow-600"
                             }
                         >
@@ -56,39 +68,60 @@ const NavBar = () => {
                         </NavLink>
                         <NavLink
                             to="/FindDoctor"
-                            className={({ isActive }) =>
+                            className={({isActive}) =>
                                 isActive ? "text-yellow-300" : "hover:text-yellow-600"
                             }
                         >
                             Appointment
                         </NavLink>
-                        {/* Auth Buttons */}
-                        <div className="bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all">
-                            <button onClick={() => setShowLogin(true)}>Login</button>
-                            {showLogin && (
-                                <LoginOverlay
-                                    onClose={() => setShowLogin(false)}
-                                    onLogin={handleLogin}
-                                />
-                            )}
-                        </div>
-                        <NavLink
-                            to="/Register"
-                            className="border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-white hover:text-[#0D47A1] transition-all"
-                        >
-                            Register
-                        </NavLink>
+
+                        {/* Conditional Auth Buttons */}
+                        {isAuthenticated ? (
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm">
+                                        Welcome, {user?.firstName || 'User'}
+                                    </span>
+                                    {user?.photo && (
+                                        <img
+                                            src={user.photo}
+                                            alt="Profile"
+                                            className="h-8 w-8 rounded-full object-cover cursor-pointer"
+                                            onClick={handleProfileClick}
+                                        />
+                                    )}
+                                </div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="border-2 border-red-500 text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-red-500 transition-all"
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <div
+                                    className="bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all">
+                                    <button onClick={() => setShowLogin(true)}>Login</button>
+                                </div>
+                                <NavLink
+                                    to="/Register"
+                                    className="border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-white hover:text-[#0D47A1] transition-all"
+                                >
+                                    Register
+                                </NavLink>
+                            </>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2 md:hidden">
-                        {user && (
-                            <a href="/UserDetail">
-                                <img
-                                    src={user.photo}
-                                    alt="Profile"
-                                    className="h-8 w-8 rounded-full object-cover"
-                                />
-                            </a>
+                        {isAuthenticated && user?.photo && (
+                            <img
+                                src={user.photo}
+                                alt="Profile"
+                                className="h-8 w-8 rounded-full object-cover cursor-pointer"
+                                onClick={handleProfileClick}
+                            />
                         )}
                         <div onClick={() => setMenuOpen(!menuOpen)}>
                             <span className="text-2xl cursor-pointer">{menuOpen ? "✕" : "☰"}</span>
@@ -113,25 +146,55 @@ const NavBar = () => {
                             Appointment
                         </NavLink>
 
-                     <div className="justify-center bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all">
-                            <button onClick={() => setShowLogin(true)}>Login</button>
-                            {showLogin && (
-                                <LoginOverlay
-                                    onClose={() => setShowLogin(false)}
-                                    onLogin={handleLogin}
-                                />
-                            )}
-                        </div>
-                        <NavLink to="/Register" className="block hover:text-blue-600" 
-                        onClick={() => setMenuOpen(false)}>
-                            Register
-                        </NavLink>
+                        {isAuthenticated ? (
+                            <>
+                                <div className="block py-2">
+                                    <span className="text-sm text-gray-600">
+                                        Welcome, {user?.firstName || 'User'}
+                                    </span>
+                                </div>
+                                <button
+                                    onClick={handleProfileClick}
+                                    className="block w-full text-left hover:text-blue-600 py-1"
+                                >
+                                    Profile
+                                </button>
+                                <button
+                                    onClick={handleLogout}
+                                    className="block w-full text-left hover:text-red-600 py-1"
+                                >
+                                    Logout
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <div
+                                    className="justify-center bg-yellow border-2 border-yellow text-white px-4 py-1 rounded-lg text-sm font-medium hover:bg-yellow transition-all">
+                                    <button onClick={() => setShowLogin(true)}>Login</button>
+                                </div>
+                                <NavLink
+                                    to="/Register"
+                                    className="block hover:text-blue-600"
+                                    onClick={() => setMenuOpen(false)}
+                                >
+                                    Register
+                                </NavLink>
+                            </>
+                        )}
                     </div>
                 )}
             </nav>
 
+            {/* Login Overlay */}
+            {showLogin && (
+                <LoginOverlay
+                    onClose={() => setShowLogin(false)}
+                    onLogin={handleLogin}
+                />
+            )}
+
             <div className="pt-[72px]">
-                <Outlet />
+                <Outlet/>
             </div>
         </>
     );
