@@ -18,7 +18,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20.11.17",
-    "prisma": "6.7.0",
+    "prisma": "^6.8.1",
     "tsx": "^4.7.1"
   }
 }
