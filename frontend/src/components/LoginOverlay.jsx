@@ -271,15 +271,6 @@ const LoginOverlay = ({onClose, onLogin}) => {
                         </button>
                     </p>
                 </div>
-
-                {/* Keyboard shortcut hint */}
-                <div className="mt-4 text-center">
-                    <p className="text-xs text-gray-500">
-                        Press <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Esc</kbd> to close
-                        {" • "}
-                        <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Ctrl+Enter</kbd> to login
-                    </p>
-                </div>
             </div>
         </div>
     );
