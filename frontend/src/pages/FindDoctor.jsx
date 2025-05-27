@@ -128,15 +128,6 @@ const FindDoctor = () => {
     }
   };
 
-  const handleTimeslot = (id) => {
-    if (id) {
-      navigate(`/Timeslot?id=${id}`);
-    }
-    else{
-      fetchAllDoctor();
-    }
-  };
-
   const toggleDetails = (id) => {
     if (selectedDoctor === id) {
       setSelectedDoctor(null);
@@ -194,18 +185,20 @@ const FindDoctor = () => {
                
               </div>
               <div className="flex-col ">
-              
-              <button onClick={handleTimeslot(doctor.id)}>
+              <Link to={`/Timeslot?id=${doctor.id}`}>
+              <div>
                   <p className="hidden sm:block w-30 py-2 ml-2 text-sm bg-yellow text-white text-center rounded-lg hover:bg-amber-500 duration-200 transition mr-2 ">
                     Select Doctor
                   </p>
-              </button>
-              <button onClick={handleTimeslot(doctor.id)}>
+              </div>
+              </Link>
+              <Link to={`/Timeslot?id=${doctor.id}`}>
+              <div>
                   <p className="sm:hidden w-8 py-2 ml-2 text-sm bg-yellow text-white text-center rounded-lg hover:bg-amber-500 duration-200 transition mr-2 ">
                     /
                   </p>
-              </button>
-              
+              </div>
+              </Link>
               <button 
                 onClick={() => toggleDetails(doctor.id)}
                 className="hidden sm:block mt-1 w-30 py-1 ml-2 text-pri border-1 text-sm text-center rounded-lg hover:text-white hover:bg-pri duration-300 transition"
