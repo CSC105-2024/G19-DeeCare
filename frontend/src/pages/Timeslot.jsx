@@ -1,21 +1,48 @@
-import {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useState, useEffect} from 'react';
+import {useNavigate, useSearchParams} from 'react-router-dom';
+import axios from 'axios';
 import ConfirmAppointmentOverlay from '../components/ConfirmAppointment.jsx';
+
+// Configure axios base URL
+const API_BASE_URL = 'http://localhost:8000';
+
+// Create axios instance with default config
+const api = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+// Add request interceptor to include auth token
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
 
 const Timeslot = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const doctorIdFromUrl = searchParams.get('doctorId');
 
     // Date setup for time slot display - matches the calendar
     const today = new Date();
     const firstDay = new Date(today);
-    // Set to the first day of the current week (Sunday)
     const day = firstDay.getDay();
     firstDay.setDate(firstDay.getDate() - day);
 
-    // Generate date strings for the current week (7 days instead of 5)
+    // Generate date strings for the current week (7 days)
     const generateDateStrings = (startDate) => {
         const dates = [];
-        for (let i = 0; i < 7; i++) { // Changed from 5 to 7 to include Friday and Saturday
+        for (let i = 0; i < 7; i++) {
             const date = new Date(startDate);
             date.setDate(startDate.getDate() + i);
             const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
@@ -32,63 +59,9 @@ const Timeslot = () => {
     const [currentWeekStart, setCurrentWeekStart] = useState(firstDay);
     const [dateStrings, setDateStrings] = useState(generateDateStrings(firstDay));
 
-    // Sample doctor data with 30-min slots
-    const generateSlots = (date, slots) => {
-        const formattedDate = `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()]}, ${date.getDate()} ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()]}`;
-
-        const available = {};
-        available[formattedDate] = slots;
-        return available;
-    };
-
-    // Initial slots for doctors - extended to include Friday and Saturday
-    const initialSlots = {
-        1: {
-            availableSlots: {
-                ...generateSlots(dateStrings[0].date, ['8:00', '8:30', '9:30', '10:00']),
-                ...generateSlots(dateStrings[1].date, ['9:00', '9:30', '10:30', '11:00', '14:00', '14:30', '15:00']),
-                ...generateSlots(dateStrings[2].date, ['8:00', '8:30', '10:00', '10:30', '11:00', '11:30', '15:00', '15:30', '16:00']),
-                ...generateSlots(dateStrings[3].date, ['13:00', '13:30', '16:00', '16:30', '17:00', '17:30']),
-                ...generateSlots(dateStrings[4].date, ['9:00', '9:30', '10:00', '10:30', '11:00', '14:00', '14:30', '15:00', '15:30']),
-                ...generateSlots(dateStrings[5].date, ['10:00', '10:30', '11:00', '11:30', '14:00']), // Friday
-                ...generateSlots(dateStrings[6].date, ['9:00', '9:30', '13:00', '13:30']) // Saturday
-            }
-        },
-        2: {
-            availableSlots: {
-                ...generateSlots(dateStrings[0].date, []),
-                ...generateSlots(dateStrings[1].date, ['9:00', '9:30', '14:00', '14:30']),
-                ...generateSlots(dateStrings[2].date, ['11:00', '11:30', '16:00', '16:30']),
-                ...generateSlots(dateStrings[3].date, ['13:00', '13:30', '17:00', '17:30']),
-                ...generateSlots(dateStrings[4].date, ['15:00', '15:30', '16:00', '16:30']),
-                ...generateSlots(dateStrings[5].date, ['9:00', '10:00', '11:00']), // Friday
-                ...generateSlots(dateStrings[6].date, []) // Saturday - no slots
-            }
-        }
-    };
-
-    // Doctors data
-    const [doctors] = useState([
-        {
-            id: 1,
-            name: 'Dr. Good Doctor',
-            department: 'General Health',
-            workHours: '8:00-18:00',
-            image: '/api/placeholder/200/200',
-            availableSlots: initialSlots[1].availableSlots
-        },
-        {
-            id: 2,
-            name: 'Dr. Jane Smith',
-            department: 'Cardiology',
-            workHours: '9:00-17:00',
-            image: '/api/placeholder/200/200',
-            availableSlots: initialSlots[2].availableSlots
-        }
-    ]);
-
     // State variables
-    const [selectedDoctor, setSelectedDoctor] = useState(doctors[0]);
+    const [doctors, setDoctors] = useState([]);
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -96,6 +69,127 @@ const Timeslot = () => {
     const [selectedDay, setSelectedDay] = useState(null);
     const [showConfirmOverlay, setShowConfirmOverlay] = useState(false);
     const [appointmentDetails, setAppointmentDetails] = useState(null);
+    const [availableSlots, setAvailableSlots] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [loadingSlots, setLoadingSlots] = useState(false);
+
+    // Fetch doctors on component mount
+    useEffect(() => {
+        fetchDoctors();
+    }, []);
+
+    // Fetch available slots when doctor or week changes
+    useEffect(() => {
+        if (selectedDoctor) {
+            fetchAvailableSlots();
+        }
+    }, [selectedDoctor, currentWeekStart]);
+
+    // API Functions
+    const fetchDoctors = async () => {
+        try {
+            setLoading(true);
+            const response = await api.get('/doctors');
+
+            if (response.data && response.data.doctors) {
+                setDoctors(response.data.doctors);
+
+                // If doctorId is provided in URL, select that doctor
+                if (doctorIdFromUrl) {
+                    const preselectedDoctor = response.data.doctors.find(
+                        doctor => doctor.id === parseInt(doctorIdFromUrl)
+                    );
+                    if (preselectedDoctor) {
+                        setSelectedDoctor(preselectedDoctor);
+                    } else {
+                        // If doctor ID from URL is not found, show error and select first doctor
+                        showNotification('error', 'Selected doctor not found. Please choose another doctor.');
+                        if (response.data.doctors.length > 0) {
+                            setSelectedDoctor(response.data.doctors[0]);
+                        }
+                    }
+                } else {
+                    // Set first doctor as selected by default if no URL parameter
+                    if (response.data.doctors.length > 0) {
+                        setSelectedDoctor(response.data.doctors[0]);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching doctors:', error);
+            showNotification('error', 'Failed to load doctors. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchAvailableSlots = async () => {
+        if (!selectedDoctor) return;
+
+        try {
+            setLoadingSlots(true);
+            const slots = {};
+
+            // Fetch slots for each day in the current week
+            for (const dateObj of dateStrings) {
+                const dateStr = dateObj.date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+
+                try {
+                    const response = await api.get(`/doctors/${selectedDoctor.id}/availability`, {
+                        params: {date: dateStr}
+                    });
+
+                    if (response.data && response.data.availableSlots) {
+                        slots[dateObj.display] = response.data.availableSlots;
+                    } else {
+                        slots[dateObj.display] = [];
+                    }
+                } catch (error) {
+                    console.error(`Error fetching slots for ${dateStr}:`, error);
+                    slots[dateObj.display] = [];
+                }
+            }
+
+            setAvailableSlots(slots);
+        } catch (error) {
+            console.error('Error fetching available slots:', error);
+            showNotification('error', 'Failed to load available time slots.');
+        } finally {
+            setLoadingSlots(false);
+        }
+    };
+
+    const createAppointment = async (appointmentData) => {
+        try {
+            const response = await api.post('/appointments', {
+                doctorId: appointmentData.doctorId,
+                date: appointmentData.date,
+                sendEmailNotification: appointmentData.sendEmailNotification || true
+            });
+
+            if (response.data) {
+                showNotification('success', 'Appointment created successfully!');
+                return response.data;
+            }
+        } catch (error) {
+            console.error('Error creating appointment:', error);
+
+            if (error.response && error.response.data && error.response.data.error) {
+                showNotification('error', error.response.data.error);
+            } else {
+                showNotification('error', 'Failed to create appointment. Please try again.');
+            }
+            throw error;
+        }
+    };
+
+    // Utility function to show notifications
+    const showNotification = (type, message) => {
+        setNotification({type, message});
+        setTimeout(() => {
+            setNotification(null);
+        }, 5000);
+    };
 
     // Calendar navigation
     const handlePrevWeek = () => {
@@ -103,14 +197,9 @@ const Timeslot = () => {
         newStart.setDate(newStart.getDate() - 7);
         setCurrentWeekStart(newStart);
 
-        // Update date strings for the grid
         const newDateStrings = generateDateStrings(newStart);
         setDateStrings(newDateStrings);
 
-        // Update available slots based on new dates
-        updateAvailableSlots(newDateStrings);
-
-        // Clear selections when changing week
         setSelectedDate(null);
         setSelectedTimeSlot(null);
         setSelectedDay(null);
@@ -121,57 +210,12 @@ const Timeslot = () => {
         newStart.setDate(newStart.getDate() + 7);
         setCurrentWeekStart(newStart);
 
-        // Update date strings for the grid
         const newDateStrings = generateDateStrings(newStart);
         setDateStrings(newDateStrings);
 
-        // Update available slots based on new dates
-        updateAvailableSlots(newDateStrings);
-
-        // Clear selections when changing week
         setSelectedDate(null);
         setSelectedTimeSlot(null);
         setSelectedDay(null);
-    };
-
-    // Update available slots when week changes
-    const updateAvailableSlots = (dates) => {
-        // Generate new random slots for each doctor
-        const newSlots = {};
-
-        doctors.forEach(doctor => {
-            newSlots[doctor.id] = {
-                availableSlots: {}
-            };
-
-            dates.forEach(dateObj => {
-                // Skip weekends for some doctors
-                if (doctor.id === 2 && dateObj.date.getDay() === 0) {
-                    newSlots[doctor.id].availableSlots[dateObj.display] = [];
-                    return;
-                }
-
-                // Generate random slots
-                const slots = [];
-                for (let hour = 8; hour < 18; hour++) {
-                    // Add slots with some randomness
-                    if (Math.random() > 0.7) slots.push(`${hour}:00`);
-                    if (Math.random() > 0.7) slots.push(`${hour}:30`);
-                }
-
-                newSlots[doctor.id].availableSlots[dateObj.display] = slots;
-            });
-        });
-
-        // Update doctors with new slots
-        const updatedDoctors = doctors.map(doctor => ({
-            ...doctor,
-            availableSlots: newSlots[doctor.id].availableSlots
-        }));
-
-        // Update selected doctor
-        const updatedSelectedDoctor = updatedDoctors.find(d => d.id === selectedDoctor.id);
-        setSelectedDoctor(updatedSelectedDoctor);
     };
 
     // Calendar generation
@@ -235,35 +279,25 @@ const Timeslot = () => {
     const generateTimeSlots = () => {
         const slots = [];
         for (let hour = 8; hour < 18; hour++) {
-            slots.push(`${hour}:00`);
-            slots.push(`${hour}:30`);
+            slots.push(`${hour.toString().padStart(2, '0')}:00`);
+            slots.push(`${hour.toString().padStart(2, '0')}:30`);
         }
         return slots;
     };
 
     // Check if a time slot is available
     const isTimeSlotAvailable = (date, time) => {
-        if (!selectedDoctor || !date) return false;
-
-        const availableSlots = selectedDoctor.availableSlots[date] || [];
-        return availableSlots.includes(time);
+        if (!selectedDoctor || !date || !availableSlots[date]) return false;
+        return availableSlots[date].includes(time);
     };
 
     // Handle appointment confirmation
     const handleConfirmAppointment = () => {
         if (!selectedDate || !selectedTimeSlot) {
-            setNotification({
-                type: 'error',
-                message: 'Please select a date and time slot'
-            });
-
-            setTimeout(() => {
-                setNotification(null);
-            }, 3000);
+            showNotification('error', 'Please select a date and time slot');
             return;
         }
 
-        // Format the time slot for the confirmation page
         const [hour, minute] = selectedTimeSlot.split(':');
         const startDateTime = new Date(selectedDay.date);
         startDateTime.setHours(parseInt(hour), parseInt(minute), 0);
@@ -272,7 +306,11 @@ const Timeslot = () => {
         endDateTime.setMinutes(endDateTime.getMinutes() + 30);
 
         const details = {
-            doctorInfo: selectedDoctor,
+            doctorInfo: {
+                ...selectedDoctor,
+                name: `${selectedDoctor.firstName} ${selectedDoctor.lastName}`,
+                department: selectedDoctor.specialty
+            },
             selectedDate: selectedDay.date,
             selectedTimeSlot: {
                 start: startDateTime.toISOString(),
@@ -280,7 +318,6 @@ const Timeslot = () => {
             }
         };
 
-        // Set the appointment details and show the overlay
         setAppointmentDetails(details);
         setShowConfirmOverlay(true);
     };
@@ -291,37 +328,38 @@ const Timeslot = () => {
     };
 
     // Handle final confirmation from overlay
-    const handleFinalConfirm = (confirmedDetails) => {
-        // Here you can handle saving the appointment data
-        console.log('Appointment confirmed with details:', confirmedDetails);
-        setShowConfirmOverlay(false);
+    const handleFinalConfirm = async (confirmedDetails) => {
+        try {
+            const [hour, minute] = selectedTimeSlot.split(':');
+            const appointmentDateTime = new Date(selectedDay.date);
+            appointmentDateTime.setHours(parseInt(hour), parseInt(minute), 0);
 
-        // Show success notification
-        setNotification({
-            type: 'success',
-            message: 'Appointment has been confirmed!'
-        });
+            const appointmentData = {
+                doctorId: selectedDoctor.id,
+                date: appointmentDateTime.toISOString(),
+                sendEmailNotification: confirmedDetails.sendEmailNotification || true
+            };
 
-        setTimeout(() => {
-            setNotification(null);
-        }, 3000);
+            await createAppointment(appointmentData);
+            setShowConfirmOverlay(false);
 
-        // Optional: Navigate to another page or reset the form
-        // navigate('/dashboard');
+            // Clear selections
+            setSelectedDate(null);
+            setSelectedTimeSlot(null);
+            setSelectedDay(null);
+
+            // Refresh available slots
+            fetchAvailableSlots();
+
+        } catch (error) {
+            console.error('Error confirming appointment:', error);
+        }
     };
 
     // Handle day selection
     const handleDaySelection = (day) => {
         setSelectedDay(day);
 
-        // Format the date to match the format used in dateStrings
-        const formatted = day.date.toLocaleDateString('en-US', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short'
-        });
-
-        // Update the weekday grid if the selected day is not in the current week view
         const isInCurrentWeek = dateStrings.some(d =>
             d.date.getDate() === day.date.getDate() &&
             d.date.getMonth() === day.date.getMonth() &&
@@ -329,19 +367,13 @@ const Timeslot = () => {
         );
 
         if (!isInCurrentWeek) {
-            // Find the start of the week for this day
             const newWeekStart = new Date(day.date);
             newWeekStart.setDate(day.date.getDate() - day.date.getDay());
             setCurrentWeekStart(newWeekStart);
 
-            // Update date strings
             const newDateStrings = generateDateStrings(newWeekStart);
             setDateStrings(newDateStrings);
 
-            // Update available slots
-            updateAvailableSlots(newDateStrings);
-
-            // Find the matching date in the new strings
             const matchingDate = newDateStrings.find(d =>
                 d.date.getDate() === day.date.getDate() &&
                 d.date.getMonth() === day.date.getMonth()
@@ -351,7 +383,6 @@ const Timeslot = () => {
                 setSelectedDate(matchingDate.display);
             }
         } else {
-            // Find the matching date in current dateStrings
             const matchingDate = dateStrings.find(d =>
                 d.date.getDate() === day.date.getDate() &&
                 d.date.getMonth() === day.date.getMonth()
@@ -362,8 +393,15 @@ const Timeslot = () => {
             }
         }
 
-        // Clear the time slot when date changes
         setSelectedTimeSlot(null);
+    };
+
+    // Handle doctor selection
+    const handleDoctorChange = (doctor) => {
+        setSelectedDoctor(doctor);
+        setSelectedDate(null);
+        setSelectedTimeSlot(null);
+        setSelectedDay(null);
     };
 
     // Get weekday names
@@ -374,7 +412,6 @@ const Timeslot = () => {
         const [hours, minutes] = time.split(':');
         const hourInt = parseInt(hours);
 
-        // Calculate the end time (30 min later)
         let endHour = hourInt;
         let endMinutes = parseInt(minutes) + 30;
 
@@ -383,28 +420,54 @@ const Timeslot = () => {
             endMinutes = 0;
         }
 
-        return `${time}-${endHour}:${endMinutes === 0 ? '00' : endMinutes}`;
+        return `${time}-${endHour.toString().padStart(2, '0')}:${endMinutes === 0 ? '00' : endMinutes}`;
     };
 
     // Handle time slot selection
     const handleTimeSlotSelection = (dateStr, time) => {
-        // Only allow selection if the slot is available
         if (isTimeSlotAvailable(dateStr, time)) {
-            // Find the corresponding day object based on the dateStr
             const selectedDateObj = dateStrings.find(d => d.display === dateStr);
 
             if (selectedDateObj) {
-                // Update all state variables consistently
                 setSelectedDate(dateStr);
                 setSelectedTimeSlot(time);
                 setSelectedDay({
                     date: selectedDateObj.date,
-                    isCurrentMonth: true, // These properties are needed for consistency with calendar selection
+                    isCurrentMonth: true,
                     day: selectedDateObj.date.getDate()
                 });
             }
         }
     };
+
+    // Loading state
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+                    <p className="mt-4 text-gray-600">Loading doctors...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // No doctors state
+    if (!doctors.length) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-gray-600">No doctors available. Please try again later.</p>
+                    <button
+                        onClick={fetchDoctors}
+                        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -425,25 +488,60 @@ const Timeslot = () => {
                 />
             )}
 
+            {/* Back button to FindDoctor */}
+            <div className="p-4">
+                <button
+                    onClick={() => navigate('/FindDoctor')}
+                    className="flex items-center text-blue-600 hover:text-blue-800 mb-4"
+                >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Doctor Selection
+                </button>
+            </div>
+
             {/* Main Content */}
             <main className="container mx-auto flex-grow p-4 bg-white my-4 rounded-lg shadow">
+                {/* Doctor Selection - Show only if multiple doctors available */}
+                {doctors.length > 1 && (
+                    <div className="mb-6">
+                        <h3 className="text-lg font-medium mb-2">Select Doctor:</h3>
+                        <div className="flex flex-wrap gap-2">
+                            {doctors.map((doctor) => (
+                                <button
+                                    key={doctor.id}
+                                    onClick={() => handleDoctorChange(doctor)}
+                                    className={`px-4 py-2 rounded-lg border ${
+                                        selectedDoctor?.id === doctor.id
+                                            ? 'bg-blue-500 text-white border-blue-500'
+                                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    {doctor.firstName} {doctor.lastName} - {doctor.specialty}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {/* Doctor Profile */}
-                <div className="bg-light-blue p-4 rounded-xl mb-6 flex items-center">
-
-                    <div className="bg-white rounded-full p-2 mr-4">
-                        <img
-                            src={selectedDoctor.image}
-                            alt={selectedDoctor.name}
-                            className="w-16 h-16 rounded-full"
-                        />
+                {selectedDoctor && (
+                    <div className="bg-ivory p-4 rounded-xl mb-6 flex items-center">
+                        <div className="bg-white rounded-full p-2 mr-4">
+                            <img
+                                src={selectedDoctor.image || '/api/placeholder/200/200'}
+                                alt={`${selectedDoctor.firstName} ${selectedDoctor.lastName}`}
+                                className="w-16 h-16 rounded-full"
+                            />
+                        </div>
+                        <div>
+                            <h2 className="text-pri font-medium">NAME: {selectedDoctor.firstName} {selectedDoctor.lastName}</h2>
+                            <p className="text-pri">DEPARTMENT: {selectedDoctor.specialty}</p>
+                            <p className="text-pri">WORK HOUR: {selectedDoctor.workHours || '8:00-18:00'}</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-pri font-medium">NAME: {selectedDoctor.name}</h2>
-                        <p className="text-pri">DEPARTMENT: {selectedDoctor.department}</p>
-                        <p className="text-pri">WORK HOUR: {selectedDoctor.workHours}</p>
-                    </div>
-
-                </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                     {/* Calendar */}
@@ -505,9 +603,8 @@ const Timeslot = () => {
                             ))}
                         </div>
 
-                        {/* Only show confirm button when date and time are selected */}
                         <button
-                            className={`w-full ${selectedDate && selectedTimeSlot ? 'bg-orange-400 hover:bg-orange-500 active:bg-orange-600' : 'bg-gray-400 cursor-not-allowed'} text-white px-2 py-2 rounded-lg mt-4`}
+                            className={`w-full ${selectedDate && selectedTimeSlot ? 'bg-yellow hover:bg-orange-400 active:bg-orange-400' : 'bg-gray-400 cursor-not-allowed'} text-white px-2 py-2 rounded-lg mt-4`}
                             onClick={handleConfirmAppointment}
                             disabled={!selectedDate || !selectedTimeSlot}
                         >
@@ -527,7 +624,7 @@ const Timeslot = () => {
                                     <p>Previous Week</p>
                                 </div>
                             </button>
-                            <div className=" text-pri font-medium pl-8 pr-8">
+                            <div className="text-pri font-medium pl-8 pr-8">
                                 {selectedDay ?
                                     `Selected: ${selectedDay.date.toLocaleDateString('en-US', {
                                         weekday: 'long',
@@ -548,62 +645,68 @@ const Timeslot = () => {
                             </button>
                         </div>
 
-                        <div className="overflow-x-auto">
-                            <div className="min-w-max grid grid-cols-8 gap-1">
-                                <div className="sticky left-0 text-center font-medium"></div>
-                                {dateStrings.map((dateObj, index) => (
-                                    <div
-                                        key={index}
-                                        className={`text-center font-medium text-sm p-1 text-pri ${
-                                            selectedDate === dateObj.display ? 'bg-blue-100 rounded-lg' : ''
-                                        }`}
-                                    >
-                                        {dateObj.display}
-                                    </div>
-                                ))}
-
-                                {generateTimeSlots().map((time, timeIndex) => (
-                                    <>
-                                        <div key={`time-${timeIndex}`}
-                                             className="sticky left-0 text-center font-medium text-pri bg-ivory pt-2">
-                                            {time}
-                                        </div>
-                                        {dateStrings.map((dateObj, dateIndex) => {
-                                            const isAvailable = isTimeSlotAvailable(dateObj.display, time);
-                                            const isSelected = selectedDate === dateObj.display && selectedTimeSlot === time;
-
-                                            return (
-
-                                                <div
-                                                    key={`slot-${timeIndex}-${dateIndex}`}
-                                                    className={`h-10 text-center pt-1 text-pri ${
-                                                        isAvailable
-                                                            ? 'bg-orange-200 cursor-pointer hover:bg-orange-400 active:bg-yellow rounded-lg'
-                                                            : 'bg-gray-100 rounded-lg'
-                                                    } ${
-                                                        isSelected
-                                                            ? 'bg-yellow ring-2 ring-background'
-                                                            : ''
-                                                    }`}
-                                                    onClick={() => {
-                                                        if (isAvailable) {
-                                                            handleTimeSlotSelection(dateObj.display, time);
-                                                        }
-                                                    }}
-                                                >
-                                                    {isAvailable && (
-                                                        <div className="text-center pt-2 text-xs">
-                                                            {formatTimeDisplay(time)}
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                            );
-                                        })}
-                                    </>
-                                ))}
+                        {loadingSlots ? (
+                            <div className="text-center py-8">
+                                <div
+                                    className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                                <p className="mt-2 text-gray-600">Loading available slots...</p>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <div className="min-w-max grid grid-cols-8 gap-1">
+                                    <div className="sticky left-0 text-center font-medium"></div>
+                                    {dateStrings.map((dateObj, index) => (
+                                        <div
+                                            key={index}
+                                            className={`text-center font-medium text-sm p-1 text-pri ${
+                                                selectedDate === dateObj.display ? 'bg-blue-100 rounded-lg' : ''
+                                            }`}
+                                        >
+                                            {dateObj.display}
+                                        </div>
+                                    ))}
+
+                                    {generateTimeSlots().map((time, timeIndex) => (
+                                        <>
+                                            <div key={`time-${timeIndex}`}
+                                                 className="sticky left-0 text-center font-medium text-pri bg-ivory pt-2">
+                                                {time}
+                                            </div>
+                                            {dateStrings.map((dateObj, dateIndex) => {
+                                                const isAvailable = isTimeSlotAvailable(dateObj.display, time);
+                                                const isSelected = selectedDate === dateObj.display && selectedTimeSlot === time;
+
+                                                return (
+                                                    <div
+                                                        key={`slot-${timeIndex}-${dateIndex}`}
+                                                        className={`h-10 text-center pt-1 text-pri ${
+                                                            isAvailable
+                                                                ? 'bg-orange-200 cursor-pointer hover:bg-orange-400 active:bg-yellow rounded-lg'
+                                                                : 'bg-gray-100 rounded-lg'
+                                                        } ${
+                                                            isSelected
+                                                                ? 'bg-yellow ring-2 ring-background'
+                                                                : ''
+                                                        }`}
+                                                        onClick={() => {
+                                                            if (isAvailable) {
+                                                                handleTimeSlotSelection(dateObj.display, time);
+                                                            }
+                                                        }}
+                                                    >
+                                                        {isAvailable && (
+                                                            <div className="text-center pt-2 text-xs">
+                                                                {formatTimeDisplay(time)}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </main>
