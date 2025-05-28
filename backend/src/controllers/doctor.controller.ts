@@ -3,6 +3,8 @@ import {doctorModel} from "../models/doctor.model.js";
 
 export const doctorController = {
     // Get all doctors
+    
+
     deleteDoc : async (c: Context) => {
         try {
         const id = await c.req.param('id')
@@ -61,6 +63,28 @@ export const doctorController = {
             return c.json({error: "Failed to fetch doctor"}, 500);
         }
     },
+
+    getDoctorByIdcard: async (c: Context) => {
+        try {
+            const doctorId = c.req.param("id");
+
+            if (!doctorId) {
+                return c.json({error: "Doctor ID is required"}, 400);
+            }
+
+            const doctor = await doctorModel.findByIdcard(doctorId);
+
+            if (!doctor) {
+                return c.json({error: "Doctor not found"}, 404);
+            }
+
+            return c.json({doctor}, 200);
+        } catch (error) {
+            console.error("Error fetching doctor:", error);
+            return c.json({error: "Failed to fetch doctor"}, 500);
+        }
+    },
+
     getDocbyDepartment: async (c: Context) => {
         try {
         const department = await c.req.param('department')
