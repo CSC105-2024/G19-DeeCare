@@ -1,8 +1,8 @@
-// axiosInstance.js - Fixed version with correct auth endpoint
+// axiosInstance.js - Fixed version with proper error handling
 import axios from 'axios';
 
 const Axios = axios.create({
-    baseURL: 'http://localhost:8000/auth', // Fixed: Added /auth prefix
+    baseURL: 'http://localhost:8000',
     timeout: 10000,
     withCredentials: true,
     headers: {
@@ -38,6 +38,13 @@ Axios.interceptors.response.use(
     },
     (error) => {
         console.error('Response error:', error.response?.status, error.response?.data);
+
+        // Handle different types of errors
+        if (error.code === 'ERR_NETWORK') {
+            console.error('Network error - server may be down or CORS issue');
+        } else if (error.code === 'ECONNABORTED') {
+            console.error('Request timeout');
+        }
 
         // Handle 401 errors globally
         if (error.response?.status === 401) {

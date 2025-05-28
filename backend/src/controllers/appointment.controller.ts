@@ -74,8 +74,8 @@ export const appointmentController = {
                     await sendAppointmentConfirmationEmail({
                         patientEmail: appointmentWithUser.User.email,
                         patientName: `${appointmentWithUser.User.firstName} ${appointmentWithUser.User.lastName}`,
-                        doctorName: `${appointment.doctor?.firstName} ${appointment.doctor?.lastName}`,
-                        doctorSpecialty: appointment.doctor?.specialty || 'General Practice',
+                        doctorName: `${appointment.doctor?.name}`,
+                        doctorSpecialty: appointment.doctor?.specialization || 'General Practice',
                         appointmentDate: appointmentDate,
                         appointmentId: appointment.id
                     });
@@ -109,7 +109,7 @@ export const appointmentController = {
             }
 
             // Find the appointment
-            const appointment = await appointmentModel.findById(Number(appointmentId)) as Appointment;
+            const appointment = await appointmentModel.findById(Number(appointmentId));
 
             if (!appointment) {
                 return c.json({error: "Appointment not found"}, 404);
@@ -126,7 +126,7 @@ export const appointmentController = {
                     await sendAppointmentCancellationEmail({
                         patientEmail: appointment.User.email,
                         patientName: `${appointment.User.firstName} ${appointment.User.lastName}`,
-                        doctorName: `${appointment.doctor?.firstName} ${appointment.doctor?.lastName}`,
+                        doctorName: `${appointment.doctor?.name}`,
                         appointmentDate: appointment.date,
                         appointmentId: appointment.id
                     });
@@ -270,7 +270,7 @@ async function sendAppointmentConfirmationEmail(emailData: AppointmentConfirmati
     `;
 
     const {data, error} = await resend.emails.send({
-        from: 'Healthcare System <appointments@deecare.com>',
+        from: "Healthcare System <appointments@deecare.com>",
         to: [patientEmail],
         subject: `Appointment Confirmed - ${formattedDate} at ${formattedTime}`,
         html: emailHtml,
@@ -348,7 +348,7 @@ async function sendAppointmentCancellationEmail(emailData: AppointmentCancellati
     `;
 
     const {data, error} = await resend.emails.send({
-        from: 'Healthcare System <appointments@yourdomain.com>', // Replace with your domain
+        from: 'Healthcare System <appointments@deecare.ttwrpz.xyz>',
         to: [patientEmail],
         subject: `Appointment Cancelled - ${formattedDate} at ${formattedTime}`,
         html: emailHtml,

@@ -2,36 +2,12 @@ import {useState, useEffect} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import axios from 'axios';
 import ConfirmAppointmentOverlay from '../components/ConfirmAppointment.jsx';
-
-// Configure axios base URL
-const API_BASE_URL = 'http://localhost:8000';
-
-// Create axios instance with default config
-const api = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
-
-// Add request interceptor to include auth token
-api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('authToken');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
+import {findDoctorByID} from '../api/getDoctors.js';
 
 const Timeslot = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const doctorIdFromUrl = searchParams.get('doctorId');
+    const doctorIdFromUrl = searchParams.get('id');
 
     // Date setup for time slot display - matches the calendar
     const today = new Date();
@@ -60,7 +36,7 @@ const Timeslot = () => {
     const [dateStrings, setDateStrings] = useState(generateDateStrings(firstDay));
 
     // State variables
-    const [doctors, setDoctors] = useState([]);
+    const [doctors, setDoctors] = useState();
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
@@ -75,8 +51,8 @@ const Timeslot = () => {
 
     // Fetch doctors on component mount
     useEffect(() => {
-        fetchDoctors();
-    }, []);
+        fetchDoctors(doctorIdFromUrl);
+    }, [doctorIdFromUrl]);
 
     // Fetch available slots when doctor or week changes
     useEffect(() => {
@@ -86,38 +62,19 @@ const Timeslot = () => {
     }, [selectedDoctor, currentWeekStart]);
 
     // API Functions
-    const fetchDoctors = async () => {
+    const fetchDoctors = async (id) => {
         try {
-            setLoading(true);
-            const response = await api.get('/doctors');
-
-            if (response.data && response.data.doctors) {
-                setDoctors(response.data.doctors);
-
-                // If doctorId is provided in URL, select that doctor
-                if (doctorIdFromUrl) {
-                    const preselectedDoctor = response.data.doctors.find(
-                        doctor => doctor.id === parseInt(doctorIdFromUrl)
-                    );
-                    if (preselectedDoctor) {
-                        setSelectedDoctor(preselectedDoctor);
-                    } else {
-                        // If doctor ID from URL is not found, show error and select first doctor
-                        showNotification('error', 'Selected doctor not found. Please choose another doctor.');
-                        if (response.data.doctors.length > 0) {
-                            setSelectedDoctor(response.data.doctors[0]);
-                        }
-                    }
-                } else {
-                    // Set first doctor as selected by default if no URL parameter
-                    if (response.data.doctors.length > 0) {
-                        setSelectedDoctor(response.data.doctors[0]);
-                    }
-                }
+            console.log(id);
+            const response = await findDoctorByID(id);
+            if (response.success) {
+                console.log(response.success)
+                setDoctors(response.data);
+            } else {
+                console.log(response.success)
+                console.error("Failed to fetch doctor");
             }
-        } catch (error) {
-            console.error('Error fetching doctors:', error);
-            showNotification('error', 'Failed to load doctors. Please try again.');
+        } catch (e) {
+            console.error("Error fetching doctor:", e);
         } finally {
             setLoading(false);
         }
@@ -453,11 +410,11 @@ const Timeslot = () => {
     }
 
     // No doctors state
-    if (!doctors.length) {
+    if (!doctors) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                 <div className="text-center">
-                    <p className="text-gray-600">No doctors available. Please try again later.</p>
+                    <p className="text-gray-600">No doctors available. Please try again later. {doctorIdFromUrl}</p>
                     <button
                         onClick={fetchDoctors}
                         className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"

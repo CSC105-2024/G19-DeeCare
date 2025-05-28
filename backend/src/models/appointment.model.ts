@@ -20,9 +20,8 @@ export const appointmentModel = {
             include: {
                 doctor: {
                     select: {
-                        firstName: true,
-                        lastName: true,
-                        specialty: true
+                        name: true,
+                        specialization: true
                     }
                 }
             }
@@ -38,9 +37,8 @@ export const appointmentModel = {
             include: {
                 doctor: {
                     select: {
-                        firstName: true,
-                        lastName: true,
-                        specialty: true
+                        name: true,
+                        specialization: true
                     }
                 },
                 User: {
@@ -63,9 +61,8 @@ export const appointmentModel = {
             include: {
                 doctor: {
                     select: {
-                        firstName: true,
-                        lastName: true,
-                        specialty: true
+                        name: true,
+                        specialization: true
                     }
                 }
             },

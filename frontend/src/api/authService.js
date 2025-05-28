@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8000/auth', // Fixed: Added /auth prefix
+    baseURL: 'http://localhost:8000/auth',
     timeout: 15000,
     withCredentials: true,
     headers: {
@@ -48,6 +48,13 @@ apiClient.interceptors.response.use(
     (error) => {
         console.error('API Error:', error.response?.data || error.message);
         console.error('Response error:', error.response?.status, error.response?.data);
+
+        // Handle network errors specifically
+        if (error.code === 'ERR_NETWORK') {
+            console.error('Network error - check if backend server is running on localhost:8000');
+        } else if (error.code === 'ECONNABORTED') {
+            console.error('Request timeout - server may be slow or unresponsive');
+        }
 
         if (error.response?.status === 401) {
             // Token expired or invalid - clear local storage
@@ -98,8 +105,12 @@ export const authAPI = {
         } catch (error) {
             console.error('Registration error:', error);
 
-            // Enhanced error handling
-            if (error.response?.data) {
+            // Enhanced error handling with specific network error messages
+            if (error.code === 'ERR_NETWORK') {
+                throw new Error('Cannot connect to the server. Please check if the backend is running on localhost:8000 and try again.');
+            } else if (error.code === 'ECONNABORTED') {
+                throw new Error('Request timed out. Please check your internet connection and try again.');
+            } else if (error.response?.data) {
                 const errorData = error.response.data;
 
                 // Handle specific error cases
@@ -113,12 +124,8 @@ export const authAPI = {
                 }
 
                 throw new Error(errorData.message || 'Registration failed. Please try again.');
-            } else if (error.code === 'ECONNABORTED') {
-                throw new Error('Request timed out. Please check your internet connection and try again.');
-            } else if (error.code === 'ERR_NETWORK') {
-                throw new Error('Network error. Please check your internet connection.');
             } else {
-                throw new Error('Registration failed. Please try again later.');
+                throw new Error('Registration failed. Please check your internet connection and try again.');
             }
         }
     },
@@ -151,8 +158,12 @@ export const authAPI = {
         } catch (error) {
             console.error('Login error:', error);
 
-            // Enhanced error handling
-            if (error.response?.data) {
+            // Enhanced error handling with network-specific messages
+            if (error.code === 'ERR_NETWORK') {
+                throw new Error('Cannot connect to the server. Please check if the backend is running and try again.');
+            } else if (error.code === 'ECONNABORTED') {
+                throw new Error('Request timed out. Please check your internet connection and try again.');
+            } else if (error.response?.data) {
                 const errorData = error.response.data;
 
                 if (error.response.status === 401) {
@@ -164,12 +175,8 @@ export const authAPI = {
                 }
 
                 throw new Error(errorData.message || 'Login failed. Please try again.');
-            } else if (error.code === 'ECONNABORTED') {
-                throw new Error('Request timed out. Please check your internet connection and try again.');
-            } else if (error.code === 'ERR_NETWORK') {
-                throw new Error('Network error. Please check your internet connection.');
             } else {
-                throw new Error('Login failed. Please try again later.');
+                throw new Error('Login failed. Please check your connection and try again.');
             }
         }
     },
@@ -212,7 +219,9 @@ export const authAPI = {
         } catch (error) {
             console.error('Get profile error:', error);
 
-            if (error.response?.data) {
+            if (error.code === 'ERR_NETWORK') {
+                throw new Error('Cannot connect to the server. Please check your connection.');
+            } else if (error.response?.data) {
                 throw new Error(error.response.data.message || 'Failed to fetch profile.');
             } else {
                 throw new Error('Network error. Please try again.');
@@ -239,7 +248,9 @@ export const authAPI = {
         } catch (error) {
             console.error('Update profile error:', error);
 
-            if (error.response?.data) {
+            if (error.code === 'ERR_NETWORK') {
+                throw new Error('Cannot connect to the server. Please check your connection.');
+            } else if (error.response?.data) {
                 throw new Error(error.response.data.message || 'Failed to update profile.');
             } else {
                 throw new Error('Network error. Please try again.');
@@ -255,7 +266,9 @@ export const authAPI = {
         } catch (error) {
             console.error('Update password error:', error);
 
-            if (error.response?.data) {
+            if (error.code === 'ERR_NETWORK') {
+                throw new Error('Cannot connect to the server. Please check your connection.');
+            } else if (error.response?.data) {
                 const errorData = error.response.data;
 
                 if (errorData.message?.includes('current password')) {
@@ -288,7 +301,9 @@ export const authAPI = {
         } catch (error) {
             console.error('Update emergency contact error:', error);
 
-            if (error.response?.data) {
+            if (error.code === 'ERR_NETWORK') {
+                throw new Error('Cannot connect to the server. Please check your connection.');
+            } else if (error.response?.data) {
                 throw new Error(error.response.data.message || 'Failed to update emergency contact.');
             } else {
                 throw new Error('Network error. Please try again.');
@@ -313,7 +328,9 @@ export const authAPI = {
         } catch (error) {
             console.error('Delete account error:', error);
 
-            if (error.response?.data) {
+            if (error.code === 'ERR_NETWORK') {
+                throw new Error('Cannot connect to the server. Please check your connection.');
+            } else if (error.response?.data) {
                 throw new Error(error.response.data.message || 'Failed to delete account.');
             } else {
                 throw new Error('Network error. Please try again.');
@@ -449,7 +466,7 @@ export const apiUtils = {
             return {
                 success: false,
                 message: error.code === 'ERR_NETWORK'
-                    ? 'Cannot connect to server'
+                    ? 'Cannot connect to server - make sure backend is running on localhost:8000'
                     : 'Connection test failed'
             };
         }

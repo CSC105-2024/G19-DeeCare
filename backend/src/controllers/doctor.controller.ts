@@ -1,28 +1,31 @@
 import type {Context} from "hono";
 import {doctorModel} from "../models/doctor.model.js";
+import {db} from "../index.js";
 
 export const doctorController = {
     // Get all doctors
-    deleteDoc : async (c: Context) => {
+
+
+    deleteDoc: async (c: Context) => {
         try {
-        const id = await c.req.param('id')
-        if (!id) {
-            return c.json({ error: "id is required" }, 404);
-          }
-          const deleteDoc = await doctorModel.DeleteDoctor(parseInt(id));
+            const id = await c.req.param('id')
+            if (!id) {
+                return c.json({error: "id is required"}, 404);
+            }
+            const deleteDoc = await doctorModel.DeleteDoctor(parseInt(id));
             return c.json({
                 success: true,
                 msg: "Delete success!",
             });
         } catch (e) {
-        return c.json(
-            {
-            success: false,
-            data: null,
-            msg: `Internal Server Error : ${e}`,
-            },
-            500
-        );
+            return c.json(
+                {
+                    success: false,
+                    data: null,
+                    msg: `Internal Server Error : ${e}`,
+                },
+                500
+            );
         }
     },
 
@@ -61,51 +64,52 @@ export const doctorController = {
             return c.json({error: "Failed to fetch doctor"}, 500);
         }
     },
+
     getDocbyDepartment: async (c: Context) => {
         try {
-        const department = await c.req.param('department')
-        if (!department) {
-            return c.json({ error: "department is required" }, 404);
-          }
-          const getDocDE = await doctorModel.findByde(department);
+            const department = await c.req.param('department')
+            if (!department) {
+                return c.json({error: "department is required"}, 404);
+            }
+            const getDocDE = await doctorModel.findByde(department);
             return c.json({
                 success: true,
                 data: getDocDE,
                 msg: "Doctor in this department!",
             });
         } catch (e) {
-        return c.json(
-            {
-            success: false,
-            data: null,
-            msg: `Internal Server Error : ${e}`,
-            },
-            500
-        );
+            return c.json(
+                {
+                    success: false,
+                    data: null,
+                    msg: `Internal Server Error : ${e}`,
+                },
+                500
+            );
         }
     },
 
     getDocbySearch: async (c: Context) => {
         try {
-        const name = await c.req.param('name')
-        if (!name) {
-            return c.json({ error: "department is required" }, 404);
-          }
-          const getDocname = await doctorModel.findBySearch(name);
+            const name = await c.req.param('name')
+            if (!name) {
+                return c.json({error: "department is required"}, 404);
+            }
+            const getDocname = await doctorModel.findBySearch(name);
             return c.json({
                 success: true,
                 data: getDocname,
                 msg: "Doctor in this department!",
             });
         } catch (e) {
-        return c.json(
-            {
-            success: false,
-            data: null,
-            msg: `Internal Server Error : ${e}`,
-            },
-            500
-        );
+            return c.json(
+                {
+                    success: false,
+                    data: null,
+                    msg: `Internal Server Error : ${e}`,
+                },
+                500
+            );
         }
     },
 

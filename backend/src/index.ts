@@ -9,9 +9,9 @@ dotenv.config()
 const app = new Hono();
 export const db = new PrismaClient();
 
-// Apply CORS middleware
+// Apply CORS middleware - FIXED: Added localhost:5174 to allowed origins
 app.use('*', cors({
-    origin: ['http://localhost:5173'],
+    origin: ['http://localhost:5173', 'http://localhost:5174'], // Added your current frontend port
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
     exposeHeaders: ['Content-Length'],
