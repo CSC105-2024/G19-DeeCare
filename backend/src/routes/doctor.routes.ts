@@ -10,7 +10,6 @@ doctorRouter.get("/search/:name", doctorController.getDocbySearch);
 
 // Get doctor by ID
 doctorRouter.get("/:id", doctorController.getDoctorById);
-doctorRouter.get("/DocID/:id", doctorController.getDoctorByIdcard);
 
 // Get doctor availability
 doctorRouter.get("/:id/availability", doctorController.getDoctorAvailability);
@@ -19,4 +18,3 @@ doctorRouter.delete("/:id", doctorController.deleteDoc)
 doctorRouter.get("/DE/:department", doctorController.getDocbyDepartment);
 
 export {doctorRouter};
-

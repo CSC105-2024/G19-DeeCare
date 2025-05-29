@@ -1,157 +1,158 @@
-import type {Context} from "hono";
-import {doctorModel} from "../models/doctor.model.js";
+import {db} from "../index.js";
 
-export const doctorController = {
-    // Get all doctors
-    
+type Doctortype = {
+    doctorId: string,
+    name: string,
+    department: string,
+    DRimage: string,
+    specialization: string,
+    email: string
+}
 
-    deleteDoc : async (c: Context) => {
-        try {
-        const id = await c.req.param('id')
-        if (!id) {
-            return c.json({ error: "id is required" }, 404);
-          }
-          const deleteDoc = await doctorModel.DeleteDoctor(parseInt(id));
-            return c.json({
-                success: true,
-                msg: "Delete success!",
-            });
-        } catch (e) {
-        return c.json(
-            {
-            success: false,
-            data: null,
-            msg: `Internal Server Error : ${e}`,
+export const doctorModel = {
+
+    newDoctor: async (Doctordata: Doctortype) => {
+        const doctor = await db.doctor.create({
+            data: Doctordata,
+        });
+        return doctor;
+    },
+
+    EditDoctor: async (Doctordata: Doctortype, id: number) => {
+        const doctor = await db.doctor.update({
+            where: {
+                id: id,
             },
-            500
-        );
-        }
+            data: Doctordata,
+        });
+        return doctor;
     },
 
-    getAllDoctors: async (c: Context) => {
-        try {
-            const doctors = await doctorModel.findAllDoc();
-            return c.json({
-                success: true,
-                data: doctors,
-                msg: "Doctor in this department!",
-            });
-        } catch (error) {
-            console.error("Error fetching doctor:", error);
-            return c.json({error: "Failed to fetch doctor"}, 500);
-        }
+    DeleteDoctor: async (id: number) => {
+        await db.doctor.delete({
+            where: {
+                id: id,
+            }
+        });
+    },
+    /**
+     * Get all doctors
+     */
+    findAllDoc: async () => {
+        return db.doctor.findMany({
+            select: {
+                id: true,
+                doctorId: true,
+                name: true,
+                department: true,
+                DRimage: true,
+                specialization: true,
+                email: true,
+            }
+        });
     },
 
-    // Get doctor by ID
-    getDoctorById: async (c: Context) => {
-        try {
-            const doctorId = c.req.param("id");
-
-            if (!doctorId) {
-                return c.json({error: "Doctor ID is required"}, 400);
+    /**
+     * Find a doctor by ID
+     */
+    findById: async (id: number) => {
+        return db.doctor.findUnique({
+            where: {id},
+            include: {
+                availableTimes: true
             }
-
-            const doctor = await doctorModel.findById(Number(doctorId));
-
-            if (!doctor) {
-                return c.json({error: "Doctor not found"}, 404);
-            }
-
-            return c.json({doctor}, 200);
-        } catch (error) {
-            console.error("Error fetching doctor:", error);
-            return c.json({error: "Failed to fetch doctor"}, 500);
-        }
+        });
     },
 
-    getDoctorByIdcard: async (c: Context) => {
-        try {
-            const doctorId = c.req.param("id");
-
-            if (!doctorId) {
-                return c.json({error: "Doctor ID is required"}, 400);
+    findByde: async (department: string) => {
+        return db.doctor.findMany({
+            where: {department: department},
+            include: {
+                availableTimes: true
             }
-
-            const doctor = await doctorModel.findByIdcard(doctorId);
-
-            if (!doctor) {
-                return c.json({error: "Doctor not found"}, 404);
-            }
-
-            return c.json({doctor}, 200);
-        } catch (error) {
-            console.error("Error fetching doctor:", error);
-            return c.json({error: "Failed to fetch doctor"}, 500);
-        }
+        });
     },
 
-    getDocbyDepartment: async (c: Context) => {
-        try {
-        const department = await c.req.param('department')
-        if (!department) {
-            return c.json({ error: "department is required" }, 404);
-          }
-          const getDocDE = await doctorModel.findByde(department);
-            return c.json({
-                success: true,
-                data: getDocDE,
-                msg: "Doctor in this department!",
-            });
-        } catch (e) {
-        return c.json(
-            {
-            success: false,
-            data: null,
-            msg: `Internal Server Error : ${e}`,
+    findBySearch: async (searchTerm: string) => {
+        return db.doctor.findMany({
+            where: {
+                name: {
+                    contains: searchTerm,
+                }
             },
-            500
-        );
-        }
-    },
-
-    getDocbySearch: async (c: Context) => {
-        try {
-        const name = await c.req.param('name')
-        if (!name) {
-            return c.json({ error: "department is required" }, 404);
-          }
-          const getDocname = await doctorModel.findBySearch(name);
-            return c.json({
-                success: true,
-                data: getDocname,
-                msg: "Doctor in this department!",
-            });
-        } catch (e) {
-        return c.json(
-            {
-            success: false,
-            data: null,
-            msg: `Internal Server Error : ${e}`,
-            },
-            500
-        );
-        }
-    },
-
-    // Get available time slots for a doctor
-    getDoctorAvailability: async (c: Context) => {
-        try {
-            const doctorId = c.req.param("id");
-            const {date} = c.req.query();
-
-            if (!doctorId || !date) {
-                return c.json({error: "Doctor ID and date are required"}, 400);
+            include: {
+                availableTimes: true
             }
+        });
+    },
 
-            const availableSlots = await doctorModel.getAvailableTimeSlots(
-                Number(doctorId),
-                new Date(date)
-            );
+    /**
+     * Get available time slots for a doctor - FIXED: Added missing doctorId
+     */
+    getAvailableTimeSlots: async (doctorId: number, date: Date) => {
+        // Get the start and end of the specified date
+        const startDate = new Date(date);
+        startDate.setHours(0, 0, 0, 0);
 
-            return c.json({availableSlots}, 200);
-        } catch (error) {
-            console.error("Error fetching doctor availability:", error);
-            return c.json({error: "Failed to fetch doctor availability"}, 500);
-        }
+        const endDate = new Date(date);
+        endDate.setHours(23, 59, 59, 999);
+
+        // Get all available time slots for the doctor on that date - FIXED: Added doctorId
+        const availableTimes = await db.availableTime.findMany({
+            where: {
+                doctorId: doctorId, // This was missing!
+                startTime: {
+                    gte: startDate,
+                    lte: endDate
+                }
+            },
+            orderBy: {
+                startTime: 'asc'
+            }
+        });
+
+        // Get all scheduled appointments for the doctor on that date
+        const scheduledAppointments = await db.appointment.findMany({
+            where: {
+                doctorId: doctorId,
+                date: {
+                    gte: startDate,
+                    lte: endDate
+                },
+                status: "scheduled"
+            },
+            orderBy: {
+                date: 'asc'
+            }
+        });
+
+        // Filter out time slots that have appointments
+        return availableTimes.filter(timeSlot => {
+            // Check if there's an appointment that overlaps with this time slot
+            return !scheduledAppointments.some(appointment => {
+                const appointmentTime = new Date(appointment.date);
+                return (
+                    appointmentTime >= timeSlot.startTime &&
+                    appointmentTime < timeSlot.endTime
+                );
+            });
+        });
+    },
+
+    /**
+     * Create available time slots for a doctor
+     */
+    createAvailableTimeSlot: async (data: {
+        doctorId: number;
+        startTime: Date;
+        endTime: Date;
+    }) => {
+        return db.availableTime.create({
+            data: {
+                doctorId: data.doctorId,
+                startTime: data.startTime,
+                endTime: data.endTime
+            }
+        });
     }
 };

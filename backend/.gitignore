@@ -29,6 +29,6 @@ lerna-debug.log*
 
 ## Prisma
 src/generated/prisma/
-prisma/dev.db
+prisma/dev1.db
 prisma/dev.db-journal
 prisma/migrations/

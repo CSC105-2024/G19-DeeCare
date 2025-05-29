@@ -2,44 +2,23 @@ import {useState, useEffect} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import axios from 'axios';
 import ConfirmAppointmentOverlay from '../components/ConfirmAppointment.jsx';
+import {findDoctorByID} from '../api/getDoctors.js';
 
-// Configure axios base URL
-const API_BASE_URL = 'http://localhost:8000';
-
-// Create axios instance with default config
 const api = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
+    baseURL: 'http://localhost:8000',
+    withCredentials: true
 });
-
-// Add request interceptor to include auth token
-api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('authToken');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
 
 const Timeslot = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const doctorIdFromUrl = searchParams.get('doctorId');
+    const doctorIdFromUrl = searchParams.get('id');
 
-    // Date setup for time slot display - matches the calendar
     const today = new Date();
     const firstDay = new Date(today);
     const day = firstDay.getDay();
     firstDay.setDate(firstDay.getDate() - day);
 
-    // Generate date strings for the current week (7 days)
     const generateDateStrings = (startDate) => {
         const dates = [];
         for (let i = 0; i < 7; i++) {
@@ -60,7 +39,7 @@ const Timeslot = () => {
     const [dateStrings, setDateStrings] = useState(generateDateStrings(firstDay));
 
     // State variables
-    const [doctors, setDoctors] = useState([]);
+    const [doctors, setDoctors] = useState(null);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
@@ -75,8 +54,8 @@ const Timeslot = () => {
 
     // Fetch doctors on component mount
     useEffect(() => {
-        fetchDoctors();
-    }, []);
+        fetchDoctors(doctorIdFromUrl);
+    }, [doctorIdFromUrl]);
 
     // Fetch available slots when doctor or week changes
     useEffect(() => {
@@ -86,45 +65,64 @@ const Timeslot = () => {
     }, [selectedDoctor, currentWeekStart]);
 
     // API Functions
-    const fetchDoctors = async () => {
+    const fetchDoctors = async (id) => {
         try {
-            setLoading(true);
-            const response = await api.get('/doctors');
 
-            if (response.data && response.data.doctors) {
-                setDoctors(response.data.doctors);
 
-                // If doctorId is provided in URL, select that doctor
-                if (doctorIdFromUrl) {
-                    const preselectedDoctor = response.data.doctors.find(
-                        doctor => doctor.id === parseInt(doctorIdFromUrl)
-                    );
-                    if (preselectedDoctor) {
-                        setSelectedDoctor(preselectedDoctor);
-                    } else {
-                        // If doctor ID from URL is not found, show error and select first doctor
-                        showNotification('error', 'Selected doctor not found. Please choose another doctor.');
-                        if (response.data.doctors.length > 0) {
-                            setSelectedDoctor(response.data.doctors[0]);
-                        }
-                    }
-                } else {
-                    // Set first doctor as selected by default if no URL parameter
-                    if (response.data.doctors.length > 0) {
-                        setSelectedDoctor(response.data.doctors[0]);
-                    }
-                }
+            if (!id || id === 'null' || id === 'undefined') {
+
+                showNotification('error', 'Invalid doctor ID');
+                return;
             }
-        } catch (error) {
-            console.error('Error fetching doctors:', error);
-            showNotification('error', 'Failed to load doctors. Please try again.');
+
+            const response = await findDoctorByID(id);
+
+
+            if (response.success) {
+
+
+                // Handle both single doctor and array of doctors
+                let doctorData;
+                doctorData = [response.data.doctor];
+
+                // Ensure each doctor has the required fields
+                const processedDoctors = doctorData.map(doctor => {
+                    // Handle the case where the backend returns different field names
+                    const processedDoctor = {
+                        id: doctor.id,
+                        doctorId: doctor.doctorId || doctor.id,
+                        firstName: doctor.firstName || doctor.name?.split(' ')[0] || doctor.name || 'Unknown',
+                        lastName: doctor.lastName || doctor.name?.split(' ').slice(1).join(' ') || '',
+                        specialty: doctor.specialty || doctor.specialization || doctor.department || 'General',
+                        department: doctor.department || doctor.specialty || doctor.specialization || 'General',
+                        image: doctor.image || doctor.DRimage || '/api/placeholder/200/200',
+                        email: doctor.email || '',
+                        workHours: doctor.workHours || '8:00-18:00'
+                    };
+                    return processedDoctor;
+                });
+
+                setDoctors(processedDoctors);
+
+                // Auto-select the first doctor if only one
+                if (processedDoctors.length === 1) {
+                    setSelectedDoctor(processedDoctors[0]);
+                } else if (processedDoctors.length > 1) {
+                }
+            } else {
+                showNotification('error', 'Failed to fetch doctor information');
+            }
+        } catch (e) {
+            showNotification('error', 'Error fetching doctor information');
         } finally {
             setLoading(false);
         }
     };
 
     const fetchAvailableSlots = async () => {
-        if (!selectedDoctor) return;
+        if (!selectedDoctor || !selectedDoctor.id) {
+            return;
+        }
 
         try {
             setLoadingSlots(true);
@@ -132,27 +130,31 @@ const Timeslot = () => {
 
             // Fetch slots for each day in the current week
             for (const dateObj of dateStrings) {
-                const dateStr = dateObj.date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                const dateStr = dateObj.date.toISOString().split('T')[0]; // Format as YYYY-MM-D
 
                 try {
                     const response = await api.get(`/doctors/${selectedDoctor.id}/availability`, {
                         params: {date: dateStr}
                     });
 
-                    if (response.data && response.data.availableSlots) {
-                        slots[dateObj.display] = response.data.availableSlots;
+                    if (response.data && response.data.success && response.data.data && response.data.data.availableSlots) {
+                        slots[dateObj.display] = response.data.data.availableSlots;
+
                     } else {
                         slots[dateObj.display] = [];
+
                     }
                 } catch (error) {
-                    console.error(`Error fetching slots for ${dateStr}:`, error);
+                    console.error(`❌ Error fetching slots for ${dateStr}:`, error);
+                    console.error('❌ Error response:', error.response?.data);
                     slots[dateObj.display] = [];
                 }
             }
 
+
             setAvailableSlots(slots);
         } catch (error) {
-            console.error('Error fetching available slots:', error);
+            console.error('❌ Error fetching available slots:', error);
             showNotification('error', 'Failed to load available time slots.');
         } finally {
             setLoadingSlots(false);
@@ -167,9 +169,11 @@ const Timeslot = () => {
                 sendEmailNotification: appointmentData.sendEmailNotification || true
             });
 
-            if (response.data) {
-                showNotification('success', 'Appointment created successfully!');
-                return response.data;
+            if (response.data && response.data.message) {
+                showNotification('success', response.data.message);
+                return response.data.appointment;
+            } else {
+                throw new Error('Failed to create appointment');
             }
         } catch (error) {
             console.error('Error creating appointment:', error);
@@ -287,8 +291,22 @@ const Timeslot = () => {
 
     // Check if a time slot is available
     const isTimeSlotAvailable = (date, time) => {
-        if (!selectedDoctor || !date || !availableSlots[date]) return false;
-        return availableSlots[date].includes(time);
+        if (!selectedDoctor) {
+
+            return false;
+        }
+        if (!date) {
+
+            return false;
+        }
+        if (!availableSlots[date]) {
+
+            return false;
+        }
+
+        const isAvailable = availableSlots[date].includes(time);
+
+        return isAvailable;
     };
 
     // Handle appointment confirmation
@@ -299,24 +317,36 @@ const Timeslot = () => {
         }
 
         const [hour, minute] = selectedTimeSlot.split(':');
+
+        // Create date in local timezone without UTC conversion
         const startDateTime = new Date(selectedDay.date);
-        startDateTime.setHours(parseInt(hour), parseInt(minute), 0);
+        startDateTime.setHours(parseInt(hour), parseInt(minute), 0, 0);
 
         const endDateTime = new Date(startDateTime);
         endDateTime.setMinutes(endDateTime.getMinutes() + 30);
 
+        // Format times for display (keep in local timezone)
+        const formatTimeForDisplay = (date) => {
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        };
+
         const details = {
             doctorInfo: {
                 ...selectedDoctor,
-                name: `${selectedDoctor.firstName} ${selectedDoctor.lastName}`,
-                department: selectedDoctor.specialty
+                name: `${selectedDoctor.name}`,
+                department: selectedDoctor.department
             },
             selectedDate: selectedDay.date,
             selectedTimeSlot: {
-                start: startDateTime.toISOString(),
-                end: endDateTime.toISOString()
+                start: formatTimeForDisplay(startDateTime), // Use formatted time instead of ISO
+                end: formatTimeForDisplay(endDateTime),     // Use formatted time instead of ISO
+                startDateTime: startDateTime.toISOString(), // Keep ISO for backend
+                endDateTime: endDateTime.toISOString()      // Keep ISO for backend
             }
         };
+
 
         setAppointmentDetails(details);
         setShowConfirmOverlay(true);
@@ -330,13 +360,24 @@ const Timeslot = () => {
     // Handle final confirmation from overlay
     const handleFinalConfirm = async (confirmedDetails) => {
         try {
-            const [hour, minute] = selectedTimeSlot.split(':');
-            const appointmentDateTime = new Date(selectedDay.date);
-            appointmentDateTime.setHours(parseInt(hour), parseInt(minute), 0);
+            // Use the ISO datetime for backend if available, otherwise create it
+            let appointmentDateTime;
+
+            if (confirmedDetails.selectedTimeSlot.startDateTime) {
+                // Use the pre-calculated ISO datetime
+                appointmentDateTime = confirmedDetails.selectedTimeSlot.startDateTime;
+            } else {
+                // Fallback: recreate the datetime
+                const [hour, minute] = selectedTimeSlot.split(':');
+                const dateTime = new Date(selectedDay.date);
+                dateTime.setHours(parseInt(hour), parseInt(minute), 0, 0);
+                appointmentDateTime = dateTime.toISOString();
+            }
+
 
             const appointmentData = {
                 doctorId: selectedDoctor.id,
-                date: appointmentDateTime.toISOString(),
+                date: appointmentDateTime,
                 sendEmailNotification: confirmedDetails.sendEmailNotification || true
             };
 
@@ -398,6 +439,8 @@ const Timeslot = () => {
 
     // Handle doctor selection
     const handleDoctorChange = (doctor) => {
+
+
         setSelectedDoctor(doctor);
         setSelectedDate(null);
         setSelectedTimeSlot(null);
@@ -453,13 +496,13 @@ const Timeslot = () => {
     }
 
     // No doctors state
-    if (!doctors.length) {
+    if (!doctors || doctors.length === 0) {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                 <div className="text-center">
                     <p className="text-gray-600">No doctors available. Please try again later.</p>
                     <button
-                        onClick={fetchDoctors}
+                        onClick={() => fetchDoctors(doctorIdFromUrl)}
                         className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                     >
                         Retry

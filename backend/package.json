@@ -3,7 +3,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "prisma:migrate": "pnpx prisma migrate dev"
+    "prisma:migrate": "pnpx prisma migrate dev",
+    "seed:availibility": "node prisma/seed/availability.js"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.1",

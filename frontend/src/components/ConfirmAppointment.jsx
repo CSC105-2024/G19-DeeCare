@@ -6,7 +6,7 @@ function ConfirmAppointmentOverlay({appointmentDetails, onClose, onConfirm}) {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        // Add animation by delaying visibility
+
         const timer = setTimeout(() => {
             setIsVisible(true);
         }, 50);
@@ -14,27 +14,34 @@ function ConfirmAppointmentOverlay({appointmentDetails, onClose, onConfirm}) {
         return () => clearTimeout(timer);
     }, []);
 
-    // If no appointment details were passed, don't render
+
     if (!appointmentDetails) {
         return null;
     }
 
     const {doctorInfo, selectedDate, selectedTimeSlot} = appointmentDetails;
 
-    // Format the appointment time for display
-    const startTime = selectedTimeSlot.start.includes('T')
-        ? selectedTimeSlot.start.split('T')[1].substring(0, 5)
-        : selectedTimeSlot.start.split(' ')[1].substring(0, 5);
+    let startTime, endTime;
 
-    const endTime = selectedTimeSlot.end.includes('T')
-        ? selectedTimeSlot.end.split('T')[1].substring(0, 5)
-        : selectedTimeSlot.end.split(' ')[1].substring(0, 5);
+    if (typeof selectedTimeSlot.start === 'string' && selectedTimeSlot.start.includes(':') && !selectedTimeSlot.start.includes('T')) {
+
+        startTime = selectedTimeSlot.start;
+        endTime = selectedTimeSlot.end;
+    } else {
+
+        startTime = selectedTimeSlot.start.includes('T')
+            ? selectedTimeSlot.start.split('T')[1].substring(0, 5)
+            : selectedTimeSlot.start.split(' ')[1].substring(0, 5);
+
+        endTime = selectedTimeSlot.end.includes('T')
+            ? selectedTimeSlot.end.split('T')[1].substring(0, 5)
+            : selectedTimeSlot.end.split(' ')[1].substring(0, 5);
+    }
 
     const formattedDate = format(selectedDate, 'MMMM d, yyyy');
 
     const handleFinalConfirm = () => {
-        // Save notification preference if needed
-        localStorage.setItem('sendEmailNotification', sendEmailNotification);
+
         onConfirm({
             ...appointmentDetails,
             sendEmailNotification
@@ -96,25 +103,6 @@ function ConfirmAppointmentOverlay({appointmentDetails, onClose, onConfirm}) {
                             <p className="font-semibold">TIME</p>
                             <p className="font-semibold">AT</p>
                             <p>{startTime} - {endTime}</p>
-                        </div>
-                    </div>
-
-                    <div className="bg-background rounded-xl p-4 mb-4 text-pri flex items-center border border-pri">
-                        <div className="flex items-center">
-                            <div className="w-16 h-16 bg-gray-200 rounded-full flex-shrink-0 mr-4">
-                                <div className="w-full h-full flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500"
-                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div>
-                                <p><span className="font-semibold">PATIENT</span></p>
-                                <p><span className="font-semibold">NAME:</span></p>
-                                <p><span className="font-semibold">SYMPTOM:</span></p>
-                            </div>
                         </div>
                     </div>
 
