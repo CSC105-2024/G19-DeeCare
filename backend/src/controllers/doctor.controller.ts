@@ -117,21 +117,47 @@ export const doctorController = {
     getDoctorAvailability: async (c: Context) => {
         try {
             const doctorId = c.req.param("id");
-            const {date} = c.req.query();
+            const date = c.req.query("date");
 
             if (!doctorId || !date) {
-                return c.json({error: "Doctor ID and date are required"}, 400);
+                return c.json({
+                    success: false,
+                    data: null,
+                    msg: "Doctor ID and date are required"
+                }, 400);
             }
+
+            console.log(`Fetching availability for doctor ${doctorId} on ${date}`);
 
             const availableSlots = await doctorModel.getAvailableTimeSlots(
                 Number(doctorId),
                 new Date(date)
             );
 
-            return c.json({availableSlots}, 200);
-        } catch (error) {
+            console.log(`Found ${availableSlots.length} available slots`);
+
+            // Convert to time format expected by frontend
+            const formattedSlots = availableSlots.map(slot => {
+                const startTime = new Date(slot.startTime);
+                const hours = startTime.getHours().toString().padStart(2, '0');
+                const minutes = startTime.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            });
+
+            return c.json({
+                success: true,
+                data: {
+                    availableSlots: formattedSlots
+                },
+                msg: "Availability fetched successfully"
+            }, 200);
+        } catch (error: any) {
             console.error("Error fetching doctor availability:", error);
-            return c.json({error: "Failed to fetch doctor availability"}, 500);
+            return c.json({
+                success: false,
+                data: null,
+                msg: `Failed to fetch doctor availability: ${error.message}`
+            }, 500);
         }
     }
 };

@@ -1,31 +1,31 @@
 import {Link} from "react-router-dom";
 import {motion, useTransform, useScroll} from "framer-motion";
 import {useEffect, useRef, useState} from "react";
-// import {eventData} from "../Data/EventData.jsx";
-// import { Axios } from "../utils/axiosInstance.js";
-import { getEventAPI } from "../api/getEvents.js";
+import {eventData} from "../Data/EventData.jsx";
+import {Axios} from "../utils/axiosInstance.js";
+import {getEventAPI} from "../api/getEvents.js";
 
 const Home = () => {
-    const [ Events, setEvents] = useState([]);
+    const [Events, setEvents] = useState([]);
 
     const fetchEventData = async () => {
-        try{
-          const response = await getEventAPI();
-          if (response.data.success) {
-            setEvents(response.data.data);
-          } else {
-            console.error("Failed to fetch events");
-          }
+        try {
+            const response = await getEventAPI();
+            if (response.data.success) {
+                setEvents(response.data.data);
+            } else {
+                console.error("Failed to fetch events");
+            }
         } catch (e) {
-          console.error("Error fetching events:", e);
+            console.error("Error fetching events:", e);
         } finally {
-          // setLoading(false);
+            // setLoading(false);
         }
-        };
-    
-      useEffect(() => {
+    };
+
+    useEffect(() => {
         fetchEventData();
-      }, []);
+    }, []);
     return (
         <>
             {/* Hospital Hero section */}
@@ -59,17 +59,17 @@ const Home = () => {
                     </p>
 
                     {/* Appointment button */}
-                    <Link       
-                        to="FilterBar"    
+                    <Link
+                        to="FilterBar"
                         className="bg-yellow-500 text-white sm:px-6 sm:py-2  px-3 py-1 rounded-md font-medium hover:bg-yellow-600 z-50 sm:mt-[20px] mt-[16px] text-xs sm:text-[20px]">
-                            Appointment
+                        Appointment
                     </Link>
                 </div>
             </div>
 
             {/* Explore Events */}
             <section className="h-[289px] sm:min-h-[600px] w-full py-[30px] sm:py-[100px]"
-            id="eventCard">
+                     id="eventCard">
                 <div>
                     <h2 className="sm:text-2xl text-base font-medium sm:mb-3 px-[28px] sm:px-[125px] ">
                         Explore Events 🩺
@@ -81,9 +81,9 @@ const Home = () => {
             </section>
         </>
     );
-}; 
+};
 
-const HorizontalScrollCarousel = ({ Events }) => {
+const HorizontalScrollCarousel = ({Events}) => {
     const targetRef = useRef(null);
     const {scrollXProgress} = useScroll({
         container: targetRef,
@@ -95,15 +95,15 @@ const HorizontalScrollCarousel = ({ Events }) => {
         <div
             ref={targetRef}
             className="relative w-full overflow-x-auto whitespace-nowrap scrollbar-hide flex py-3 bg-background">
-            <motion.div 
-                style={{x}} 
-                className="flex w-full sm:gap-[58px] gap-[16px] ">   
+            <motion.div
+                style={{x}}
+                className="flex w-full sm:gap-[58px] gap-[16px] ">
                 {Events.map((event) => (
-                    <Link to = {`/Event/${event.id}`} 
+                    <Link to={`/Event/${event.id}`}
                         // event box
-                        key={event.id}
-                        className="flex-none bg- cursor-pointer rounded-2xl shadow-md sm:min-w-[366px] w-[172px]"
-                        >
+                          key={event.id}
+                          className="flex-none bg- cursor-pointer rounded-2xl shadow-md sm:min-w-[366px] w-[172px]"
+                    >
 
                         {/* inside box */}
                         {/* image */}
@@ -117,10 +117,10 @@ const HorizontalScrollCarousel = ({ Events }) => {
                         <div className="flex justify-center items-center sm:pb-[15px] sm:px-[12px] pb-[14px] px-[10px]">
 
                             {/* event start date */}
-                            <div 
+                            <div
                                 className="sm:w-[86px] sm:h-[86px] w-[45px] h-[45px] sm:mr-[14px] mr-[4px] flex flex-col flex-none justify-center items-center bg-light-blue rounded-xl font-medium text-[10px] sm:text-[18px]">
-                                    <p>{event.day}</p>
-                                    <p>{event.month}</p>
+                                <p>{event.day}</p>
+                                <p>{event.month}</p>
                             </div>
 
 
@@ -133,9 +133,9 @@ const HorizontalScrollCarousel = ({ Events }) => {
 
                                 {/* Event date */}
                                 <div className="flex">
-                                    <img 
-                                        src="/icons/calendar-event.svg" 
-                                        alt="icons calendar-event" 
+                                    <img
+                                        src="/icons/calendar-event.svg"
+                                        alt="icons calendar-event"
                                         className="sm:w-[20px] sm:h-[20px] w-[8px] h-[8px]"
                                     />
                                     <p className="ml-2 text-ellipsis overflow-hidden whitespace-nowrap w-full text-[8px] font-normal sm:text-base">
@@ -145,8 +145,8 @@ const HorizontalScrollCarousel = ({ Events }) => {
 
                                 {/* place */}
                                 <div className="flex">
-                                    <img 
-                                        src="/icons/map-pin.svg" 
+                                    <img
+                                        src="/icons/map-pin.svg"
                                         alt="icon map-pin"
                                         className="sm:w-[20px] sm:h-[20px] w-[8px] h-[8px]"
                                     />

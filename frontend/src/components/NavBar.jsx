@@ -17,7 +17,18 @@ const NavBar = () => {
             setUser(JSON.parse(storedUser));
             setIsAuthenticated(true);
         }
-    }, []);
+
+        // Listen for logout events
+        const handleLogout = () => {
+            setUser(null);
+            setIsAuthenticated(false);
+            setMenuOpen(false);
+            navigate("/");
+        };
+
+        window.addEventListener('auth:logout', handleLogout);
+        return () => window.removeEventListener('auth:logout', handleLogout);
+    }, [navigate]);
 
     const handleLogin = (data) => {
         // data contains { user, token } from the API response
@@ -26,8 +37,10 @@ const NavBar = () => {
         setShowLogin(false);
         setMenuOpen(false);
 
-        // Optional: navigate to dashboard or stay on current page
-        // navigate("/dashboard");
+        // Store user data and token
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('authToken', data.token);
+
         console.log('User logged in:', data.user);
     };
 
@@ -42,7 +55,12 @@ const NavBar = () => {
 
     const handleProfileClick = () => {
         setMenuOpen(false);
-        navigate("/profile"); // or wherever your profile page is
+        navigate("/UserDetail"); // Navigate to UserDetail page
+    };
+
+    // New function to handle welcome text click
+    const handleWelcomeClick = () => {
+        navigate("/UserDetail");
     };
 
     return (
@@ -79,14 +97,17 @@ const NavBar = () => {
                         {isAuthenticated ? (
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-sm">
+                                    <span
+                                        className="text-sm cursor-pointer hover:text-yellow-300 transition-colors"
+                                        onClick={handleWelcomeClick}
+                                    >
                                         Welcome, {user?.firstName || 'User'}
                                     </span>
                                     {user?.photo && (
                                         <img
                                             src={user.photo}
                                             alt="Profile"
-                                            className="h-8 w-8 rounded-full object-cover cursor-pointer"
+                                            className="h-8 w-8 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-yellow-300 transition-all"
                                             onClick={handleProfileClick}
                                         />
                                     )}
@@ -119,7 +140,7 @@ const NavBar = () => {
                             <img
                                 src={user.photo}
                                 alt="Profile"
-                                className="h-8 w-8 rounded-full object-cover cursor-pointer"
+                                className="h-8 w-8 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-yellow-300 transition-all"
                                 onClick={handleProfileClick}
                             />
                         )}
@@ -148,7 +169,10 @@ const NavBar = () => {
 
                         {isAuthenticated ? (
                             <>
-                                <div className="block py-2">
+                                <div
+                                    className="block py-2 cursor-pointer hover:text-blue-600"
+                                    onClick={handleWelcomeClick}
+                                >
                                     <span className="text-sm text-gray-600">
                                         Welcome, {user?.firstName || 'User'}
                                     </span>

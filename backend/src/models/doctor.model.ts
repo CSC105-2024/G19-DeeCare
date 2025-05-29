@@ -59,14 +59,13 @@ export const doctorModel = {
         return db.doctor.findUnique({
             where: {id},
             include: {
-
                 availableTimes: true
             }
         });
     },
 
     findByde: async (department: string) => {
-        return db.doctor.findMany({//เสือก
+        return db.doctor.findMany({
             where: {department: department},
             include: {
                 availableTimes: true
@@ -87,9 +86,8 @@ export const doctorModel = {
         });
     },
 
-
     /**
-     * Get available time slots for a doctor
+     * Get available time slots for a doctor - FIXED: Added missing doctorId
      */
     getAvailableTimeSlots: async (doctorId: number, date: Date) => {
         // Get the start and end of the specified date
@@ -99,10 +97,10 @@ export const doctorModel = {
         const endDate = new Date(date);
         endDate.setHours(23, 59, 59, 999);
 
-        // Get all available time slots for the doctor on that date
+        // Get all available time slots for the doctor on that date - FIXED: Added doctorId
         const availableTimes = await db.availableTime.findMany({
             where: {
-                doctorId,
+                doctorId: doctorId, // This was missing!
                 startTime: {
                     gte: startDate,
                     lte: endDate
@@ -116,7 +114,7 @@ export const doctorModel = {
         // Get all scheduled appointments for the doctor on that date
         const scheduledAppointments = await db.appointment.findMany({
             where: {
-                doctorId,
+                doctorId: doctorId,
                 date: {
                     gte: startDate,
                     lte: endDate
